@@ -263,7 +263,7 @@ footer strong{color:#c3d2ec}
 }
 
 /* ---------- pie: créditos y redes ---------- */
-.credito{margin:0 0 14px;font-size:14.5px;color:#c3d2ec}
+.credito{margin:0 auto 14px;font-size:14.5px;color:#c3d2ec}
 .credito a{color:#fff;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 
 .redes{display:flex;gap:10px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
@@ -443,7 +443,7 @@ img, canvas, video, svg{max-width:100%}
 .hashtag .ro{color:#ff5f74}
 
 .foot-hashtag{
-  margin:0 0 14px;
+  margin:0 auto 14px;
   font-size:17px;font-weight:800;letter-spacing:-.01em;
 }
 .foot-hashtag .az{color:#7fb2ff}
