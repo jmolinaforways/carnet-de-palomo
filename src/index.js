@@ -3,8 +3,6 @@
 
      POST /api/emitir        toma un secuencial, firma el carnet y lo devuelve
      GET  /v/<token>         página de verificación
-     GET  /api/wallet/google pase de Google Wallet (si hay credenciales)
-     GET  /api/wallet/apple  pase de Apple Wallet (si hay credenciales)
      resto                   archivos estáticos
 
    No guardamos carnets ni fotos. Lo único con estado es el contador de
@@ -291,11 +289,6 @@ function esc(s) {
   );
 }
 
-const walletDisponible = (env) => ({
-  google: !!(env.GOOGLE_WALLET_ISSUER_ID && env.GOOGLE_WALLET_SA_EMAIL && env.GOOGLE_WALLET_SA_KEY),
-  apple: !!(env.APPLE_PASS_CERT && env.APPLE_PASS_KEY && env.APPLE_WWDR_CERT)
-});
-
 // En producción SIGNING_SECRET va como secreto de Wrangler. El respaldo
 // solo existe para que `wrangler dev` arranque sin configurar nada.
 const secretoDe = (env) => env.SIGNING_SECRET || 'palomo-dev-secret-no-usar-en-produccion';
@@ -336,8 +329,7 @@ async function emitir(request, env) {
     emitido,
     vence: 'UN PALOMO NUNCA MUERE',
     token,
-    verifyUrl: `${new URL(request.url).origin}/v/${token}`,
-    wallet: walletDisponible(env)
+    verifyUrl: `${new URL(request.url).origin}/v/${token}`
   });
 }
 
@@ -400,7 +392,7 @@ footer a{color:#c3d2ec}
   background:rgba(0,0,0,.26);color:#fff;outline:none;
   font:600 18px/1.2 'IBM Plex Mono',ui-monospace,Menlo,monospace}
 .form input::placeholder{color:#5f7396;font-weight:400}
-.form input:focus{border-color:#c9a227;box-shadow:0 0 0 3px rgba(201,162,39,.18)}
+.form input:focus{border-color:#ff5f74;box-shadow:0 0 0 3px rgba(255,95,116,.2)}
 .form button{margin-top:4px;padding:14px 20px;border:0;border-radius:11px;cursor:pointer;
   font:700 15px/1 'Archivo',system-ui,sans-serif;color:#fff;
   background:linear-gradient(180deg,#ce1126,#a80e1f)}
@@ -414,15 +406,15 @@ footer a{color:#c3d2ec}
 .vtxt{margin:0;font-size:13.5px;line-height:1.5;color:#c3d2ec}
 
 .total{margin:0 0 18px;text-align:center;font-size:13.5px;color:#8ea2c4}
-.total strong{color:#c9a227;font-size:15px}
+.total strong{color:#ff5f74;font-size:15px}
 .nota{margin:0;font-size:12.5px;line-height:1.6;color:#8ea2c4}
 .doc{text-align:left}
-.doc h2{margin:28px 0 8px;font-size:15px;font-weight:800;color:#c9a227;letter-spacing:-.01em}
+.doc h2{margin:28px 0 8px;font-size:15px;font-weight:800;color:#7fb2ff;letter-spacing:-.01em}
 .doc h2:first-child{margin-top:0}
 .doc p{margin:0 0 12px;font-size:14.5px;line-height:1.68;color:#c3d2ec}
 .doc strong{color:#fff}
 .doc em{color:#fff;font-style:italic}
-.doc a{color:#c9a227}
+.doc a{color:#7fb2ff}
 `;
 
 function envoltura(titulo, cuerpo) {
@@ -696,26 +688,6 @@ async function rutaVerificar(request, env) {
   });
 }
 
-/* ---------------- Wallet (pendiente de credenciales) ---------------- */
-
-function walletGoogle(request, env) {
-  if (!walletDisponible(env).google) {
-    return json({ ok: false, error: 'Google Wallet no está configurado en este despliegue.' }, 501);
-  }
-  // Se implementa al activar las credenciales: ver README, «Google Wallet».
-  return json({ ok: false, error: 'No implementado todavía.' }, 501);
-}
-
-function walletApple(request, env) {
-  const msg = walletDisponible(env).apple
-    ? 'No implementado todavía.'
-    : 'Apple Wallet no está configurado en este despliegue.';
-  return new Response(msg, {
-    status: 501,
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-  });
-}
-
 /* ---------------- router ---------------- */
 
 export default {
@@ -748,8 +720,6 @@ export default {
       return json({ ok: true, ...(await verificarSerial(env, s)) });
     }
 
-    if (path === '/api/wallet/google') return walletGoogle(request, env);
-    if (path === '/api/wallet/apple') return walletApple(request, env);
 
     const res = await env.ASSETS.fetch(request);
     const headers = new Headers(res.headers);

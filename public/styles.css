@@ -3,7 +3,8 @@
   --navy-2:#122a57;
   --blue:#002d62;
   --red:#ce1126;
-  --gold:#c9a227;
+  --azul:#7fb2ff;
+  --rojo:#ff5f74;
   --paper:#f4f1e8;
   --ink:#0d1526;
   --muted:#8ea2c4;
@@ -55,7 +56,7 @@ main{
 .kicker{
   margin:0 0 12px;
   font-size:11px;letter-spacing:.17em;text-transform:uppercase;
-  font-weight:700;color:var(--gold);
+  font-weight:700;color:var(--azul);
 }
 
 h1{
@@ -65,7 +66,7 @@ h1{
 }
 h1 span{
   color:transparent;
-  background:linear-gradient(100deg,#fff 10%,var(--gold) 55%,#fff 95%);
+  background:linear-gradient(100deg,#fff 10%,var(--rojo) 55%,#fff 95%);
   -webkit-background-clip:text;background-clip:text;
 }
 
@@ -115,8 +116,8 @@ h2.mt{margin-top:26px}
 }
 .field input::placeholder{color:#5f7396;font-weight:400}
 .field input:focus{
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(201,162,39,.18);
+  border-color:var(--azul);
+  box-shadow:0 0 0 3px rgba(255,95,116,.2);
 }
 
 .hint{margin:8px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45}
@@ -170,11 +171,6 @@ h2.mt{margin-top:26px}
 .row-actions{display:flex;gap:10px;margin-top:24px}
 .row-actions .btn{flex:1}
 
-.btn-wallet{
-  background:#1a1a1a;
-  border:1px solid rgba(255,255,255,.2);
-  display:flex;align-items:center;justify-content:center;gap:9px;
-}
 
 /* ---------- cámara ---------- */
 .cam-frame{
@@ -211,7 +207,7 @@ h2.mt{margin-top:26px}
 }
 .vb-title{
   margin:0 0 6px;font-size:11px;letter-spacing:.14em;
-  text-transform:uppercase;font-weight:700;color:var(--gold);
+  text-transform:uppercase;font-weight:700;color:var(--azul);
 }
 .vb-body{margin:0 0 10px;font-size:13.5px;color:#c3d2ec;line-height:1.5}
 .vb-link{
@@ -251,7 +247,7 @@ footer strong{color:#c3d2ec}
 .descargo h2{
   margin:0 0 14px;
   font-size:12px;letter-spacing:.15em;text-transform:uppercase;
-  font-weight:700;color:var(--gold);
+  font-weight:700;color:var(--azul);
 }
 .descargo p{
   margin:0 0 13px;
@@ -263,7 +259,7 @@ footer strong{color:#c3d2ec}
 /* ---------- secuencial ---------- */
 .secuencial{
   margin:0 0 4px;
-  font-size:15px;font-weight:700;color:var(--gold);
+  font-size:15px;font-weight:700;color:var(--azul);
 }
 
 /* ---------- pie: créditos y redes ---------- */
@@ -286,12 +282,12 @@ footer strong{color:#c3d2ec}
 
 .invita{
   margin:22px 0 0;
-  font-size:14.5px;font-weight:600;color:var(--gold);
+  font-size:14.5px;font-weight:600;color:var(--azul);
 }
 .vb-body a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 
-/* El atributo hidden pierde contra cualquier display del autor
-   (.btn-wallet usa flex), así que lo forzamos. */
+/* El atributo hidden pierde contra cualquier display del autor,
+   así que lo forzamos. Lo usa el botón Compartir. */
 [hidden]{display:none !important}
 
 .mt-sm{margin-top:20px}
@@ -312,10 +308,10 @@ footer strong{color:#c3d2ec}
   padding-right:40px;
   transition:border-color .16s, box-shadow .16s;
 }
-.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.18)}
+.field select:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(255,95,116,.2)}
 .field select option{background:#12264b;color:#fff}
 
-.descargo a{color:#c9a227;text-decoration:underline;text-underline-offset:3px}
+.descargo a{color:var(--azul);text-decoration:underline;text-underline-offset:3px}
 
 /* =====================================================================
    Móvil
@@ -360,7 +356,7 @@ img, canvas, video, svg{max-width:100%}
 
 .claim{
   margin:16px 0 0;
-  font-size:16px;font-weight:700;color:var(--gold);
+  font-size:16px;font-weight:700;color:var(--azul);
   line-height:1.4;
 }
 
@@ -381,10 +377,10 @@ img, canvas, video, svg{max-width:100%}
   cursor:pointer;
 }
 .acepto span{font-size:13px;line-height:1.55;color:#a9bcd8}
-.acepto a{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+.acepto a{color:var(--azul);text-decoration:underline;text-underline-offset:3px}
 .acepto:has(input:checked){
-  border-color:rgba(201,162,39,.45);
-  background:rgba(201,162,39,.08);
+  border-color:rgba(255,95,116,.5);
+  background:rgba(255,95,116,.09);
 }
 
 /* ---------- ver el carnet en grande ---------- */

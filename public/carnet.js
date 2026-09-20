@@ -20,7 +20,6 @@
     navy:  '#13294b',
     navy2: '#31507f',
     label: '#6b7c93',
-    gold:  '#b8860f',
     red:   '#c8102e',
     line:  'rgba(19,41,75,.16)',
     ghost: '#9fb6d0'
@@ -399,10 +398,15 @@
     /* --- cabecera --- */
     drawEmblema(ctx, 58, 46, 62, C.navy);
 
-    ctx.fillStyle = C.navy;
+    // «PALOMOS» en azul y «RD» en rojo: los dos colores del país, sin
+    // reproducir la bandera.
     ctx.font = font(800, 30);
-    ctx.fillText('PALOMOS RD', 100, 57);
-    var anchoMarca = ctx.measureText('PALOMOS RD').width;
+    ctx.fillStyle = C.navy;
+    ctx.fillText('PALOMOS ', 100, 57);
+    var anchoPalomos = ctx.measureText('PALOMOS ').width;
+    ctx.fillStyle = C.red;
+    ctx.fillText('RD', 100 + anchoPalomos, 57);
+    var anchoMarca = anchoPalomos + ctx.measureText('RD').width;
 
     var divisor = 100 + anchoMarca + 26;
     ctx.strokeStyle = C.line;
@@ -412,7 +416,7 @@
     ctx.lineTo(divisor, 74);
     ctx.stroke();
 
-    ctx.fillStyle = C.gold;
+    ctx.fillStyle = C.red;
     ctx.font = font(700, 21);
     ctx.fillText('Ministerio de Palomos', divisor + 20, 53);
 
@@ -561,7 +565,7 @@
       var t = 'ESCANEA PARA VERIFICAR';
       tracked(ctx, t, cx - trackedWidth(ctx, t, 0.9) / 2, QY + QS + 20, 0.9);
 
-      ctx.fillStyle = C.gold;
+      ctx.fillStyle = C.red;
       ctx.font = font(700, 12);
       var d = SITIO;
       ctx.fillText(d, cx - ctx.measureText(d).width / 2, QY + QS + 38);
@@ -667,7 +671,7 @@
     ctx.font = font(600, 10.5);
     ctx.fillText('DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · ES UN MEME', 32, MY + 126);
 
-    ctx.fillStyle = C.gold;
+    ctx.fillStyle = C.red;
     ctx.font = font(700, 11.5);
     (function () {
       var t = 'MEME DE @javimolinax';

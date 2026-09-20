@@ -285,8 +285,6 @@
       $('verifyLink').href = j.verifyUrl;
       $('verifyLink').textContent = j.verifyUrl;
 
-      setupWalletButtons(j);
-
       return new Promise(function (resolve) {
         $('carnetCanvas').toBlob(function (b) {
           state.blob = b;
@@ -295,48 +293,6 @@
         }, 'image/png');
       });
     });
-  }
-
-  /* ---------------- wallet ---------------- */
-
-  function setupWalletButtons(j) {
-    var w = j.wallet || {};
-    var note = $('walletNote');
-    var notes = [];
-
-    var gBtn = $('btnGoogleWallet');
-    gBtn.hidden = !w.google;
-    if (w.google) {
-      gBtn.onclick = function () {
-        gBtn.disabled = true;
-        fetch('/api/wallet/google?t=' + encodeURIComponent(j.token))
-          .then(function (r) { return r.json(); })
-          .then(function (res) {
-            if (res.saveUrl) { window.location.href = res.saveUrl; }
-            else { throw new Error(res.error || 'sin enlace'); }
-          })
-          .catch(function () {
-            notes.push('Google Wallet no respondió. Descarga el PNG mientras tanto.');
-            note.textContent = notes.join(' ');
-          })
-          .finally(function () { gBtn.disabled = false; });
-      };
-    }
-
-    var aBtn = $('btnAppleWallet');
-    aBtn.hidden = !w.apple;
-    if (w.apple) {
-      aBtn.onclick = function () {
-        window.location.href = '/api/wallet/apple?t=' + encodeURIComponent(j.token);
-      };
-    }
-
-    if (!w.google && !w.apple) {
-      note.textContent = 'El pase de Wallet todavía no está activo. Por ahora descarga el carnet ' +
-        'como imagen y guárdalo en tus fotos.';
-    } else {
-      note.textContent = '';
-    }
   }
 
   /* ---------------- visor a pantalla completa ---------------- */

@@ -17,6 +17,8 @@ Sitio: **[palomos.com.do](https://palomos.com.do)** · Meme de [@javimolinax](ht
 3. El servidor toma un número secuencial, firma el carnet con HMAC-SHA256 y
    devuelve un token.
 4. El QR del carnet apunta a `/v/<token>`, que muestra la página de verificación.
+5. El carnet se descarga como PNG. No hay pases de Apple Wallet ni Google Wallet:
+   el PNG funciona igual en iPhone y en Android, y mantiene el proyecto simple.
 
 ### Lo que no hacemos
 
@@ -105,37 +107,6 @@ Cámbialo solo si se filtró.
 En el panel de Cloudflare, Workers & Pages → `carnet-de-palomo` → Settings →
 Domains & Routes → Add custom domain → `palomos.com.do`.
 
----
-
-## Wallet
-
-El botón «Guardar en Wallet» está en el código pero **apagado**, porque necesita
-credenciales que hay que pedir. Mientras tanto el carnet se descarga como PNG,
-que funciona igual en iPhone y Android.
-
-| | Costo | Qué hace falta |
-|---|---|---|
-| **Google Wallet** | Gratis | Cuenta de emisor en el [Google Pay & Wallet Console](https://pay.google.com/business/console). Arranca en *demo mode* (los pases salen con `[TEST ONLY]` y solo los guardan cuentas de prueba). Para abrirlo a todo el mundo hay que pedir *publishing access*: es gratis, lo revisa Google y tarda ~2 días hábiles. |
-| **Apple Wallet** | US$99/año | Certificado Pass Type ID, que exige membresía activa del Apple Developer Program. No hay vía gratis: ninguna librería puede emitir ese certificado porque es una autoridad certificadora. |
-
-El Worker enciende cada botón solo si encuentra sus variables:
-
-```bash
-# Google Wallet
-npx wrangler secret put GOOGLE_WALLET_ISSUER_ID
-npx wrangler secret put GOOGLE_WALLET_SA_EMAIL
-npx wrangler secret put GOOGLE_WALLET_SA_KEY     # llave privada del service account
-
-# Apple Wallet
-npx wrangler secret put APPLE_PASS_CERT
-npx wrangler secret put APPLE_PASS_KEY
-npx wrangler secret put APPLE_WWDR_CERT
-```
-
-Sin ellas, `/api/wallet/*` responde 501 y los botones ni aparecen.
-
----
-
 ## Estructura
 
 ```
@@ -157,7 +128,6 @@ public/vendor/      qrcode-generator (MIT, de Kazuhiko Arase)
 | `GET /api/verificar?s=<número>` | Lo mismo, en JSON |
 | `GET /terminos` | Términos y condiciones |
 | `GET /privacidad` | Política de privacidad |
-| `GET /api/wallet/google` · `/apple` | Pases de Wallet (501 sin credenciales) |
 
 ---
 
