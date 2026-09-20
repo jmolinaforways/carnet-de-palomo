@@ -1,11 +1,9 @@
 /* =========================================================================
    Carnet de Palomo — renderizador del carnet.
 
-   Sobre los símbolos patrios: el escudo y la bandera se dibujan a partir de
-   los archivos oficiales (public/assets/), sin recolorear, recortar ni
-   deformar. La Ley de Símbolos Patrios no permite alterarlos, así que aquí
-   solo se colocan; nunca se modifican. El emblema del «Ministerio de
-   Palomos» es un dibujo aparte, sin relación alguna con el escudo nacional.
+   No lleva símbolos patrios: ni el Escudo ni la Bandera Nacional. El
+   emblema del «Ministerio de Palomos» es el palomo, dibujado aquí mismo.
+   El porqué está explicado más abajo, junto a loadAssets().
 
    Medidas lógicas: 1012 x 638 (proporción ID-1, la de una cédula).
    ========================================================================= */
@@ -89,39 +87,45 @@
     return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
   }
 
-  /* ---------- símbolos oficiales ---------- */
+  /* ---------- símbolos patrios: aquí no hay ninguno ----------
 
-  var assets = { escudo: null, bandera: null };
-  var assetsPromise = null;
+     El carnet NO lleva el Escudo Nacional ni la Bandera Nacional, y es a
+     propósito.
 
-  function loadImage(src) {
-    return new Promise(function (resolve) {
-      var img = new Image();
-      img.onload = function () { resolve(img); };
-      img.onerror = function () { resolve(null); };
-      img.src = src;
-    });
-  }
+     La Ley 210-19 reserva el uso del Escudo en identificaciones e impresos
+     a una lista cerrada de funcionarios públicos (art. 26) y lo declara
+     irreverencia en promociones comerciales con fines de lucro (art. 28.3).
+     De la Bandera prohíbe el uso en propaganda comercial y como distintivo
+     característico de una organización privada (art. 24.5).
 
+     Este carnet es una identificación emitida por una organización privada
+     ficticia, y está previsto usarlo en promociones con negocios. Las dos
+     cosas que la ley nombra. Por eso el emblema del Ministerio es el
+     palomo y nada más.
+
+     Si alguien piensa devolver los símbolos al carnet: no lo haga.
+     ------------------------------------------------------------------- */
+
+  // Nada que cargar: el carnet se dibuja entero con código.
   function loadAssets() {
-    if (assetsPromise) return assetsPromise;
-    assetsPromise = Promise.all([
-      loadImage('/assets/escudo-rd.svg'),
-      loadImage('/assets/bandera-rd.svg')
-    ]).then(function (r) {
-      assets.escudo = r[0];
-      assets.bandera = r[1];
-      return assets;
-    });
-    return assetsPromise;
+    return Promise.resolve();
   }
 
-  // Encaja la imagen en la caja respetando su proporción: nunca la deforma.
-  function drawContain(ctx, img, x, y, w, h) {
-    if (!img || !img.naturalWidth) return;
-    var s = Math.min(w / img.naturalWidth, h / img.naturalHeight);
-    var dw = img.naturalWidth * s, dh = img.naturalHeight * s;
-    ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  // El emblema del Ministerio: el palomo dentro de un sello.
+  function drawEmblema(ctx, cx, cy, size, color) {
+    var r = size / 2;
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(1.4, size * 0.045);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.lineWidth = Math.max(0.8, size * 0.018);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.86, 0, Math.PI * 2);
+    ctx.stroke();
+    drawPalomo(ctx, cx, cy, size * 0.62, color);
+    ctx.restore();
   }
 
   /* ---------- el palomo (emblema propio, no es símbolo patrio) ---------- */
@@ -392,8 +396,8 @@
     drawPalomo(ctx, 655, 290, 330, C.navy);
     ctx.restore();
 
-    /* --- cabecera: símbolos oficiales, sin alterar --- */
-    drawContain(ctx, assets.escudo, 28, 12, 68, 68);
+    /* --- cabecera --- */
+    drawEmblema(ctx, 62, 46, 66, C.navy);
 
     ctx.fillStyle = C.navy;
     ctx.font = font(800, 19);
@@ -407,11 +411,9 @@
     ctx.lineTo(272, 74);
     ctx.stroke();
 
-    drawContain(ctx, assets.bandera, 292, 29, 54, 36);
-
     ctx.fillStyle = C.gold;
     ctx.font = font(700, 21);
-    ctx.fillText('Ministerio de Palomos', 360, 53);
+    ctx.fillText('Ministerio de Palomos', 292, 53);
 
     ctx.fillStyle = C.navy;
     ctx.font = font(700, 17);
@@ -665,7 +667,7 @@
     render: renderCarnet,
     loadAssets: loadAssets,
     drawPalomo: drawPalomo,
-    assets: assets,
+    drawEmblema: drawEmblema,
     W: W,
     H: H
   };

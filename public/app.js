@@ -31,8 +31,8 @@
 
   /* ---------------- portada: sello del Ministerio ---------------- */
 
-  // El emblema del palomo, no el escudo nacional: los símbolos patrios
-  // solo aparecen en el carnet, tal cual son.
+  // El emblema del Ministerio es el palomo. Ni aquí ni en el carnet
+  // aparecen la bandera o el escudo: ver /simbolos-patrios.
   function paintHeroSeal() {
     var cv = $('heroSeal');
     if (!cv || !window.Carnet) { return; }
@@ -249,8 +249,6 @@
   }
 
   function drawResult(j) {
-    // Los símbolos oficiales tienen que estar cargados antes de pintar,
-    // si no el carnet sale sin escudo ni bandera.
     return Promise.all([loadFonts(), window.Carnet.loadAssets()]).then(function () {
       var data = {
         nombre: j.nombre,
@@ -404,7 +402,6 @@
   function init() {
     paintHeroSeal();
     loadFonts().then(paintHeroSeal);   // se repinta cuando llega la tipografía
-    window.Carnet.loadAssets();        // el escudo y la bandera, ya listos al emitir
     cargarLugares();
 
     $('btnStart').addEventListener('click', function () { go('step-form'); });
