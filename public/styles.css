@@ -473,3 +473,12 @@ img, canvas, video, svg{max-width:100%}
   transition:background .16s;
 }
 .geek-btn:hover{background:rgba(255,255,255,.15)}
+
+/* ---------- mandárselo a un pana ---------- */
+.btn-wa{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  text-decoration:none;
+  background:#1faa54;
+  color:#fff;
+}
+.btn-wa:hover{background:#1a9349}

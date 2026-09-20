@@ -8,6 +8,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
 
+  var SITIO = 'https://palomos.com.do';
   var PHOTO_W = 400, PHOTO_H = 500;
   var EXPORT_SCALE = 2;   // 2024x1276: de sobra para el QR y pesa la mitad
 
@@ -282,13 +283,14 @@
       $('secuencial').textContent = 'Eres el palomo número ' +
         Number(j.secuencial).toLocaleString('es-DO');
 
+      armarWhatsapp(j);
+
       $('verifyLink').href = j.verifyUrl;
       $('verifyLink').textContent = j.verifyUrl;
 
       return new Promise(function (resolve) {
         $('carnetCanvas').toBlob(function (b) {
           state.blob = b;
-          $('btnCompartir').hidden = !canShareFile();
           resolve();
         }, 'image/png');
       });
@@ -335,23 +337,20 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
-  function canShareFile() {
-    if (!navigator.canShare || !state.blob) { return false; }
-    try {
-      return navigator.canShare({
-        files: [new File([state.blob], fileName(), { type: 'image/png' })]
-      });
-    } catch (e) { return false; }
-  }
+  // WhatsApp solo acepta texto, así que va el enlace del sitio. La imagen
+  // se comparte descargándola; para que el pana llegue aquí, el enlace.
+  function armarWhatsapp(j) {
+    var texto = [
+      'Ya tengo mi Carnet de Palomo: soy el palomo número ' +
+        Number(j.secuencial).toLocaleString('es-DO') + '.',
+      '',
+      'Tú también eres palomo, no te hagas el loco. Saca el tuyo aquí:',
+      SITIO,
+      '',
+      '#teampalomos'
+    ].join('\n');
 
-  function compartir() {
-    if (!state.blob) { return; }
-    var file = new File([state.blob], fileName(), { type: 'image/png' });
-    navigator.share({
-      files: [file],
-      title: 'Mi Carnet de Palomo',
-      text: 'Ya soy palomo certificado por el Ministerio de Palomos. Saca el tuyo:'
-    }).catch(function () { /* el usuario canceló */ });
+    $('btnWhatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(texto);
   }
 
   /* ---------------- arranque ---------------- */
@@ -400,7 +399,6 @@
 
     $('btnGenerar').addEventListener('click', emitir);
     $('btnDescargar').addEventListener('click', descargar);
-    $('btnCompartir').addEventListener('click', compartir);
     $('btnOtro').addEventListener('click', reset);
 
     $('carnetStage').addEventListener('click', abrirVisor);
