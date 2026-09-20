@@ -283,8 +283,6 @@
       $('secuencial').textContent = 'Eres el palomo número ' +
         Number(j.secuencial).toLocaleString('es-DO');
 
-      armarWhatsapp(j);
-
       $('verifyLink').href = j.verifyUrl;
       $('verifyLink').textContent = j.verifyUrl;
 
@@ -337,20 +335,30 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
-  // WhatsApp solo acepta texto, así que va el enlace del sitio. La imagen
-  // se comparte descargándola; para que el pana llegue aquí, el enlace.
-  function armarWhatsapp(j) {
+  // El carnet con su texto debajo. A WhatsApp no se le puede mandar un
+  // archivo por enlace: solo la hoja de compartir del sistema lo permite.
+  // Por eso se usa esa, y el enlace queda de respaldo donde no exista.
+  function compartir() {
+    if (!state.blob) { return; }
+
     var texto = [
-      'Ya tengo mi Carnet de Palomo: soy el palomo número ' +
-        Number(j.secuencial).toLocaleString('es-DO') + '.',
+      'Ya soy palomo certificado.',
       '',
-      'Tú también eres palomo, no te hagas el loco. Saca el tuyo aquí:',
-      SITIO,
-      '',
-      '#teampalomos'
+      'Ahora saca el tuyo: ' + SITIO
     ].join('\n');
 
-    $('btnWhatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+    var file = new File([state.blob], fileName(), { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: texto })
+        .catch(function () { /* el usuario canceló */ });
+      return;
+    }
+
+    // Escritorio sin compartir de archivos: va el texto, y la imagen se
+    // descarga aparte.
+    window.open('https://wa.me/?text=' + encodeURIComponent(texto),
+                '_blank', 'noopener');
   }
 
   /* ---------------- arranque ---------------- */
@@ -399,6 +407,7 @@
 
     $('btnGenerar').addEventListener('click', emitir);
     $('btnDescargar').addEventListener('click', descargar);
+    $('btnWhatsapp').addEventListener('click', compartir);
     $('btnOtro').addEventListener('click', reset);
 
     $('carnetStage').addEventListener('click', abrirVisor);
