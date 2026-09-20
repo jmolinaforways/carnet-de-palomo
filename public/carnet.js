@@ -397,23 +397,29 @@
     ctx.restore();
 
     /* --- cabecera --- */
-    drawEmblema(ctx, 62, 46, 66, C.navy);
+    drawEmblema(ctx, 58, 46, 62, C.navy);
 
     ctx.fillStyle = C.navy;
-    ctx.font = font(800, 19);
-    ctx.fillText('REPÚBLICA', 106, 40);
-    ctx.fillText('DOMINICANA', 106, 62);
+    ctx.font = font(800, 34);
+    ctx.fillText('RD', 100, 58);
+
+    // Acento con los colores de RD: dos barras sueltas. Son color, no
+    // símbolo: ni cuarteadas, ni con cruz, ni con forma de bandera.
+    ctx.fillStyle = C.navy;
+    ctx.fillRect(160, 28, 7, 34);
+    ctx.fillStyle = C.red;
+    ctx.fillRect(172, 28, 7, 34);
 
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(272, 18);
-    ctx.lineTo(272, 74);
+    ctx.moveTo(202, 18);
+    ctx.lineTo(202, 74);
     ctx.stroke();
 
     ctx.fillStyle = C.gold;
     ctx.font = font(700, 21);
-    ctx.fillText('Ministerio de Palomos', 292, 53);
+    ctx.fillText('Ministerio de Palomos', 222, 53);
 
     ctx.fillStyle = C.navy;
     ctx.font = font(700, 17);
@@ -423,12 +429,14 @@
       tracked(ctx, t, W - 32 - tw, 53, 1.6);
     })();
 
-    ctx.strokeStyle = 'rgba(184,134,15,.5)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(32, 90);
-    ctx.lineTo(W - 32, 90);
-    ctx.stroke();
+    // Regla bajo la cabecera, partida en azul y rojo con el papel de por medio.
+    (function () {
+      var y = 89, x0 = 32, w = W - 64, h = 3;
+      ctx.fillStyle = C.navy;
+      ctx.fillRect(x0, y, w * 0.46, h);
+      ctx.fillStyle = C.red;
+      ctx.fillRect(x0 + w * 0.54, y, w * 0.46, h);
+    })();
 
     /* --- helpers de campo --- */
     function label(text, x, y) {
@@ -659,6 +667,12 @@
       var t = 'MEME DE @javimolinax';
       ctx.fillText(t, W - 32 - ctx.measureText(t).width, MY + 126);
     })();
+
+    // Banda al pie, con los mismos colores y el mismo criterio que la regla.
+    ctx.fillStyle = C.navy;
+    ctx.fillRect(0, H - 7, W * 0.46, 7);
+    ctx.fillStyle = C.red;
+    ctx.fillRect(W * 0.54, H - 7, W * 0.46, 7);
 
     return canvas;
   }

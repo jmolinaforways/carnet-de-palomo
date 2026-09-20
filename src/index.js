@@ -574,14 +574,16 @@ Dominicana no lo son. Por eso no están aquí.</p>
   nadie confunda el chiste con el símbolo.</p>
 
   <h2>Sobre los colores</h2>
-  <p>El sitio usa azul y rojo, que son colores, no un símbolo. La franja de
-  arriba es una banda horizontal decorativa: no es cuarteada, no tiene la cruz
-  blanca y no reproduce la forma de la Bandera Nacional. El
-  <strong>artículo 44</strong> prohíbe combinar los colores patrios para
+  <p>Lo que sí usamos son el azul y el rojo, que son colores, no un símbolo. En
+  el carnet aparecen como dos barras sueltas junto a las siglas «RD», una regla
+  partida bajo la cabecera y una banda al pie; en el sitio, como la franja de
+  arriba. Ninguno de esos elementos es cuarteado, ninguno lleva la cruz blanca y
+  ninguno reproduce la forma de la Bandera Nacional.</p>
+  <p>El <strong>artículo 44</strong> prohíbe combinar los colores patrios para
   identificar agrupaciones, partidos o movimientos políticos de manera que se
   asemejen a la bandera, y el <strong>artículo 24, numeral 6</strong>, prohíbe
-  usarlos en propaganda comercial o política que en conjunto la asemeje. Ni lo
-  uno ni lo otro ocurre aquí.</p>
+  usarlos en propaganda comercial o política que en conjunto la asemeje. Aquí no
+  hay ni partido ni parecido: hay dos colores.</p>
 
   <h2>No hay burla al símbolo</h2>
   <p>La broma es sobre el palomo, no sobre la patria. Los artículos 25 y 29 de la
