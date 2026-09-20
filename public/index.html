@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es-DO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carnet de Palomo</title>
+<meta name="description" content="Genera tu Carnet de Palomo del Ministerio de Palomos. Tranquilo de su casa desde siempre. Un meme de @javimolinax.">
+<meta name="theme-color" content="#0b1b3a">
+
+<meta property="og:title" content="Carnet de Palomo">
+<meta property="og:description" content="Tranquilo de su casa. Saca tu carnet en 10 segundos.">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<div class="flagbar" aria-hidden="true"></div>
+
+<main>
+
+  <!-- ================= PASO 0: PORTADA ================= -->
+  <section class="step" id="step-intro" data-active>
+    <div class="hero">
+      <div class="seal" aria-hidden="true"><canvas id="heroSeal" width="260" height="260"></canvas></div>
+      <p class="kicker">Ministerio de Palomos &middot; Rep&uacute;blica Dominicana</p>
+      <h1>Genera tu<br><span>Carnet de Palomo</span></h1>
+      <p class="sub">Tranquilo de su casa. Sin l&iacute;os, sin cuentos, sin ma&ntilde;a.<br>Pon tu nombre, tira una foto y listo.</p>
+      <button class="btn btn-primary btn-xl" id="btnStart">Generar mi carnet</button>
+      <p class="micro">Es un chiste. No pedimos c&eacute;dula, correo ni nada delicado.<br>Tu foto nunca sale de tu tel&eacute;fono.</p>
+    </div>
+
+    <!-- ================= DESCARGO ================= -->
+    <section class="descargo" aria-labelledby="descargo-titulo">
+      <h2 id="descargo-titulo">Descargo de responsabilidad</h2>
+
+      <p><strong>Esto es un meme.</strong> El &laquo;Ministerio de Palomos&raquo; no existe, no est&aacute;
+      afiliado a ninguna instituci&oacute;n del Estado dominicano ni act&uacute;a en representaci&oacute;n de
+      ninguna. Es una parodia hecha para re&iacute;rse un rato.</p>
+
+      <p><strong>El carnet carece de validez legal.</strong> No es un documento de identidad, no
+      sustituye la c&eacute;dula ni ning&uacute;n otro documento, y no sirve para identificarte ni
+      acreditarte ante ninguna autoridad, empresa o persona. Usarlo como si fuera real no es
+      cosa nuestra y puede meterte en problemas que son solo tuyos.</p>
+
+      <p><strong>No pedimos datos personales reales.</strong> Solo un nombre, y puede ser inventado,
+      un apodo o lo que se te ocurra. No pedimos c&eacute;dula, correo, tel&eacute;fono, direcci&oacute;n,
+      fecha de nacimiento ni ning&uacute;n otro dato.</p>
+
+      <p><strong>No manejamos informaci&oacute;n personal.</strong> Tu foto nunca se env&iacute;a a ning&uacute;n
+      servidor: se procesa dentro de tu propio navegador y se queda en tu dispositivo. No
+      guardamos carnets, ni fotos, ni nombres, ni registros de qui&eacute;n entra. Lo &uacute;nico que el
+      servidor conserva es un contador de cu&aacute;ntos carnets se han emitido, que no va asociado a
+      ninguna persona.</p>
+
+      <p><strong>Los s&iacute;mbolos patrios son los oficiales.</strong> La bandera y el escudo de la
+      Rep&uacute;blica Dominicana se reproducen tal cual, sin alteraci&oacute;n, recorte ni cambio de color,
+      en respeto a la Ley de S&iacute;mbolos Patrios. El emblema del palomo es un dibujo aparte y no
+      guarda relaci&oacute;n con el escudo nacional.</p>
+    </section>
+  </section>
+
+  <!-- ================= PASO 1: DATOS ================= -->
+  <section class="step" id="step-form">
+    <div class="card-ui">
+      <p class="step-label">Paso 1 de 2</p>
+      <h2>&iquest;C&oacute;mo te llamas?</h2>
+
+      <label class="field">
+        <span>Nombre completo</span>
+        <input type="text" id="inNombre" maxlength="32" autocomplete="off" autocapitalize="words"
+               spellcheck="false" placeholder="Ej. Juan Carlos P&eacute;rez">
+      </label>
+      <p class="hint" id="hintNombre">Como quieres que salga en el carnet. Puede ser inventado.</p>
+
+      <h2 class="mt">Ahora la foto</h2>
+
+      <div class="photo-zone" id="photoZone">
+        <div class="photo-preview" id="photoPreview">
+          <canvas id="photoCanvas" width="400" height="500"></canvas>
+          <div class="photo-empty" id="photoEmpty">
+            <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path fill="currentColor" d="M9 2 7.2 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.2L15 2H9Zm3 5.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z" opacity=".55"/></svg>
+            <span>Sin foto todav&iacute;a</span>
+          </div>
+        </div>
+
+        <div class="photo-actions">
+          <button class="btn btn-ghost" id="btnCamera">Tomar foto</button>
+          <button class="btn btn-ghost" id="btnUpload">Subir foto</button>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+        <p class="hint">Cara al frente, serio, como en la c&eacute;dula. O como quieras, es tu carnet.</p>
+      </div>
+
+      <div class="row-actions">
+        <button class="btn btn-quiet" data-back>Atr&aacute;s</button>
+        <button class="btn btn-primary" id="btnGenerar" disabled>Emitir carnet</button>
+      </div>
+      <p class="error" id="formError" hidden></p>
+    </div>
+  </section>
+
+  <!-- ================= CÁMARA ================= -->
+  <section class="step" id="step-camera">
+    <div class="card-ui cam">
+      <h2>Mira a la c&aacute;mara</h2>
+      <div class="cam-frame">
+        <video id="video" playsinline muted autoplay></video>
+        <div class="cam-guide" aria-hidden="true"></div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-quiet" id="btnCamCancel">Cancelar</button>
+        <button class="btn btn-primary" id="btnShoot">Disparar</button>
+      </div>
+      <p class="error" id="camError" hidden></p>
+    </div>
+  </section>
+
+  <!-- ================= PASO 2: CARNET ================= -->
+  <section class="step" id="step-result">
+    <div class="result">
+      <p class="step-label ok">Carnet emitido</p>
+      <p class="secuencial" id="secuencial"></p>
+
+      <div class="carnet-stage">
+        <canvas id="carnetCanvas" aria-label="Tu Carnet de Palomo"></canvas>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-primary" id="btnDescargar">Descargar carnet</button>
+        <button class="btn btn-ghost" id="btnCompartir" hidden>Compartir</button>
+        <button class="btn btn-wallet" id="btnGoogleWallet" hidden>
+          <span>Guardar en Google Wallet</span>
+        </button>
+        <button class="btn btn-wallet" id="btnAppleWallet" hidden>
+          <span>Agregar a Apple Wallet</span>
+        </button>
+      </div>
+
+      <p class="micro" id="walletNote"></p>
+
+      <div class="verify-box">
+        <p class="vb-title">Verificaci&oacute;n</p>
+        <p class="vb-body">Escanea el QR del carnet y el Ministerio confirma que es aut&eacute;ntico.
+        Tambi&eacute;n puedes <a href="/verificar">verificarlo por su n&uacute;mero</a>.</p>
+        <a class="vb-link" id="verifyLink" href="#" target="_blank" rel="noopener">Ver mi p&aacute;gina de verificaci&oacute;n</a>
+      </div>
+
+      <p class="invita">Ahora invita a tus panas palomos a ser parte del club.</p>
+
+      <button class="btn btn-quiet wide" id="btnOtro">Hacer otro carnet</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p class="credito">
+    Un meme de
+    <a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener">@javimolinax</a>
+  </p>
+
+  <div class="redes">
+    <a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener" aria-label="Instagram de javimolinax">
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.7.07-1.1.05-1.7.24-2.1.4-.5.2-.9.44-1.2.77-.3.3-.6.7-.8 1.2-.2.4-.4 1-.4 2.1C2.7 9.5 2.7 9.9 2.7 13s0 3.5.1 4.7c0 1.1.2 1.7.4 2.1.2.5.5.9.8 1.2.3.3.7.6 1.2.8.4.2 1 .4 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1 0 1.7-.2 2.1-.4.5-.2.9-.5 1.2-.8.3-.3.6-.7.8-1.2.2-.4.4-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c0-1.1-.2-1.7-.4-2.1-.2-.5-.5-.9-.8-1.2-.3-.3-.7-.6-1.2-.8-.4-.2-1-.4-2.1-.4C15.5 4 15.1 4 12 4Z"/><path fill="currentColor" d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Z"/><circle fill="currentColor" cx="17" cy="7" r="1.15"/></svg>
+      <span>Instagram</span>
+    </a>
+    <a href="https://www.tiktok.com/@javimolinax" target="_blank" rel="noopener" aria-label="TikTok de javimolinax">
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M16.5 2h-2.9v12.1a2.5 2.5 0 1 1-2.1-2.5V8.6a5.6 5.6 0 1 0 5 5.5V8.7a6.8 6.8 0 0 0 4 1.3V7a4 4 0 0 1-4-4Z"/></svg>
+      <span>TikTok</span>
+    </a>
+  </div>
+
+  <p class="legal"><strong>Esto es un meme.</strong> El &laquo;Ministerio de Palomos&raquo; no existe.
+  Este carnet no es un documento oficial ni sirve para identificarte ante nadie.</p>
+
+  <p class="foot-links">
+    <a href="https://github.com/javimolinax/carnet-de-palomo" id="repoLink" target="_blank" rel="noopener">C&oacute;digo fuente</a>
+    <span>&middot;</span>
+    <a href="/verificar">Verificar un carnet</a>
+    <span>&middot;</span>
+    <span>Hecho en RD</span>
+  </p>
+</footer>
+
+<script src="/vendor/qrcode.js"></script>
+<script src="/carnet.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "carnet-de-palomo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genera tu Carnet de Palomo. Un meme dominicano.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

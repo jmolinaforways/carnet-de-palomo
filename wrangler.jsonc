@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "carnet-de-palomo",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  // El contador de secuenciales. Es lo único con estado en todo el
+  // proyecto, y solo guarda un número: cuántos carnets se han emitido.
+  "durable_objects": {
+    "bindings": [
+      { "name": "SECUENCIA", "class_name": "Secuencia" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Secuencia"]
+    }
+  ],
+
+  "observability": {
+    "enabled": true
+  }
+}
