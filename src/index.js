@@ -211,7 +211,7 @@ function parsearSerial(raw) {
   return { seq, chk: m[2] === undefined ? null : parseInt(m[2], 10) };
 }
 
-async function verificarSerial(env, raw) {
+async function verificarSerial(env, raw, url) {
   const parsed = parsearSerial(raw);
   if (!parsed) {
     return { valido: false, motivo: 'formato', mensaje: 'Ese número no tiene forma de carnet de palomo.' };
@@ -220,7 +220,11 @@ async function verificarSerial(env, raw) {
   const { seq, chk } = parsed;
 
   if (chk !== null) {
-    const esperado = (await sign(secretoDe(env), 'palomo:chk:' + seq))[0] % 10;
+    const secret = secretoDe(env, url);
+    if (!secret) {
+      return { valido: false, motivo: 'sin-llave', mensaje: SIN_LLAVE };
+    }
+    const esperado = (await sign(secret, 'palomo:chk:' + seq))[0] % 10;
     if (chk !== esperado) {
       return {
         valido: false, secuencial: seq, motivo: 'digito',
@@ -289,9 +293,23 @@ function esc(s) {
   );
 }
 
-// En producción SIGNING_SECRET va como secreto de Wrangler. El respaldo
-// solo existe para que `wrangler dev` arranque sin configurar nada.
-const secretoDe = (env) => env.SIGNING_SECRET || 'palomo-dev-secret-no-usar-en-produccion';
+// La llave que firma los carnets. En producción va como secreto de Wrangler.
+//
+// El respaldo de desarrollo SOLO se entrega en localhost, y es a propósito:
+// este código es público, así que firmar con una llave que está en GitHub
+// sería peor que no firmar. Si en producción falta el secreto preferimos
+// fallar de cara antes que emitir carnets falsificables.
+function secretoDe(env, url) {
+  if (env.SIGNING_SECRET) return env.SIGNING_SECRET;
+
+  const host = url && url.hostname;
+  if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+    return 'palomo-dev-secret-solo-local';
+  }
+  return null;
+}
+
+const SIN_LLAVE = 'El Ministerio está sin llave de firma. Avisa a quien lo administra.';
 
 /* ---------------- POST /api/emitir ---------------- */
 
@@ -312,7 +330,9 @@ async function emitir(request, env) {
   // carnet lo dice; no le inventamos un pueblo.
   const lugar = limpiarLugar(body && body.lugar) || SIN_LUGAR;
 
-  const secret = secretoDe(env);
+  const secret = secretoDe(env, new URL(request.url));
+  if (!secret) return json({ ok: false, error: SIN_LLAVE }, 503);
+
   const emitido = hoyRD();
   const seq = await siguienteSecuencial(env);
   const datos = await derive(secret, nombre, seq);
@@ -336,7 +356,8 @@ async function emitir(request, env) {
 /* ---------------- GET /v/<token> ---------------- */
 
 async function verificar(request, env, token) {
-  const secret = secretoDe(env);
+  const secret = secretoDe(env, new URL(request.url));
+  if (!secret) return new Response(SIN_LLAVE, { status: 503 });
   const payload = await readToken(secret, token);
 
   const seqOk = payload && Number.isInteger(payload.q) && payload.q > 0;
@@ -681,7 +702,7 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
 
 async function rutaVerificar(request, env) {
   const consulta = (new URL(request.url).searchParams.get('s') || '').slice(0, 32);
-  const resultado = consulta ? await verificarSerial(env, consulta) : null;
+  const resultado = consulta ? await verificarSerial(env, consulta, new URL(request.url)) : null;
   const emitidos = await emitidosHasta(env);
 
   return new Response(paginaVerificar(consulta, resultado, emitidos), {
@@ -719,7 +740,7 @@ export default {
 
     if (path === '/api/verificar') {
       const s = new URL(request.url).searchParams.get('s') || '';
-      return json({ ok: true, ...(await verificarSerial(env, s)) });
+      return json({ ok: true, ...(await verificarSerial(env, s, new URL(request.url))) });
     }
 
 

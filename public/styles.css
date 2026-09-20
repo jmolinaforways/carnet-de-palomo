@@ -448,3 +448,28 @@ img, canvas, video, svg{max-width:100%}
 }
 .foot-hashtag .az{color:#7fb2ff}
 .foot-hashtag .ro{color:#ff5f74}
+
+/* ---------- invitación a revisar el código ---------- */
+.geek{
+  max-width:var(--maxw);
+  margin:0 auto 22px;
+  padding:16px 17px;
+  text-align:left;
+  background:rgba(0,0,0,.24);
+  border:1px solid var(--line);
+  border-radius:13px;
+}
+.geek p{margin:0 0 10px;font-size:12.5px;line-height:1.6;color:#a9bcd8}
+.geek strong{color:#dfe8f7}
+.geek-ro{color:#8ea2c4 !important}
+.geek-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  min-height:44px;padding:0 18px;
+  border-radius:999px;
+  background:rgba(255,255,255,.085);
+  border:1px solid var(--line);
+  color:#eef3fb;text-decoration:none;
+  font-size:13.5px;font-weight:700;
+  transition:background .16s;
+}
+.geek-btn:hover{background:rgba(255,255,255,.15)}
