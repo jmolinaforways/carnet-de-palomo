@@ -426,7 +426,9 @@ function envoltura(titulo, cuerpo) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
-<style>${ESTILO}</style></head>
+<style>${ESTILO}</style>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "5252e7034c504b9ebe41f551a96ef465"}'></script></head>
 <body><div class="flagbar"></div><main>${cuerpo}</main>
 <footer>
 <p><strong>Esto es un meme.</strong> El «Ministerio de Palomos» no existe y este carnet
@@ -644,15 +646,15 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
   de abuso y funcionamiento del servicio. No usamos esos datos para identificarte ni
   los cruzamos con tu carnet.</p>
 
-  <h2>Medición y publicidad</h2>
-  <p>Usamos herramientas de medición para saber cuánta gente visita el sitio y cómo
-  funcionan nuestras publicaciones. Según la herramienta, esto puede implicar cookies
-  o identificadores en tu navegador, y compartir datos de navegación con terceros como
-  Meta, Google o TikTok con fines estadísticos y publicitarios.</p>
-  <p>Esas herramientas <strong>no</strong> reciben tu foto ni el contenido de tu
-  carnet: solo datos de navegación. Cuando la medición requiera tu consentimiento, te
-  lo pediremos antes de activarla, y puedes negarte y seguir usando el sitio con total
-  normalidad.</p>
+  <h2>Medición, sin cookies</h2>
+  <p>Para saber cuánta gente nos visita usamos <strong>Cloudflare Web Analytics</strong>,
+  y solo eso. No pone cookies, no guarda identificadores en tu navegador y no te sigue
+  de un sitio a otro. Cuenta visitas, páginas vistas, país y desde dónde llega la gente,
+  sin armar un perfil de nadie.</p>
+  <p>Por eso no te salta ningún cartel pidiéndote permiso: no hay nada que consentir.
+  No usamos el pixel de Meta, ni Google Analytics, ni ninguna herramienta publicitaria.
+  Si algún día eso cambiara, te lo pediríamos antes de activarlo y podrías negarte sin
+  perder nada.</p>
 
   <h2>Tus derechos</h2>
   <p>La <strong>Ley núm. 172-13</strong> sobre protección de datos personales te
