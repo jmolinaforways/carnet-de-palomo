@@ -400,26 +400,21 @@
     drawEmblema(ctx, 58, 46, 62, C.navy);
 
     ctx.fillStyle = C.navy;
-    ctx.font = font(800, 34);
-    ctx.fillText('RD', 100, 58);
+    ctx.font = font(800, 30);
+    ctx.fillText('PALOMOS RD', 100, 57);
+    var anchoMarca = ctx.measureText('PALOMOS RD').width;
 
-    // Acento con los colores de RD: dos barras sueltas. Son color, no
-    // símbolo: ni cuarteadas, ni con cruz, ni con forma de bandera.
-    ctx.fillStyle = C.navy;
-    ctx.fillRect(160, 28, 7, 34);
-    ctx.fillStyle = C.red;
-    ctx.fillRect(172, 28, 7, 34);
-
+    var divisor = 100 + anchoMarca + 26;
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(202, 18);
-    ctx.lineTo(202, 74);
+    ctx.moveTo(divisor, 18);
+    ctx.lineTo(divisor, 74);
     ctx.stroke();
 
     ctx.fillStyle = C.gold;
     ctx.font = font(700, 21);
-    ctx.fillText('Ministerio de Palomos', 222, 53);
+    ctx.fillText('Ministerio de Palomos', divisor + 20, 53);
 
     ctx.fillStyle = C.navy;
     ctx.font = font(700, 17);
@@ -595,6 +590,17 @@
 
     label('Estado', RX, 356);
     value('TRANQUILO', RX, 382, 20, 130);
+
+    // El hashtag, en dos tonos: azul y rojo, los colores de RD.
+    (function () {
+      // A esta altura el sello ya se estrecha, así que no se tocan.
+      var hx = RX, hy = 460;
+      ctx.font = font(800, 21);
+      ctx.fillStyle = C.navy;
+      ctx.fillText('#team', hx, hy);
+      ctx.fillStyle = C.red;
+      ctx.fillText('palomos', hx + ctx.measureText('#team').width, hy);
+    })();
 
     // sello del Ministerio
     (function () {

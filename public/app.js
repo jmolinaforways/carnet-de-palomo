@@ -29,39 +29,52 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /* ---------------- portada: sello del Ministerio ---------------- */
+  /* ---------------- portada: carnet de muestra ---------------- */
 
-  // El emblema del Ministerio es el palomo. Ni aquí ni en el carnet
-  // aparecen la bandera o el escudo: ver /simbolos-patrios.
-  function paintHeroSeal() {
-    var cv = $('heroSeal');
+  // Una silueta genérica. No es la foto de nadie.
+  function fotoDemo() {
+    var cv = document.createElement('canvas');
+    cv.width = PHOTO_W;
+    cv.height = PHOTO_H;
+    var c = cv.getContext('2d');
+
+    var g = c.createLinearGradient(0, 0, 0, PHOTO_H);
+    g.addColorStop(0, '#d3e0ee');
+    g.addColorStop(1, '#a9bdd4');
+    c.fillStyle = g;
+    c.fillRect(0, 0, PHOTO_W, PHOTO_H);
+
+    c.fillStyle = '#7e95b2';
+    c.beginPath();
+    c.arc(PHOTO_W / 2, PHOTO_H * 0.36, PHOTO_W * 0.21, 0, Math.PI * 2);
+    c.fill();
+    c.beginPath();
+    c.ellipse(PHOTO_W / 2, PHOTO_H * 1.04, PHOTO_W * 0.37, PHOTO_H * 0.42, 0, 0, Math.PI * 2);
+    c.fill();
+
+    return cv;
+  }
+
+  function paintDemo() {
+    var cv = $('demoCanvas');
     if (!cv || !window.Carnet) { return; }
 
-    var S = 260;
-    var ctx = cv.getContext('2d');
-    var dpr = Math.min(window.devicePixelRatio || 1, 3);
-    cv.width = S * dpr;
-    cv.height = S * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, S, S);
+    var hoy = new Date();
+    var dd = String(hoy.getDate()).padStart(2, '0');
+    var mm = String(hoy.getMonth() + 1).padStart(2, '0');
 
-    var c = S / 2;
-    ctx.strokeStyle = '#c9a227';
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.arc(c, c, 116, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(c, c, 102, 0, Math.PI * 2);
-    ctx.stroke();
-
-    window.Carnet.drawPalomo(ctx, c, c - 10, 150, '#c9a227');
-
-    ctx.fillStyle = '#c9a227';
-    ctx.font = "700 13px 'Archivo', system-ui, sans-serif";
-    var t = 'MINISTERIO DE PALOMOS';
-    ctx.fillText(t, c - ctx.measureText(t).width / 2, c + 78);
+    window.Carnet.render(cv, {
+      nombre: 'JUAN PALOMO',
+      serial: 'PAL-000001-7',
+      nivel: 97,
+      categoria: 'PALOMO CERTIFICADO',
+      lugar: 'SANTO DOMINGO',
+      oficio: 'TRANQUILO DE SU CASA',
+      emitido: dd + '/' + mm + '/' + hoy.getFullYear(),
+      vence: 'UN PALOMO NUNCA MUERE',
+      qrUrl: window.location.origin,
+      photo: fotoDemo()
+    }, 2);
   }
 
   /* ---------------- foto ---------------- */
@@ -189,7 +202,8 @@
 
   function validate() {
     var nombre = cleanName($('inNombre').value);
-    var ok = nombre.length >= 2 && !!state.photo;
+    // La ciudad es opcional; aceptar los términos no lo es.
+    var ok = nombre.length >= 2 && !!state.photo && $('inAcepto').checked;
     $('btnGenerar').disabled = !ok;
     return ok;
   }
@@ -216,7 +230,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nombre: cleanName($('inNombre').value),
-        lugar: $('inLugar').value || undefined   // vacío = que lo elija el Ministerio
+        lugar: cleanName($('inLugar').value)
       })
     }).then(function (r) {
       return r.json().then(function (j) {
@@ -325,6 +339,24 @@
     }
   }
 
+  /* ---------------- visor a pantalla completa ---------------- */
+
+  // En el teléfono el carnet se ve diminuto. Al tocarlo se abre a pantalla
+  // completa, girado, que es como se lee de verdad.
+  function abrirVisor() {
+    if (!state.blob) { return; }
+    var img = $('visorImg');
+    if (img.src) { URL.revokeObjectURL(img.src); }
+    img.src = URL.createObjectURL(state.blob);
+    $('visor').setAttribute('data-open', '');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarVisor() {
+    $('visor').removeAttribute('data-open');
+    document.body.style.overflow = '';
+  }
+
   /* ---------------- descargar / compartir ---------------- */
 
   function fileName() {
@@ -373,36 +405,17 @@
     state.carnet = null;
     state.blob = null;
     $('inNombre').value = '';
+    $('inLugar').value = '';
+    $('inAcepto').checked = false;
     $('photoPreview').classList.remove('has-photo');
     $('fileInput').value = '';
     validate();
     go('step-form');
   }
 
-  // La lista de lugares la manda el servidor, que es quien la valida:
-  // así el <select> no se desincroniza de lo que el carnet acepta.
-  function cargarLugares() {
-    fetch('/api/lugares')
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (!j || !Array.isArray(j.lugares)) { return; }
-        var sel = $('inLugar');
-        var frag = document.createDocumentFragment();
-        j.lugares.forEach(function (l) {
-          var o = document.createElement('option');
-          o.value = l;
-          o.textContent = l;
-          frag.appendChild(o);
-        });
-        sel.appendChild(frag);
-      })
-      .catch(function () { /* si falla, queda «que decida el Ministerio» */ });
-  }
-
   function init() {
-    paintHeroSeal();
-    loadFonts().then(paintHeroSeal);   // se repinta cuando llega la tipografía
-    cargarLugares();
+    paintDemo();
+    loadFonts().then(paintDemo);   // se repinta cuando llega la tipografía
 
     $('btnStart').addEventListener('click', function () { go('step-form'); });
 
@@ -411,6 +424,7 @@
     });
 
     $('inNombre').addEventListener('input', validate);
+    $('inAcepto').addEventListener('change', validate);
     $('inNombre').addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && validate()) { emitir(); }
     });
@@ -432,6 +446,15 @@
     $('btnDescargar').addEventListener('click', descargar);
     $('btnCompartir').addEventListener('click', compartir);
     $('btnOtro').addEventListener('click', reset);
+
+    $('carnetStage').addEventListener('click', abrirVisor);
+    $('visorCerrar').addEventListener('click', cerrarVisor);
+    $('visor').addEventListener('click', function (e) {
+      if (e.target === $('visor')) { cerrarVisor(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { cerrarVisor(); }
+    });
 
     window.addEventListener('pagehide', closeCamera);
   }

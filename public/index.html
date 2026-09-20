@@ -26,12 +26,18 @@
   <!-- ================= PASO 0: PORTADA ================= -->
   <section class="step" id="step-intro" data-active>
     <div class="hero">
-      <div class="seal" aria-hidden="true"><canvas id="heroSeal" width="260" height="260"></canvas></div>
       <p class="kicker">Ministerio de Palomos &middot; RD</p>
-      <h1>Genera tu<br><span>Carnet de Palomo</span></h1>
-      <p class="sub">Tranquilo de su casa. Sin l&iacute;os, sin cuentos, sin ma&ntilde;a.<br>Pon tu nombre, tira una foto y listo.</p>
-      <button class="btn btn-primary btn-xl" id="btnStart">Generar mi carnet</button>
-      <p class="micro">Es un chiste. No pedimos c&eacute;dula, correo ni nada delicado.<br>Tu foto nunca sale de tu tel&eacute;fono.</p>
+      <h1>Carnet de Palomo</h1>
+      <p class="sub">Tranquilo en su casa, todo fr&iacute;o. No tamo en l&iacute;os.</p>
+
+      <div class="demo" aria-label="Ejemplo de Carnet de Palomo">
+        <canvas id="demoCanvas"></canvas>
+      </div>
+
+      <button class="btn btn-primary btn-xl" id="btnStart">Genera el tuyo</button>
+      <p class="claim">Gratis, r&aacute;pido y sin dar datos personales.</p>
+      <p class="hashtag"><span class="az">#team</span><span class="ro">palomos</span></p>
+      <p class="micro">Solo un nombre, que puede ser inventado, y una foto que nunca sale de tu tel&eacute;fono.</p>
     </div>
 
     <!-- ================= DESCARGO ================= -->
@@ -51,17 +57,21 @@
       un apodo o lo que se te ocurra. No pedimos c&eacute;dula, correo, tel&eacute;fono, direcci&oacute;n,
       fecha de nacimiento ni ning&uacute;n otro dato.</p>
 
-      <p><strong>No manejamos informaci&oacute;n personal.</strong> Tu foto nunca se env&iacute;a a ning&uacute;n
-      servidor: se procesa dentro de tu propio navegador y se queda en tu dispositivo. No
-      guardamos carnets, ni fotos, ni nombres, ni registros de qui&eacute;n entra. Lo &uacute;nico que el
-      servidor conserva es un contador de cu&aacute;ntos carnets se han emitido, que no va asociado a
-      ninguna persona.</p>
+      <p><strong>Tu foto no se sube.</strong> Se procesa dentro de tu propio navegador y se
+      queda en tu dispositivo. No guardamos carnets, ni fotos, ni nombres: no existe una base
+      de datos de personas. Lo &uacute;nico que el servidor conserva es un contador de cu&aacute;ntos
+      carnets se han emitido, que no va asociado a nadie.</p>
 
-      <p><strong>No usamos los s&iacute;mbolos patrios.</strong> El carnet no lleva la bandera ni el
-      escudo de la Rep&uacute;blica Dominicana. La Ley 210-19 reserva el escudo en identificaciones a
-      funcionarios p&uacute;blicos y prohíbe la bandera como distintivo de una organizaci&oacute;n privada,
-      as&iacute; que el emblema del Ministerio es un palomo dibujado para este proyecto, sin relaci&oacute;n
-      con el escudo nacional. <a href="/simbolos-patrios">Aqu&iacute; est&aacute; explicado en detalle</a>.</p>
+      <p><strong>El QR s&iacute; lleva tus datos.</strong> Para poder verificar un carnet sin
+      guardar nada, el nombre y la ciudad viajan firmados dentro del c&oacute;digo QR. Quien lo
+      escanee los ver&aacute;. Si compartes tu carnet, los compartes t&uacute; &mdash; por eso puedes usar
+      un apodo.</p>
+
+      <p><strong>S&iacute; medimos el tr&aacute;fico.</strong> Como cualquier web, usamos herramientas
+      para saber cu&aacute;nta gente nos visita. Nunca reciben tu foto ni el contenido de tu carnet.
+      Lo explicamos en la <a href="/privacidad">pol&iacute;tica de privacidad</a>, y en los
+      <a href="/terminos">t&eacute;rminos</a> est&aacute; el resto de las reglas.</p>
+
     </section>
   </section>
 
@@ -79,12 +89,32 @@
       <p class="hint" id="hintNombre">Como quieres que salga en el carnet. Puede ser inventado.</p>
 
       <label class="field mt-sm">
-        <span>&iquest;De d&oacute;nde eres?</span>
-        <select id="inLugar">
-          <option value="">Que decida el Ministerio</option>
-        </select>
+        <span>&iquest;De d&oacute;nde eres? <em>(opcional)</em></span>
+        <input type="text" id="inLugar" maxlength="24" autocomplete="off"
+               autocapitalize="words" spellcheck="false" list="ciudades"
+               placeholder="Ej. Santiago">
+        <datalist id="ciudades">
+          <option value="Santo Domingo"></option>
+          <option value="Santiago"></option>
+          <option value="San Crist&oacute;bal"></option>
+          <option value="La Vega"></option>
+          <option value="Puerto Plata"></option>
+          <option value="San Pedro de Macor&iacute;s"></option>
+          <option value="La Romana"></option>
+          <option value="Hig&uuml;ey"></option>
+          <option value="Moca"></option>
+          <option value="Ban&iacute;"></option>
+          <option value="Azua"></option>
+          <option value="Barahona"></option>
+          <option value="Bonao"></option>
+          <option value="San Francisco de Macor&iacute;s"></option>
+          <option value="Saman&aacute;"></option>
+          <option value="Nagua"></option>
+          <option value="Nueva York"></option>
+        </datalist>
       </label>
-      <p class="hint">Tu lugar de tranquilidad. Sale impreso en el carnet.</p>
+      <p class="hint">Tu lugar de tranquilidad. Sale impreso en el carnet.
+      Si lo dejas vac&iacute;o, el carnet dir&aacute; &laquo;no declarado&raquo;.</p>
 
       <h2 class="mt">Ahora la foto</h2>
 
@@ -104,6 +134,14 @@
         </div>
         <p class="hint">Cara al frente, serio, como en la c&eacute;dula. O como quieras, es tu carnet.</p>
       </div>
+
+      <label class="acepto" for="inAcepto">
+        <input type="checkbox" id="inAcepto">
+        <span>Acepto los <a href="/terminos" target="_blank" rel="noopener">t&eacute;rminos y
+        condiciones</a> y la <a href="/privacidad" target="_blank" rel="noopener">pol&iacute;tica
+        de privacidad</a>. Entiendo que este carnet es un meme sin validez legal, y que el
+        nombre y la ciudad que escriba quedan dentro del QR, visibles para quien lo escanee.</span>
+      </label>
 
       <div class="row-actions">
         <button class="btn btn-quiet" data-back>Atr&aacute;s</button>
@@ -135,9 +173,10 @@
       <p class="step-label ok">Carnet emitido</p>
       <p class="secuencial" id="secuencial"></p>
 
-      <div class="carnet-stage">
+      <div class="carnet-stage" id="carnetStage">
         <canvas id="carnetCanvas" aria-label="Tu Carnet de Palomo"></canvas>
       </div>
+      <p class="lupa">Toca el carnet para verlo en grande</p>
 
       <div class="result-actions">
         <button class="btn btn-primary" id="btnDescargar">Descargar carnet</button>
@@ -168,6 +207,8 @@
 </main>
 
 <footer>
+  <p class="foot-hashtag"><span class="az">#team</span><span class="ro">palomos</span></p>
+
   <p class="credito">
     Un meme de
     <a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener">@javimolinax</a>
@@ -178,7 +219,7 @@
       <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.7.07-1.1.05-1.7.24-2.1.4-.5.2-.9.44-1.2.77-.3.3-.6.7-.8 1.2-.2.4-.4 1-.4 2.1C2.7 9.5 2.7 9.9 2.7 13s0 3.5.1 4.7c0 1.1.2 1.7.4 2.1.2.5.5.9.8 1.2.3.3.7.6 1.2.8.4.2 1 .4 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1 0 1.7-.2 2.1-.4.5-.2.9-.5 1.2-.8.3-.3.6-.7.8-1.2.2-.4.4-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c0-1.1-.2-1.7-.4-2.1-.2-.5-.5-.9-.8-1.2-.3-.3-.7-.6-1.2-.8-.4-.2-1-.4-2.1-.4C15.5 4 15.1 4 12 4Z"/><path fill="currentColor" d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2Z"/><circle fill="currentColor" cx="17" cy="7" r="1.15"/></svg>
       <span>Instagram</span>
     </a>
-    <a href="https://www.tiktok.com/@javimolinaxx" target="_blank" rel="noopener" aria-label="TikTok de javimolinaxx">
+    <a href="https://www.tiktok.com/@javimolinaxt" target="_blank" rel="noopener" aria-label="TikTok de javimolinaxt">
       <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M16.5 2h-2.9v12.1a2.5 2.5 0 1 1-2.1-2.5V8.6a5.6 5.6 0 1 0 5 5.5V8.7a6.8 6.8 0 0 0 4 1.3V7a4 4 0 0 1-4-4Z"/></svg>
       <span>TikTok</span>
     </a>
@@ -192,11 +233,18 @@
     <span>&middot;</span>
     <a href="/verificar">Verificar un carnet</a>
     <span>&middot;</span>
-    <a href="/simbolos-patrios">S&iacute;mbolos patrios</a>
+    <a href="/terminos">T&eacute;rminos</a>
+    <span>&middot;</span>
+    <a href="/privacidad">Privacidad</a>
     <span>&middot;</span>
     <span>Hecho en RD</span>
   </p>
 </footer>
+
+<div id="visor" role="dialog" aria-modal="true" aria-label="Carnet en grande">
+  <button id="visorCerrar" type="button" aria-label="Cerrar">&times;</button>
+  <img id="visorImg" alt="Tu Carnet de Palomo">
+</div>
 
 <script src="/vendor/qrcode.js"></script>
 <script src="/carnet.js"></script>

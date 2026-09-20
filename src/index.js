@@ -25,21 +25,9 @@ const CATEGORIAS = [
   'PALOMO HOMOLOGADO'
 ];
 
-// El palomo elige el suyo; si no elige, se saca del nombre.
-// En el token viaja el nombre del lugar, no su posición en esta lista,
-// para que reordenarla o ampliarla no invalide los carnets ya emitidos.
-const LUGARES = [
-  'AZUA', 'BANÍ', 'BARAHONA', 'BÁVARO', 'BOCA CHICA', 'BONAO',
-  'CABARETE', 'COMENDADOR', 'CONSTANZA', 'COTUÍ', 'DAJABÓN',
-  'EL SEIBO', 'ESPERANZA', 'HATO MAYOR', 'HIGÜEY', 'JARABACOA',
-  'JIMANÍ', 'LA ROMANA', 'LA VEGA', 'LAS MATAS DE FARFÁN',
-  'LAS TERRENAS', 'MAO', 'MOCA', 'MONTE CRISTI', 'MONTE PLATA',
-  'NAGUA', 'NAVARRETE', 'NEIBA', 'NUEVA YORK', 'PEDERNALES',
-  'PUERTO PLATA', 'SABANETA', 'SAMANÁ', 'SAN CRISTÓBAL',
-  'SAN FRANCISCO DE MACORÍS', 'SAN JOSÉ DE OCOA',
-  'SAN JUAN DE LA MAGUANA', 'SAN PEDRO DE MACORÍS', 'SANTIAGO',
-  'SANTO DOMINGO', 'SOSÚA', 'TAMBORIL', 'VILLA ALTAGRACIA'
-];
+// Lo que sale en el carnet cuando no escriben de dónde son. El lugar viaja
+// dentro del token firmado, así que verificarlo no consulta nada.
+const SIN_LUGAR = 'NO DECLARADO';
 
 const OFICIOS = [
   'TRANQUILO DE SU CASA',
@@ -152,10 +140,11 @@ async function readToken(secret, token) {
 
 /* ---------------- datos del carnet ---------------- */
 
-// El secuencial da el número. El resto sale del nombre, así que es
-// estable: el mismo nombre siempre tiene la misma condición y el mismo
-// nivel de palomería, aunque saque el carnet diez veces.
-async function derive(secret, nombre, seq, lugarPedido) {
+// El secuencial da el número y la ciudad la escribe la persona. El resto
+// sale del nombre, así que es estable: el mismo nombre siempre tiene la
+// misma condición y el mismo nivel de palomería, aunque saque el carnet
+// diez veces.
+async function derive(secret, nombre, seq) {
   const mac = await sign(secret, 'palomo:v2:' + nombre.toLocaleLowerCase('es'));
   const chk = await sign(secret, 'palomo:chk:' + seq);
 
@@ -163,19 +152,22 @@ async function derive(secret, nombre, seq, lugarPedido) {
     serial: `PAL-${String(seq).padStart(6, '0')}-${chk[0] % 10}`,
     nivel: 82 + (mac[5] % 19),
     categoria: CATEGORIAS[mac[6] % CATEGORIAS.length],
-    lugar: normalizarLugar(lugarPedido) || LUGARES[mac[7] % LUGARES.length],
     oficio: OFICIOS[mac[8] % OFICIOS.length]
   };
 }
 
-// Solo dejamos pasar lugares de la lista: así nadie escribe lo que quiera
-// en el carnet, ni aunque llame a la API directamente.
-function normalizarLugar(raw) {
-  if (typeof raw !== 'string') return null;
-  // NFC porque iOS manda los acentos descompuestos: «SAMANÁ» llegaría
-  // como A + tilde suelta y no cuadraría con la lista.
-  const s = raw.normalize('NFC').trim().toLocaleUpperCase('es');
-  return LUGARES.includes(s) ? s : null;
+// El lugar lo escribe la persona: texto libre. Lo limpiamos y lo pasamos a
+// mayúsculas, que es como van los demás campos del carnet. NFC porque iOS
+// manda los acentos descompuestos.
+function limpiarLugar(raw) {
+  if (typeof raw !== 'string') return '';
+  return raw
+    .normalize('NFC')
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, '') // caracteres de control
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 24)
+    .toLocaleUpperCase('es');
 }
 
 function contador(env) {
@@ -323,12 +315,16 @@ async function emitir(request, env) {
     return json({ ok: false, error: 'Nombre demasiado corto' }, 400);
   }
 
+  // La ciudad es opcional y la escribe la persona. Si no pone nada, el
+  // carnet lo dice; no le inventamos un pueblo.
+  const lugar = limpiarLugar(body && body.lugar) || SIN_LUGAR;
+
   const secret = secretoDe(env);
   const emitido = hoyRD();
   const seq = await siguienteSecuencial(env);
-  const datos = await derive(secret, nombre, seq, body && body.lugar);
+  const datos = await derive(secret, nombre, seq);
   const token = await makeToken(secret, {
-    n: nombre, e: emitido, q: seq, l: datos.lugar
+    n: nombre, e: emitido, q: seq, l: lugar
   });
 
   return json({
@@ -336,6 +332,7 @@ async function emitir(request, env) {
     nombre,
     secuencial: seq,
     ...datos,
+    lugar,
     emitido,
     vence: 'UN PALOMO NUNCA MUERE',
     token,
@@ -359,10 +356,11 @@ async function verificar(request, env, token) {
   }
 
   const nombre = limpiarNombre(payload.n);
-  const datos = await derive(secret, nombre, payload.q, payload.l);
+  const datos = await derive(secret, nombre, payload.q);
+  const lugar = limpiarLugar(payload.l) || SIN_LUGAR;
 
   return new Response(
-    paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, ...datos }),
+    paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, lugar, ...datos }),
     {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
@@ -419,14 +417,12 @@ footer a{color:#c3d2ec}
 .total strong{color:#c9a227;font-size:15px}
 .nota{margin:0;font-size:12.5px;line-height:1.6;color:#8ea2c4}
 .doc{text-align:left}
-.doc h2{margin:26px 0 8px;font-size:15px;font-weight:800;color:#c9a227;letter-spacing:-.01em}
+.doc h2{margin:28px 0 8px;font-size:15px;font-weight:800;color:#c9a227;letter-spacing:-.01em}
 .doc h2:first-child{margin-top:0}
-.doc p{margin:0 0 12px;font-size:14px;line-height:1.68;color:#c3d2ec}
+.doc p{margin:0 0 12px;font-size:14.5px;line-height:1.68;color:#c3d2ec}
 .doc strong{color:#fff}
 .doc em{color:#fff;font-style:italic}
-.aviso{margin-top:26px !important;padding:15px 16px;border-radius:12px;
-  background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.1);
-  font-size:12.5px !important;line-height:1.6 !important;color:#8ea2c4 !important}
+.doc a{color:#c9a227}
 `;
 
 function envoltura(titulo, cuerpo) {
@@ -444,8 +440,7 @@ function envoltura(titulo, cuerpo) {
 <p><strong>Esto es un meme.</strong> El «Ministerio de Palomos» no existe y este carnet
 no es un documento oficial ni sirve para identificarte ante nadie.</p>
 <p>Meme de <a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener">@javimolinax</a>
-en Instagram y <a href="https://www.tiktok.com/@javimolinaxx" target="_blank" rel="noopener">@javimolinaxx</a> en TikTok</p>
-<p><a href="/simbolos-patrios">Sobre el uso de los símbolos patrios</a></p>
+en Instagram y <a href="https://www.tiktok.com/@javimolinaxt" target="_blank" rel="noopener">@javimolinaxt</a> en TikTok</p>
 </footer></body></html>`;
 }
 
@@ -531,84 +526,159 @@ escanea su código QR, que los lleva firmados dentro.</p>
   );
 }
 
-/* ---------------- /simbolos-patrios ---------------- */
+/* ---------------- términos y privacidad ---------------- */
 
-function paginaSimbolos() {
+const CONTACTO =
+  '<a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener">@javimolinax</a>';
+
+function paginaTerminos() {
   return envoltura(
-    'Símbolos patrios: uso y respeto',
+    'Términos y condiciones',
     `
-<h1>Sobre los símbolos patrios</h1>
-<p class="lead">Este sitio es una parodia. La bandera y el escudo de la República
-Dominicana no lo son. Por eso no están aquí.</p>
+<h1>Términos y condiciones</h1>
+<p class="lead">En corto: esto es un chiste, el carnet no vale para nada oficial, y
+lo que hagas con él es cosa tuya.</p>
 
 <div class="doc">
-  <h2>El carnet no lleva la bandera ni el escudo</h2>
-  <p>No es un descuido ni un problema de diseño: es una decisión. El Carnet de
-  Palomo no reproduce el Escudo Nacional ni la Bandera Nacional en ninguna parte.
-  Lo que ves en el carnet es un palomo dibujado para este proyecto.</p>
+  <h2>1. Qué es este sitio</h2>
+  <p>Carnet de Palomo es una parodia. El «Ministerio de Palomos» no existe, no está
+  afiliado a ninguna institución del Estado dominicano ni actúa en representación de
+  ninguna. El carnet que genera es una imagen humorística.</p>
 
-  <h2>Por qué</h2>
-  <p>La <strong>Ley núm. 210-19</strong>, sobre los símbolos patrios, es clara en
-  tres puntos que nos tocan de lleno:</p>
-  <p>El <strong>artículo 26</strong> reserva el uso del Escudo Nacional en
-  identificaciones e impresos a una lista cerrada de funcionarios públicos. Un
-  carnet emitido por un ministerio inventado no está en esa lista, y el
-  <strong>artículo 28, numeral 1</strong>, considera irreverencia usar el escudo
-  violando cualquier precepto de la ley.</p>
-  <p>El <strong>artículo 24, numeral 5</strong>, prohíbe usar la Bandera Nacional
-  «total o parcialmente» como distintivo característico de cualquier organización
-  privada. El «Ministerio de Palomos» es precisamente una organización privada
-  ficticia.</p>
-  <p>Y el <strong>artículo 28, numeral 3</strong>, declara irreverencia usar el
-  Escudo Nacional en promociones comerciales con fines de lucro. Este carnet está
-  pensado para que más adelante sirva en promociones e iniciativas con negocios
-  locales, así que ese supuesto nos alcanzaría de forma directa.</p>
-  <p>Podíamos haber puesto los símbolos y acompañarlos de un descargo. Preferimos
-  no ponerlos.</p>
+  <h2>2. Al usarlo, aceptas esto</h2>
+  <p>Generar un carnet implica que leíste y aceptas estos términos y la
+  <a href="/privacidad">política de privacidad</a>. Si no estás de acuerdo con algo,
+  no generes el carnet.</p>
 
-  <h2>El palomo no es el escudo</h2>
-  <p>El emblema del Ministerio es una paloma dibujada desde cero. No es una
-  versión del Escudo Nacional, no lo imita y no toma ninguno de sus elementos: ni
-  la Biblia, ni la cruz, ni los trofeos, ni las ramas de laurel y palma, ni el
-  lema <em>Dios, Patria, Libertad</em>. Son cosas separadas a propósito, para que
-  nadie confunda el chiste con el símbolo.</p>
+  <h2>3. El carnet no vale como documento</h2>
+  <p>No es un documento de identidad. No sustituye la cédula ni ningún otro documento
+  oficial. No sirve para identificarte, acreditarte ni probar nada ante ninguna
+  autoridad, empresa o persona.</p>
+  <p>Te comprometes a <strong>no</strong> presentarlo como documento real, no usarlo
+  para engañar a nadie, no suplantar a otra persona y no alterarlo para que parezca
+  emitido por una institución de verdad. Si lo haces, la responsabilidad es
+  únicamente tuya.</p>
 
-  <h2>Sobre los colores</h2>
-  <p>Lo que sí usamos son el azul y el rojo, que son colores, no un símbolo. En
-  el carnet aparecen como dos barras sueltas junto a las siglas «RD», una regla
-  partida bajo la cabecera y una banda al pie; en el sitio, como la franja de
-  arriba. Ninguno de esos elementos es cuarteado, ninguno lleva la cruz blanca y
-  ninguno reproduce la forma de la Bandera Nacional.</p>
-  <p>El <strong>artículo 44</strong> prohíbe combinar los colores patrios para
-  identificar agrupaciones, partidos o movimientos políticos de manera que se
-  asemejen a la bandera, y el <strong>artículo 24, numeral 6</strong>, prohíbe
-  usarlos en propaganda comercial o política que en conjunto la asemeje. Aquí no
-  hay ni partido ni parecido: hay dos colores.</p>
+  <h2>4. El nombre y la foto los pones tú</h2>
+  <p>Al generar un carnet declaras que el nombre que escribes y la foto que usas son
+  tuyos, o que tienes permiso para usarlos. No uses fotos de otras personas sin su
+  consentimiento, ni imágenes de menores, ni contenido ilegal, sexual, violento o que
+  incite al odio.</p>
+  <p>Este sitio no revisa ni almacena lo que pones: la foto se procesa en tu propio
+  navegador y no llega a ningún servidor. Eso significa que el contenido de tu carnet
+  es tuyo y de nadie más, y también que respondes tú por él.</p>
 
-  <h2>No hay burla al símbolo</h2>
-  <p>La broma es sobre el palomo, no sobre la patria. Los artículos 25 y 29 de la
-  ley definen el ultraje como quemar, destruir, arrojar al suelo, profanar o
-  colocar letreros e imágenes encima de los símbolos. Nada de eso se hace ni se
-  hará en este sitio.</p>
+  <h2>5. Lo que el carnet muestra a quien lo escanee</h2>
+  <p>El nombre, la ciudad, la fecha y el número de tu carnet van dentro del código QR,
+  firmados. Cualquiera que escanee tu carnet verá esos datos. Si lo publicas o lo
+  compartes, los estás compartiendo tú. Puedes usar un apodo o un nombre inventado.</p>
 
-  <h2>El carnet no se hace pasar por un documento</h2>
-  <p>Cada carnet lleva impreso «DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · ES UN
-  MEME», el emisor es un ministerio que no existe y el sitio lo dice desde la
-  portada. No sustituye la cédula ni ningún documento, y no sirve para
-  identificarse ante ninguna autoridad, empresa o persona.</p>
+  <h2>6. Promociones con terceros</h2>
+  <p>Si en algún momento un negocio decide reconocer el Carnet de Palomo para una
+  promoción, esa promoción es del negocio: sus condiciones, su cumplimiento y sus
+  reclamaciones son con él, no con nosotros. Este sitio no garantiza que ningún
+  comercio acepte el carnet ni responde por lo que ofrezca.</p>
 
-  <h2>Si hay algo que corregir, se corrige</h2>
-  <p>Si alguna autoridad, el Instituto Duartiano, la Comisión Permanente de
-  Efemérides Patrias o cualquier persona entiende que algo de este sitio falta al
-  respeto a los símbolos patrios, se corrige o se retira. Sin discusión. El
-  código es público y el cambio se puede ver.</p>
+  <h2>7. Se entrega tal cual</h2>
+  <p>El servicio se ofrece «tal cual», sin garantía de que funcione siempre, de que
+  esté disponible, ni de que los carnets ya emitidos se puedan seguir verificando.
+  Podemos cambiarlo, pausarlo o cerrarlo en cualquier momento y sin aviso.</p>
 
-  <p class="aviso">Esta página explica nuestro criterio y cita la ley, pero no es
-  asesoría legal. La Ley 210-19 sanciona la irreverencia contra los símbolos con
-  quince a treinta días de prisión y multa de uno a cinco salarios mínimos del
-  sector público (artículo 38), y el ultraje con uno a tres meses y multa de cinco
-  a veinte salarios mínimos (artículo 39). El juzgado de paz es el tribunal
-  competente (artículo 42).</p>
+  <h2>8. Hasta dónde respondemos</h2>
+  <p>En la medida en que la ley lo permita, no respondemos por daños, perjuicios ni
+  reclamaciones derivados del uso del sitio o del carnet, ni por el uso que un tercero
+  haga de un carnet que tú generaste o compartiste.</p>
+
+  <h2>9. De quién es qué</h2>
+  <p>El código fuente es público y está bajo licencia MIT. El nombre «Carnet de
+  Palomo», el emblema del palomo y los textos del sitio son de ${CONTACTO}. Tu carnet
+  es tuyo: úsalo, compártelo y ríete con él.</p>
+
+  <h2>10. Menores</h2>
+  <p>Este sitio no está dirigido a menores de 13 años. Si eres menor de edad, úsalo
+  con el permiso de tu madre, padre o tutor.</p>
+
+  <h2>11. Cambios</h2>
+  <p>Podemos actualizar estos términos. La versión vigente es siempre la publicada en
+  esta página.</p>
+
+  <h2>12. Ley aplicable</h2>
+  <p>Estos términos se rigen por las leyes de la República Dominicana, y cualquier
+  controversia se somete a sus tribunales.</p>
+
+  <h2>13. Contacto</h2>
+  <p>Escribe a ${CONTACTO} en Instagram.</p>
+</div>
+
+<a class="cta" href="/">Volver al inicio</a>`
+  );
+}
+
+function paginaPrivacidad() {
+  return envoltura(
+    'Política de privacidad',
+    `
+<h1>Política de privacidad</h1>
+<p class="lead">Lo más importante: tu foto nunca sale de tu teléfono, y no guardamos
+tu nombre ni tu carnet en ninguna base de datos.</p>
+
+<div class="doc">
+  <h2>Quién responde</h2>
+  <p>Este sitio lo mantiene ${CONTACTO}, en la República Dominicana. Para cualquier
+  asunto de datos, escribe por ahí.</p>
+
+  <h2>Tu foto no se sube. Nunca.</h2>
+  <p>Cuando tomas o eliges una foto, el navegador la recorta y dibuja el carnet dentro
+  de tu propio dispositivo. La imagen no viaja a ningún servidor, ni al nuestro ni a
+  ninguno. Cuando cierras la página, desaparece.</p>
+
+  <h2>No guardamos carnets, ni nombres</h2>
+  <p>El nombre y la ciudad que escribes viajan al servidor solo el instante necesario
+  para firmar el código de tu carnet, y no se escriben en ningún sitio. No existe una
+  base de datos de carnets ni de personas.</p>
+  <p>Lo único que el servidor conserva es un contador: cuántos carnets se han emitido
+  en total. Es un número, no una lista, y no está asociado a nadie.</p>
+
+  <h2>Pero el QR sí lleva tus datos</h2>
+  <p>Para poder verificar un carnet sin guardar nada, el nombre, la ciudad, la fecha y
+  el número van <em>dentro</em> del código QR, protegidos con una firma que impide
+  alterarlos. No están cifrados: quien escanee tu carnet los verá. Si compartes tu
+  carnet, compartes esos datos. Por eso puedes poner un apodo.</p>
+
+  <h2>Datos técnicos de la conexión</h2>
+  <p>Como cualquier web, para servirte la página se procesan datos técnicos de tu
+  conexión (dirección IP, tipo de navegador y dispositivo). De eso se encarga
+  Cloudflare, nuestro proveedor de infraestructura, con fines de seguridad, prevención
+  de abuso y funcionamiento del servicio. No usamos esos datos para identificarte ni
+  los cruzamos con tu carnet.</p>
+
+  <h2>Medición y publicidad</h2>
+  <p>Usamos herramientas de medición para saber cuánta gente visita el sitio y cómo
+  funcionan nuestras publicaciones. Según la herramienta, esto puede implicar cookies
+  o identificadores en tu navegador, y compartir datos de navegación con terceros como
+  Meta, Google o TikTok con fines estadísticos y publicitarios.</p>
+  <p>Esas herramientas <strong>no</strong> reciben tu foto ni el contenido de tu
+  carnet: solo datos de navegación. Cuando la medición requiera tu consentimiento, te
+  lo pediremos antes de activarla, y puedes negarte y seguir usando el sitio con total
+  normalidad.</p>
+
+  <h2>Tus derechos</h2>
+  <p>La <strong>Ley núm. 172-13</strong> sobre protección de datos personales te
+  reconoce los derechos de acceso, rectificación, cancelación y oposición sobre tus
+  datos. Puedes ejercerlos escribiendo a ${CONTACTO}.</p>
+  <p>En la práctica, sobre tu carnet no hay nada que rectificar ni cancelar, porque no
+  lo tenemos. Si quieres que un carnet deje de circular, basta con que dejes de
+  compartirlo: nosotros no tenemos copia. Sobre los datos de medición, puedes retirar
+  tu consentimiento cuando quieras.</p>
+
+  <h2>Menores</h2>
+  <p>El sitio no está dirigido a menores de 13 años y no recogemos datos de ellos a
+  sabiendas.</p>
+
+  <h2>Cambios</h2>
+  <p>Si cambiamos cómo tratamos los datos, actualizaremos esta página. El código es
+  público, así que cualquiera puede comprobar que lo que dice aquí es lo que hace el
+  sitio.</p>
 </div>
 
 <a class="cta" href="/">Volver al inicio</a>`
@@ -661,21 +731,11 @@ export default {
       return verificar(request, env, decodeURIComponent(path.slice(3)));
     }
 
-    if (path === '/api/lugares') {
-      // Lista única: el <select> del formulario se llena desde aquí,
-      // así no se desincroniza de la que valida el servidor.
-      return new Response(JSON.stringify({ ok: true, lugares: LUGARES }), {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Cache-Control': 'public, max-age=3600'
-        }
-      });
-    }
-
     if (path === '/verificar') return rutaVerificar(request, env);
 
-    if (path === '/simbolos-patrios') {
-      return new Response(paginaSimbolos(), {
+    if (path === '/terminos' || path === '/privacidad') {
+      const html = path === '/terminos' ? paginaTerminos() : paginaPrivacidad();
+      return new Response(html, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
           'Cache-Control': 'public, max-age=3600'

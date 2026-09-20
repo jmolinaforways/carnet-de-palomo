@@ -35,47 +35,40 @@ firmados dentro.
 
 ---
 
-## Símbolos patrios
+## Sin símbolos patrios
 
-**El carnet no lleva la bandera ni el escudo de la República Dominicana.** Es una
-decisión, no un descuido. No los pongas.
+**El carnet no lleva la bandera ni el escudo de la República Dominicana. No los
+añadas.** El emblema es un palomo dibujado con código (`paintPalomo` en
+`public/carnet.js`); lo demás son solo azul y rojo, que son colores, no símbolos.
 
-El emblema del «Ministerio de Palomos» es un palomo dibujado con código
-(`paintPalomo`, en `public/carnet.js`). No es una versión del Escudo Nacional ni
-toma ninguno de sus elementos.
+El motivo está en la [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf):
+el artículo 26 reserva el Escudo en **identificaciones** a una lista cerrada de
+funcionarios públicos; el 24.5 prohíbe la bandera como distintivo de una
+organización privada; y el 28.3 declara irreverencia usar el escudo en promociones
+comerciales con fines de lucro, que es justo hacia donde va este proyecto. La pena
+por irreverencia es de 15 a 30 días de prisión y multa de 1 a 5 salarios mínimos
+del sector público (art. 38).
 
-### Por qué, según la Ley 210-19
+## Términos, privacidad y datos
 
-La [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf)
-regula el uso de la bandera, el escudo y el himno. Tres artículos nos tocaban de lleno:
+El sitio publica [términos](https://palomos.com.do/terminos) y
+[política de privacidad](https://palomos.com.do/privacidad), y hay que aceptarlos
+con una casilla antes de poder emitir un carnet.
 
-| Artículo | Qué dice | Por qué aplica |
-|---|---|---|
-| 26 | Reserva el uso del Escudo Nacional en **identificaciones** e impresos a una lista cerrada de funcionarios públicos | El carnet es una identificación emitida por un ministerio inventado |
-| 28.1 | Es irreverencia usar el escudo violando cualquier precepto de la ley | Se activa por el artículo 26 |
-| 24.5 | Prohíbe usar la bandera «total o parcialmente» como **distintivo característico de cualquier organización privada**, y en propaganda comercial | El «Ministerio de Palomos» es una organización privada ficticia |
-| 28.3 | Es irreverencia usar el escudo en **promociones comerciales con fines de lucro** | El carnet está pensado para promociones con negocios locales |
-| 25 y 29 | Ultraje: quemar, destruir, arrojar al suelo, profanar, poner letreros encima | No aplica: nada de eso se hace |
-| 38 | Pena por irreverencia: 15 a 30 días de prisión y multa de 1 a 5 salarios mínimos del sector público | |
-| 39 | Pena por ultraje: 1 a 3 meses y multa de 5 a 20 salarios mínimos | |
-| 42 | El juzgado de paz es el tribunal competente | |
+Lo que declaran es lo que el código hace, y conviene que siga siendo así:
 
-El artículo 28.3 es el decisivo: en cuanto el carnet sirva para promociones con
-negocios, usar el escudo pasaría de riesgo interpretable a supuesto expreso. Por eso
-se quitó antes de que eso ocurra, y no después.
+- La foto **nunca** sale del navegador. No hay endpoint que la reciba.
+- El nombre y la ciudad viajan al servidor solo para firmar el token. No se guardan.
+- Lo único con estado es el contador de secuenciales: un número, no una lista.
+- El nombre y la ciudad **sí** van dentro del QR, firmados y legibles por quien lo
+  escanee. Eso está dicho en los términos, en la privacidad y en la propia casilla.
 
-### Los colores sí se usan
+Si algún día se empieza a almacenar nombres o fotos, hay que reescribir las dos
+páginas y asumir las obligaciones de responsable de tratamiento de la Ley 172-13:
+base legal, conservación, seguridad y atención de los derechos de acceso,
+rectificación, cancelación y oposición.
 
-La franja superior del sitio es azul, blanco y rojo en banda horizontal. Es color,
-no símbolo: no es cuarteada, no tiene cruz blanca y no reproduce la forma de la
-bandera. El artículo 44 prohíbe combinar los colores para identificar **agrupaciones,
-partidos o movimientos políticos** de modo que se asemejen a la bandera, y el 24.6
-habla de propaganda **comercial o política** que en conjunto la asemeje. Si algún día
-el sitio hace campañas comerciales con piezas que evoquen la bandera, hay que volver
-a mirar el 24.6.
-
-La página [/simbolos-patrios](https://palomos.com.do/simbolos-patrios) publica este
-criterio. Esto no es asesoría legal; para certeza, consulta a un abogado dominicano.
+Nada de esto es asesoría legal. Para certeza, consulta a un abogado dominicano.
 
 ## Correr en local
 
@@ -162,8 +155,8 @@ public/vendor/      qrcode-generator (MIT, de Kazuhiko Arase)
 | `GET /v/<token>` | Página de verificación del QR |
 | `GET /verificar?s=<número>` | Verificación por número escrito |
 | `GET /api/verificar?s=<número>` | Lo mismo, en JSON |
-| `GET /api/lugares` | Lista de lugares del selector |
-| `GET /simbolos-patrios` | Criterio de uso de los símbolos patrios |
+| `GET /terminos` | Términos y condiciones |
+| `GET /privacidad` | Política de privacidad |
 | `GET /api/wallet/google` · `/apple` | Pases de Wallet (501 sin credenciales) |
 
 ---

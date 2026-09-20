@@ -316,3 +316,139 @@ footer strong{color:#c3d2ec}
 .field select option{background:#12264b;color:#fff}
 
 .descargo a{color:#c9a227;text-decoration:underline;text-underline-offset:3px}
+
+/* =====================================================================
+   Móvil
+   ===================================================================== */
+
+html{-webkit-text-size-adjust:100%}
+
+/* Respeta el notch y la barra de gestos. */
+main{
+  padding-left:max(18px, env(safe-area-inset-left));
+  padding-right:max(18px, env(safe-area-inset-right));
+}
+footer{
+  padding-bottom:calc(30px + env(safe-area-inset-bottom));
+  padding-left:max(18px, env(safe-area-inset-left));
+  padding-right:max(18px, env(safe-area-inset-right));
+}
+
+/* Nada se sale de la pantalla, pase lo que pase. */
+img, canvas, video, svg{max-width:100%}
+
+/* Los botones tienen que ser cómodos con el dedo. */
+.btn{min-height:50px}
+.redes a{min-height:44px}
+
+/* ---------- carnet de muestra en la portada ---------- */
+.demo{
+  margin:26px 0 30px;
+  perspective:1000px;
+}
+.demo canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  box-shadow:0 20px 44px -16px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.1);
+  transform:rotate(-1.6deg);
+}
+@media (prefers-reduced-motion:reduce){
+  .demo canvas{transform:none}
+}
+
+.claim{
+  margin:16px 0 0;
+  font-size:16px;font-weight:700;color:var(--gold);
+  line-height:1.4;
+}
+
+/* ---------- aceptación de términos ---------- */
+.acepto{
+  display:flex;gap:12px;align-items:flex-start;
+  margin-top:26px;padding:14px 15px;
+  background:rgba(0,0,0,.24);
+  border:1px solid var(--line);
+  border-radius:12px;
+  cursor:pointer;
+}
+.acepto input{
+  flex:none;
+  width:24px;height:24px;
+  margin:1px 0 0;
+  accent-color:var(--red);
+  cursor:pointer;
+}
+.acepto span{font-size:13px;line-height:1.55;color:#a9bcd8}
+.acepto a{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+.acepto:has(input:checked){
+  border-color:rgba(201,162,39,.45);
+  background:rgba(201,162,39,.08);
+}
+
+/* ---------- ver el carnet en grande ---------- */
+.carnet-stage{cursor:zoom-in}
+.lupa{
+  margin:10px 0 0;
+  font-size:12.5px;color:var(--muted);
+}
+
+#visor{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(4,10,24,.96);
+  display:none;
+  align-items:center;justify-content:center;
+  padding:16px;
+}
+#visor[data-open]{display:flex}
+#visor img{
+  max-width:100%;max-height:100%;
+  border-radius:8px;
+  box-shadow:0 20px 60px -20px #000;
+}
+/* En vertical el carnet se gira para llenar la pantalla. */
+@media (orientation:portrait){
+  #visor img{
+    transform:rotate(90deg);
+    max-width:calc(100dvh - 32px);
+    max-height:calc(100vw - 32px);
+  }
+}
+#visorCerrar{
+  position:absolute;
+  top:calc(12px + env(safe-area-inset-top));
+  right:calc(12px + env(safe-area-inset-right));
+  width:46px;height:46px;
+  display:grid;place-items:center;
+  border:0;border-radius:50%;
+  background:rgba(255,255,255,.14);
+  color:#fff;font-size:24px;line-height:1;
+  cursor:pointer;
+}
+
+/* ---------- pantallas muy estrechas ---------- */
+@media (max-width:360px){
+  h1{font-size:30px}
+  .card-ui{padding:18px 15px}
+  .descargo{padding:18px 15px}
+  .acepto span{font-size:12.5px}
+}
+
+/* ---------- #teampalomos ---------- */
+.hashtag{
+  margin:14px 0 0;
+  font-size:clamp(22px,6.5vw,28px);
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1.1;
+}
+.hashtag .az{color:#7fb2ff}
+.hashtag .ro{color:#ff5f74}
+
+.foot-hashtag{
+  margin:0 0 14px;
+  font-size:17px;font-weight:800;letter-spacing:-.01em;
+}
+.foot-hashtag .az{color:#7fb2ff}
+.foot-hashtag .ro{color:#ff5f74}
