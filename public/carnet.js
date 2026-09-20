@@ -450,11 +450,11 @@
       ctx.fillText(text, x, y);
     }
 
-    /* --- foto --- */
-    var PX = 32, PY = 106, PW = 182, PH = 228;
+    /* --- foto: lo primero que se mira, así que manda --- */
+    var PX = 32, PY = 104, PW = 248, PH = 310;
 
     ctx.save();
-    roundRect(ctx, PX, PY, PW, PH, 4);
+    roundRect(ctx, PX, PY, PW, PH, 5);
     ctx.clip();
     if (data.photo) {
       ctx.drawImage(data.photo, PX, PY, PW, PH);
@@ -465,95 +465,50 @@
     ctx.restore();
     ctx.strokeStyle = 'rgba(19,41,75,.25)';
     ctx.lineWidth = 1;
-    roundRect(ctx, PX, PY, PW, PH, 4);
+    roundRect(ctx, PX, PY, PW, PH, 5);
     ctx.stroke();
 
     /* --- firma bajo la foto --- */
-    label('Firma', PX, 364);
-    drawSignature(ctx, PX + 46, 348, 136, 46, seed);
+    label('Firma', PX, 436);
+    drawSignature(ctx, PX + 46, 424, 200, 52, seed);
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(PX, 398);
-    ctx.lineTo(PX + PW, 398);
+    ctx.moveTo(PX, 478);
+    ctx.lineTo(PX + PW, 478);
     ctx.stroke();
-
-    label('Vigencia hasta', PX, 422);
-    (function () {
-      // «UN PALOMO NUNCA MUERE» no cabe en una línea sobre la foto.
-      var palabras = String(data.vence).split(' ');
-      var lineas = [], actual = '';
-      ctx.font = font(700, 17);
-      palabras.forEach(function (p) {
-        var prueba = actual ? actual + ' ' + p : p;
-        if (ctx.measureText(prueba).width > PW && actual) {
-          lineas.push(actual);
-          actual = p;
-        } else {
-          actual = prueba;
-        }
-      });
-      if (actual) lineas.push(actual);
-
-      ctx.fillStyle = C.navy;
-      lineas.slice(0, 2).forEach(function (l, i) {
-        ctx.fillText(l, PX, 446 + i * 21);
-      });
-    })();
 
     /* --- columna de datos --- */
-    var BX = 242, BW = 420;
+    var BX = 306, FIELD_W = 344;
 
-    label('Número de palomo', BX, 124);
-    value(data.serial, BX, 160, 32, BW, F.mono, 700);
+    label('Número de palomo', BX, 122);
+    value(data.serial, BX, 156, 30, FIELD_W, F.mono, 700);
 
-    label('Nombre', BX, 198);
-    value(nom.nombres, BX, 224, 23, BW);
+    label('Nombre', BX, 194);
+    value(nom.nombres, BX, 218, 23, FIELD_W);
 
-    label('Apellido', BX, 256);
-    value(nom.apellidos, BX, 282, 23, BW);
+    label('Apellido', BX, 248);
+    value(nom.apellidos, BX, 272, 23, FIELD_W);
 
-    label('Condición', BX, 314);
-    value(data.categoria, BX, 340, 21, BW);
+    label('Condición', BX, 302);
+    value(data.categoria, BX, 326, 21, FIELD_W);
 
-    label('Lugar de tranquilidad', BX, 372);
-    value(data.lugar, BX, 398, 21, BW);
+    label('Lugar de tranquilidad', BX, 356);
+    value(data.lugar, BX, 380, 21, FIELD_W);
 
-    label('Ocupación u oficio', BX, 430);
-    value(data.oficio, BX, 456, 21, BW);
+    label('Ocupación u oficio', BX, 410);
+    value(data.oficio, BX, 434, 21, FIELD_W);
 
-    /* --- columna derecha --- */
-    var RX = 692;
+    /* --- columna derecha: el QR, en grande --- */
+    var RX = 690;
+    var QS = 200, QX = W - 32 - QS, QY = 104;
 
-    // foto fantasma, teñida de azul como en los documentos reales
-    var GW = 92, GH = 115;
-    ctx.save();
-    roundRect(ctx, RX, 106, GW, GH, 3);
-    ctx.clip();
-    if (data.photo) {
-      ctx.globalAlpha = 0.5;
-      ctx.drawImage(data.photo, RX, 106, GW, GH);
-      ctx.globalAlpha = 0.38;
-      ctx.fillStyle = '#2f6fb0';
-      ctx.fillRect(RX, 106, GW, GH);
-    } else {
-      ctx.fillStyle = C.ghost;
-      ctx.fillRect(RX, 106, GW, GH);
-    }
-    ctx.restore();
-    ctx.strokeStyle = 'rgba(19,41,75,.2)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, RX, 106, GW, GH, 3);
-    ctx.stroke();
-
-    // QR
-    var QS = 142, QX = W - 32 - QS, QY = 106;
     ctx.fillStyle = '#fff';
-    roundRect(ctx, QX - 6, QY - 6, QS + 12, QS + 12, 6);
+    roundRect(ctx, QX - 7, QY - 7, QS + 14, QS + 14, 7);
     ctx.fill();
     ctx.strokeStyle = 'rgba(19,41,75,.18)';
     ctx.lineWidth = 1;
-    roundRect(ctx, QX - 6, QY - 6, QS + 12, QS + 12, 6);
+    roundRect(ctx, QX - 7, QY - 7, QS + 14, QS + 14, 7);
     ctx.stroke();
     drawQR(ctx, data.qrUrl, QX, QY, QS);
 
@@ -561,22 +516,21 @@
       var cx = QX + QS / 2;
 
       ctx.fillStyle = C.label;
-      ctx.font = font(600, 10);
+      ctx.font = font(600, 11);
       var t = 'ESCANEA PARA VERIFICAR';
-      tracked(ctx, t, cx - trackedWidth(ctx, t, 0.9) / 2, QY + QS + 20, 0.9);
+      tracked(ctx, t, cx - trackedWidth(ctx, t, 1) / 2, QY + QS + 26, 1);
 
       ctx.fillStyle = C.red;
-      ctx.font = font(700, 12);
-      var d = SITIO;
-      ctx.fillText(d, cx - ctx.measureText(d).width / 2, QY + QS + 38);
+      ctx.font = font(700, 14);
+      ctx.fillText(SITIO, cx - ctx.measureText(SITIO).width / 2, QY + QS + 46);
     })();
 
     // nivel de palomería
-    label('Nivel de palomería', RX, 302);
+    label('Nivel de palomería', RX, 378);
     (function () {
-      var bx = RX, by = 314, bw = 196, bh = 12;
+      var bx = RX, by = 390, bw = 186, bh = 13;
       ctx.fillStyle = 'rgba(19,41,75,.12)';
-      roundRect(ctx, bx, by, bw, bh, 6);
+      roundRect(ctx, bx, by, bw, bh, 6.5);
       ctx.fill();
 
       var pct = Math.max(0, Math.min(100, data.nivel)) / 100;
@@ -584,7 +538,7 @@
       g.addColorStop(0, C.navy2);
       g.addColorStop(1, C.red);
       ctx.fillStyle = g;
-      roundRect(ctx, bx, by, Math.max(bh, bw * pct), bh, 6);
+      roundRect(ctx, bx, by, Math.max(bh, bw * pct), bh, 6.5);
       ctx.fill();
 
       ctx.fillStyle = C.navy;
@@ -592,46 +546,8 @@
       ctx.fillText(data.nivel + '%', bx + bw + 12, by + bh);
     })();
 
-    label('Estado', RX, 356);
-    value('TRANQUILO', RX, 382, 20, 130);
-
-    // El hashtag, en dos tonos: azul y rojo, los colores de RD.
-    (function () {
-      // A esta altura el sello ya se estrecha, así que no se tocan.
-      var hx = RX, hy = 460;
-      ctx.font = font(800, 21);
-      ctx.fillStyle = C.navy;
-      ctx.fillText('#team', hx, hy);
-      ctx.fillStyle = C.red;
-      ctx.fillText('palomos', hx + ctx.measureText('#team').width, hy);
-    })();
-
-    // sello del Ministerio
-    (function () {
-      var sx = 898, sy = 428;
-      ctx.save();
-      ctx.translate(sx, sy);
-      ctx.rotate(-0.12);
-      ctx.globalAlpha = 0.5;
-      ctx.strokeStyle = C.red;
-      ctx.lineWidth = 2.6;
-      ctx.beginPath();
-      ctx.arc(0, 0, 54, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.lineWidth = 1.1;
-      ctx.beginPath();
-      ctx.arc(0, 0, 46, 0, Math.PI * 2);
-      ctx.stroke();
-
-      drawPalomo(ctx, 0, -8, 66, C.red);
-
-      ctx.fillStyle = C.red;
-      ctx.font = font(700, 8.5);
-      var t = 'MINISTERIO DE PALOMOS';
-      var tw = trackedWidth(ctx, t, 0.7);
-      tracked(ctx, t, -tw / 2, 32, 0.7);
-      ctx.restore();
-    })();
+    label('Vigencia hasta', RX, 428);
+    value(data.vence, RX, 452, 19, 290);
 
     // número vertical en el canto derecho
     ctx.save();
@@ -669,13 +585,51 @@
 
     ctx.fillStyle = C.label;
     ctx.font = font(600, 10.5);
-    ctx.fillText('DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · ES UN MEME', 32, MY + 126);
+    ctx.fillText('DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · ES UN MEME', 156, MY + 126);
 
     ctx.fillStyle = C.red;
     ctx.font = font(700, 11.5);
     (function () {
       var t = 'MEME DE @javimolinax';
       ctx.fillText(t, W - 32 - ctx.measureText(t).width, MY + 126);
+    })();
+
+    // El hashtag, en dos tonos: azul y rojo, los colores de RD.
+    (function () {
+      var hx = 32, hy = MY + 126;
+      ctx.font = font(800, 15);
+      ctx.fillStyle = C.navy;
+      ctx.fillText('#team', hx, hy);
+      ctx.fillStyle = C.red;
+      ctx.fillText('palomos', hx + ctx.measureText('#team').width, hy);
+    })();
+
+    // El cuño del Ministerio, estampado encima del pie y girado, como si
+    // lo hubieran puesto a mano después de imprimir.
+    (function () {
+      var sx = 906, sy = 552;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(-0.14);
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = C.red;
+
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.arc(0, 0, 50, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.arc(0, 0, 43, 0, Math.PI * 2);
+      ctx.stroke();
+
+      drawPalomo(ctx, 0, -9, 60, C.red);
+
+      ctx.fillStyle = C.red;
+      ctx.font = font(700, 8);
+      var t = 'MINISTERIO DE PALOMOS';
+      tracked(ctx, t, -trackedWidth(ctx, t, 0.6) / 2, 28, 0.6);
+      ctx.restore();
     })();
 
     // Banda al pie, con los mismos colores y el mismo criterio que la regla.
