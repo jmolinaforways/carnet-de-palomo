@@ -41,7 +41,7 @@ firmados dentro.
 decisión, no un descuido. No los pongas.
 
 El emblema del «Ministerio de Palomos» es un palomo dibujado con código
-( en ). No es una versión del Escudo Nacional ni
+(`paintPalomo`, en `public/carnet.js`). No es una versión del Escudo Nacional ni
 toma ninguno de sus elementos.
 
 ### Por qué, según la Ley 210-19
