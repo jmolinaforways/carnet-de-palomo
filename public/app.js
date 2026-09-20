@@ -9,7 +9,7 @@
   var $ = function (id) { return document.getElementById(id); };
 
   var PHOTO_W = 400, PHOTO_H = 500;
-  var EXPORT_SCALE = 3;
+  var EXPORT_SCALE = 2;   // 2024x1276: de sobra para el QR y pesa la mitad
 
   var state = {
     photo: null,      // canvas 400x500 con la foto recortada

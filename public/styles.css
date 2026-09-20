@@ -289,3 +289,7 @@ footer strong{color:#c3d2ec}
   font-size:14.5px;font-weight:600;color:var(--gold);
 }
 .vb-body a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+
+/* El atributo hidden pierde contra cualquier display del autor
+   (.btn-wallet usa flex), así que lo forzamos. */
+[hidden]{display:none !important}
