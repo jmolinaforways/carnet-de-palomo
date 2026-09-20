@@ -214,7 +214,10 @@
     fetch('/api/emitir', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre: cleanName($('inNombre').value) })
+      body: JSON.stringify({
+        nombre: cleanName($('inNombre').value),
+        lugar: $('inLugar').value || undefined   // vacío = que lo elija el Ministerio
+      })
     }).then(function (r) {
       return r.json().then(function (j) {
         if (!r.ok || !j.ok) { throw new Error(j.error || 'Falló la emisión'); }
@@ -378,10 +381,31 @@
     go('step-form');
   }
 
+  // La lista de lugares la manda el servidor, que es quien la valida:
+  // así el <select> no se desincroniza de lo que el carnet acepta.
+  function cargarLugares() {
+    fetch('/api/lugares')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !Array.isArray(j.lugares)) { return; }
+        var sel = $('inLugar');
+        var frag = document.createDocumentFragment();
+        j.lugares.forEach(function (l) {
+          var o = document.createElement('option');
+          o.value = l;
+          o.textContent = l;
+          frag.appendChild(o);
+        });
+        sel.appendChild(frag);
+      })
+      .catch(function () { /* si falla, queda «que decida el Ministerio» */ });
+  }
+
   function init() {
     paintHeroSeal();
     loadFonts().then(paintHeroSeal);   // se repinta cuando llega la tipografía
     window.Carnet.loadAssets();        // el escudo y la bandera, ya listos al emitir
+    cargarLugares();
 
     $('btnStart').addEventListener('click', function () { go('step-form'); });
 

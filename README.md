@@ -45,9 +45,34 @@ se recolorean, no se recortan y no se deforman. Los archivos están en
 El emblema del palomo (`drawPalomo` en `public/carnet.js`) es un dibujo propio y
 no guarda ninguna relación con el escudo nacional.
 
-> La Ley de Símbolos Patrios restringe el uso de los símbolos nacionales. Que un
-> archivo esté libre de derechos de autor no significa que su uso esté libre de
-> restricciones.
+### Lo que dice la Ley 210-19
+
+Que los archivos estén libres de derechos de autor **no** significa que su uso esté
+libre de restricciones. La [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf)
+regula el uso de la bandera, el escudo y el himno. Lo que aplica aquí:
+
+| Artículo | Qué dice | Cómo nos afecta |
+|---|---|---|
+| 24.1 y 24.2 | Es irreverencia usar colores distintos a los constitucionales, o incorporar a la bandera una versión del escudo que no sea la oficial | **Cumplido.** Usamos los archivos oficiales sin tocar |
+| 24.5 | Prohíbe usar la bandera en propaganda comercial o **como distintivo característico de cualquier organización privada** | **Riesgo.** El «Ministerio de Palomos» es una organización ficticia privada que usa la bandera como distintivo |
+| 26 | Reserva el uso del Escudo Nacional en **identificaciones** e impresos a una lista cerrada de funcionarios públicos | **Riesgo.** El carnet es una identificación con el escudo, emitida por un particular |
+| 28.1 | Es irreverencia usar el escudo violando cualquier precepto de la ley | Se activa si el artículo 26 se considera incumplido |
+| 28.3 | Es irreverencia usar el escudo en promociones comerciales con fines de lucro | **No aplica hoy.** Aplicaría si el sitio se monetiza |
+| 25 y 29 | Ultraje: quemar, destruir, arrojar al suelo, profanar, poner letreros encima | **No aplica.** Nada de eso se hace |
+| 38 | Pena por irreverencia: 15 a 30 días de prisión y multa de 1 a 5 salarios mínimos del sector público | |
+| 39 | Pena por ultraje: 1 a 3 meses y multa de 5 a 20 salarios mínimos | |
+| 42 | El juzgado de paz es el tribunal competente | |
+
+El riesgo real está en los artículos 26 y 24.5, no en el ultraje: poner el escudo
+oficial en una identificación emitida por un particular. El descargo y la página
+[/simbolos-patrios](https://palomos.com.do/simbolos-patrios) documentan la buena fe
+y la ausencia de lucro, pero no eliminan ese punto.
+
+**Si se quiere exposición cero**, la vía es quitar el escudo y la bandera del carnet
+y dejar solo el emblema del palomo: el documento sigue leyéndose como cédula
+dominicana por la tipografía, la retícula, el guilloche y la banda MRZ.
+
+Esto no es asesoría legal. Para certeza, consulta a un abogado dominicano.
 
 ---
 

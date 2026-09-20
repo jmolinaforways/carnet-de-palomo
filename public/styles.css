@@ -293,3 +293,26 @@ footer strong{color:#c3d2ec}
 /* El atributo hidden pierde contra cualquier display del autor
    (.btn-wallet usa flex), así que lo forzamos. */
 [hidden]{display:none !important}
+
+.mt-sm{margin-top:20px}
+.field select{
+  width:100%;
+  padding:14px 15px;
+  font:600 17px/1.2 'Archivo',system-ui,sans-serif;
+  color:#fff;
+  background:rgba(0,0,0,.26);
+  border:1px solid var(--line);
+  border-radius:11px;
+  outline:none;
+  appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238ea2c4'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:20px;
+  padding-right:40px;
+  transition:border-color .16s, box-shadow .16s;
+}
+.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.18)}
+.field select option{background:#12264b;color:#fff}
+
+.descargo a{color:#c9a227;text-decoration:underline;text-underline-offset:3px}

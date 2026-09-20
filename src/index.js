@@ -25,11 +25,20 @@ const CATEGORIAS = [
   'PALOMO HOMOLOGADO'
 ];
 
+// El palomo elige el suyo; si no elige, se saca del nombre.
+// En el token viaja el nombre del lugar, no su posición en esta lista,
+// para que reordenarla o ampliarla no invalide los carnets ya emitidos.
 const LUGARES = [
-  'SANTO DOMINGO', 'SANTIAGO', 'SAN CRISTÓBAL', 'LA VEGA',
-  'PUERTO PLATA', 'SAN PEDRO DE MACORÍS', 'LA ROMANA', 'HIGÜEY',
-  'MOCA', 'BANÍ', 'AZUA', 'BARAHONA', 'BONAO', 'SAN JUAN',
-  'NAGUA', 'COTUÍ', 'SAN FRANCISCO DE MACORÍS', 'HATO MAYOR'
+  'AZUA', 'BANÍ', 'BARAHONA', 'BÁVARO', 'BOCA CHICA', 'BONAO',
+  'CABARETE', 'COMENDADOR', 'CONSTANZA', 'COTUÍ', 'DAJABÓN',
+  'EL SEIBO', 'ESPERANZA', 'HATO MAYOR', 'HIGÜEY', 'JARABACOA',
+  'JIMANÍ', 'LA ROMANA', 'LA VEGA', 'LAS MATAS DE FARFÁN',
+  'LAS TERRENAS', 'MAO', 'MOCA', 'MONTE CRISTI', 'MONTE PLATA',
+  'NAGUA', 'NAVARRETE', 'NEIBA', 'NUEVA YORK', 'PEDERNALES',
+  'PUERTO PLATA', 'SABANETA', 'SAMANÁ', 'SAN CRISTÓBAL',
+  'SAN FRANCISCO DE MACORÍS', 'SAN JOSÉ DE OCOA',
+  'SAN JUAN DE LA MAGUANA', 'SAN PEDRO DE MACORÍS', 'SANTIAGO',
+  'SANTO DOMINGO', 'SOSÚA', 'TAMBORIL', 'VILLA ALTAGRACIA'
 ];
 
 const OFICIOS = [
@@ -146,7 +155,7 @@ async function readToken(secret, token) {
 // El secuencial da el número. El resto sale del nombre, así que es
 // estable: el mismo nombre siempre tiene la misma condición y el mismo
 // nivel de palomería, aunque saque el carnet diez veces.
-async function derive(secret, nombre, seq) {
+async function derive(secret, nombre, seq, lugarPedido) {
   const mac = await sign(secret, 'palomo:v2:' + nombre.toLocaleLowerCase('es'));
   const chk = await sign(secret, 'palomo:chk:' + seq);
 
@@ -154,9 +163,19 @@ async function derive(secret, nombre, seq) {
     serial: `PAL-${String(seq).padStart(6, '0')}-${chk[0] % 10}`,
     nivel: 82 + (mac[5] % 19),
     categoria: CATEGORIAS[mac[6] % CATEGORIAS.length],
-    lugar: LUGARES[mac[7] % LUGARES.length],
+    lugar: normalizarLugar(lugarPedido) || LUGARES[mac[7] % LUGARES.length],
     oficio: OFICIOS[mac[8] % OFICIOS.length]
   };
+}
+
+// Solo dejamos pasar lugares de la lista: así nadie escribe lo que quiera
+// en el carnet, ni aunque llame a la API directamente.
+function normalizarLugar(raw) {
+  if (typeof raw !== 'string') return null;
+  // NFC porque iOS manda los acentos descompuestos: «SAMANÁ» llegaría
+  // como A + tilde suelta y no cuadraría con la lista.
+  const s = raw.normalize('NFC').trim().toLocaleUpperCase('es');
+  return LUGARES.includes(s) ? s : null;
 }
 
 function contador(env) {
@@ -307,8 +326,10 @@ async function emitir(request, env) {
   const secret = secretoDe(env);
   const emitido = hoyRD();
   const seq = await siguienteSecuencial(env);
-  const datos = await derive(secret, nombre, seq);
-  const token = await makeToken(secret, { n: nombre, e: emitido, q: seq });
+  const datos = await derive(secret, nombre, seq, body && body.lugar);
+  const token = await makeToken(secret, {
+    n: nombre, e: emitido, q: seq, l: datos.lugar
+  });
 
   return json({
     ok: true,
@@ -338,7 +359,7 @@ async function verificar(request, env, token) {
   }
 
   const nombre = limpiarNombre(payload.n);
-  const datos = await derive(secret, nombre, payload.q);
+  const datos = await derive(secret, nombre, payload.q, payload.l);
 
   return new Response(
     paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, ...datos }),
@@ -397,6 +418,15 @@ footer a{color:#c3d2ec}
 .total{margin:0 0 18px;text-align:center;font-size:13.5px;color:#8ea2c4}
 .total strong{color:#c9a227;font-size:15px}
 .nota{margin:0;font-size:12.5px;line-height:1.6;color:#8ea2c4}
+.doc{text-align:left}
+.doc h2{margin:26px 0 8px;font-size:15px;font-weight:800;color:#c9a227;letter-spacing:-.01em}
+.doc h2:first-child{margin-top:0}
+.doc p{margin:0 0 12px;font-size:14px;line-height:1.68;color:#c3d2ec}
+.doc strong{color:#fff}
+.doc em{color:#fff;font-style:italic}
+.aviso{margin-top:26px !important;padding:15px 16px;border-radius:12px;
+  background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.1);
+  font-size:12.5px !important;line-height:1.6 !important;color:#8ea2c4 !important}
 `;
 
 function envoltura(titulo, cuerpo) {
@@ -413,7 +443,9 @@ function envoltura(titulo, cuerpo) {
 <footer>
 <p><strong>Esto es un meme.</strong> El «Ministerio de Palomos» no existe y este carnet
 no es un documento oficial ni sirve para identificarte ante nadie.</p>
-<p>Meme de <a href="https://instagram.com/javimolinax" target="_blank" rel="noopener">@javimolinax</a></p>
+<p>Meme de <a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener">@javimolinax</a>
+en Instagram y <a href="https://www.tiktok.com/@javimolinaxx" target="_blank" rel="noopener">@javimolinaxx</a> en TikTok</p>
+<p><a href="/simbolos-patrios">Sobre el uso de los símbolos patrios</a></p>
 </footer></body></html>`;
 }
 
@@ -499,6 +531,73 @@ escanea su código QR, que los lleva firmados dentro.</p>
   );
 }
 
+/* ---------------- /simbolos-patrios ---------------- */
+
+function paginaSimbolos() {
+  return envoltura(
+    'Símbolos patrios: uso y respeto',
+    `
+<h1>Sobre los símbolos patrios</h1>
+<p class="lead">Este sitio es una parodia, pero la bandera y el escudo de la
+República Dominicana no lo son. Así los usamos y por qué.</p>
+
+<div class="doc">
+  <h2>Los reproducimos sin alterar</h2>
+  <p>La bandera y el Escudo Nacional que aparecen en el carnet son los archivos
+  oficiales. No se recolorean, no se recortan, no se deforman y no se les
+  superpone nada. Se dibujan a partir del diseño oficial vigente, con la Biblia
+  abierta, la cruz, los trofeos, las ramas de laurel y palma y el lema
+  <em>Dios, Patria, Libertad</em>.</p>
+  <p>La <strong>Ley núm. 210-19</strong>, sobre los símbolos patrios, considera
+  irreverencia usar colores distintos a los del artículo 32 de la Constitución
+  (artículo 24, numeral 1) e incorporar a la bandera una versión del escudo que
+  no sea la oficial vigente (artículo 24, numeral 2). Nada de eso ocurre aquí, y
+  es deliberado.</p>
+
+  <h2>El palomo no es el escudo</h2>
+  <p>El emblema del «Ministerio de Palomos» es un dibujo propio: una paloma.
+  No es una versión del Escudo Nacional, no lo imita y no toma ninguno de sus
+  elementos. Son cosas separadas a propósito, para que nadie confunda el chiste
+  con el símbolo.</p>
+
+  <h2>Esto no es, ni será, un negocio</h2>
+  <p>El sitio no vende nada, no tiene publicidad, no cobra por el carnet y no
+  recoge datos para venderlos. El artículo 28, numeral 3, de la Ley 210-19
+  considera irreverencia usar el Escudo Nacional en promociones comerciales con
+  fines de lucro, y el artículo 24, numeral 5, prohíbe usar la bandera en
+  propaganda comercial. Mantener esto sin ánimo de lucro no es un detalle: es
+  parte de cómo está pensado.</p>
+
+  <h2>No hay burla al símbolo</h2>
+  <p>La broma es sobre el palomo, no sobre la patria. Los artículos 25 y 29 de
+  la ley definen el ultraje como quemar, destruir, arrojar al suelo, profanar o
+  colocar letreros e imágenes encima de los símbolos. Nada de eso se hace ni se
+  hará en este sitio.</p>
+
+  <h2>El carnet no se hace pasar por un documento</h2>
+  <p>Cada carnet lleva impreso «DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · ES UN
+  MEME», el emisor es un ministerio que no existe y el sitio entero lo dice desde
+  la portada. No sustituye la cédula ni ningún documento, y no sirve para
+  identificarse ante nadie.</p>
+
+  <h2>Si hay algo que corregir, se corrige</h2>
+  <p>Si alguna autoridad, el Instituto Duartiano, la Comisión Permanente de
+  Efemérides Patrias o cualquier persona entiende que el uso que hacemos de los
+  símbolos no es el correcto, se corrige o se retira. Sin discusión. El código
+  es público y el cambio se puede ver.</p>
+
+  <p class="aviso">Esta página explica nuestro criterio y cita la ley, pero no es
+  asesoría legal. La Ley 210-19 sanciona la irreverencia contra los símbolos con
+  quince a treinta días de prisión y multa de uno a cinco salarios mínimos del
+  sector público (artículo 38), y el ultraje con uno a tres meses y multa de cinco
+  a veinte salarios mínimos (artículo 39). El juzgado de paz es el tribunal
+  competente (artículo 42).</p>
+</div>
+
+<a class="cta" href="/">Volver al inicio</a>`
+  );
+}
+
 async function rutaVerificar(request, env) {
   const consulta = (new URL(request.url).searchParams.get('s') || '').slice(0, 32);
   const resultado = consulta ? await verificarSerial(env, consulta) : null;
@@ -545,7 +644,27 @@ export default {
       return verificar(request, env, decodeURIComponent(path.slice(3)));
     }
 
+    if (path === '/api/lugares') {
+      // Lista única: el <select> del formulario se llena desde aquí,
+      // así no se desincroniza de la que valida el servidor.
+      return new Response(JSON.stringify({ ok: true, lugares: LUGARES }), {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    }
+
     if (path === '/verificar') return rutaVerificar(request, env);
+
+    if (path === '/simbolos-patrios') {
+      return new Response(paginaSimbolos(), {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    }
 
     if (path === '/api/verificar') {
       const s = new URL(request.url).searchParams.get('s') || '';
