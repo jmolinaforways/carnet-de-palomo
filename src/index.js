@@ -168,8 +168,16 @@ function limpiarLugar(raw) {
     .toLocaleUpperCase('es');
 }
 
+// El contador vive en un único Durable Object, identificado por este
+// nombre. Cambiarlo crea uno nuevo que empieza en cero: es la forma de
+// reiniciar la numeración, y la única.
+//
+// Hacerlo después de lanzar significaría repartir números que ya tiene
+// otra gente. Si alguna vez hace falta, que sea antes de anunciar.
+const CONTADOR = 'lanzamiento-2026';
+
 function contador(env) {
-  return env.SECUENCIA.get(env.SECUENCIA.idFromName('global'));
+  return env.SECUENCIA.get(env.SECUENCIA.idFromName(CONTADOR));
 }
 
 async function siguienteSecuencial(env) {
