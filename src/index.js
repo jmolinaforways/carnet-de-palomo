@@ -197,6 +197,7 @@ async function derive(secret, nombre, seq, tipo, estilo, genero) {
     // registro: asi un carnet nuevo no obliga a tocar el dibujo.
     sujeto: t(tipo.sujeto),
     plural: t(tipo.plural),
+    emblema: tipo.emblema || 'palomo',
     certificado: t(CERTIFICADO),
     lema: t(tipo.lema),
     cintilla: t(tipo.cintilla),

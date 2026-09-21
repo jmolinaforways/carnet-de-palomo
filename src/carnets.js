@@ -41,6 +41,10 @@ export function g(valor, genero) {
 // concuerda. Es igual para todos los carnets: vive aqui una sola vez.
 // El plural va escrito, no derivado: «BEBEDOR» + «S» da «BEBEDORS».
 // En espanol las palabras acabadas en consonante llevan -es.
+// El dibujo que lleva cada carnet: 'palomo', 'bulto' o 'copa'. Un
+// bebedor no lleva palomos; lleva botella y vaso.
+export const EMBLEMAS = ['palomo', 'bulto', 'copa'];
+
 export const CERTIFICADO = { m: 'CERTIFICADO', f: 'CERTIFICADA' };
 
 export const CARNETS = {
@@ -61,6 +65,7 @@ export const CARNETS = {
     sujeto: { m: 'PALOMO', f: 'PALOMA' },
     plural: { m: 'PALOMOS', f: 'PALOMAS' },
     hashtag: 'palomos',
+    emblema: 'palomo',
     nivelEtiqueta: 'Nivel de tigueraje',
     vence: 'DE POR VIDA',
     invitacion: 'Invita a tus panas palomos al club.',
@@ -180,6 +185,7 @@ export const CARNETS = {
     sujeto: { m: 'PARIGUAYO', f: 'PARIGUAYA' },
     plural: { m: 'PARIGUAYOS', f: 'PARIGUAYAS' },
     hashtag: 'pariguayos',
+    emblema: 'bulto',
     nivelEtiqueta: 'Nivel de flow',
     vence: 'DE POR VIDA',
     invitacion: 'Invita a tus panas pariguayos al club.',
@@ -300,6 +306,7 @@ export const CARNETS = {
     sujeto: { m: 'BEBEDOR', f: 'BEBEDORA' },
     plural: { m: 'BEBEDORES', f: 'BEBEDORAS' },
     hashtag: 'bebedores',
+    emblema: 'copa',
     nivelEtiqueta: 'Nivel de resistencia',
     vence: 'DE VIERNES A DOMINGO',
     invitacion: 'Invita a tus panas bebedores al club.',

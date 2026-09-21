@@ -294,7 +294,7 @@
   // cambia en los dos sitios a la vez, que es justo el punto.
   function marcaPalomos(ctx, cx, cy, size, color) {
     drawCorona(ctx, cx, cy - size * 0.22, size * 0.21, color);
-    drawPalomo(ctx, cx, cy + size * 0.05, size * 0.50, color);
+    dibujarEmblema(ctx, cx, cy + size * 0.05, size * 0.50, color);
   }
   function drawEmblema(ctx, cx, cy, size, color) {
     var r = size / 2;
@@ -603,6 +603,103 @@
   }
 
   // Lo pinta en un lienzo aparte y lo estampa, a la resolución real de salida.
+  /* ---------- los otros emblemas ---------- */
+
+  // Botella y vaso. A veinte píxeles dentro de un aro hay que leer
+  // «aquí se bebe» de un vistazo, así que las dos piezas van juntas y
+  // gordas, sin detalle que se pierda.
+  function drawCopa(ctx, cx, cy, s, fill) {
+    var k = s / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    ctx.fillStyle = fill;
+
+    // botella: tapa, cuello y cuerpo, de una pieza
+    ctx.beginPath();
+    ctx.moveTo(-40, 52);
+    ctx.lineTo(-40, 2);
+    ctx.bezierCurveTo(-40, -12, -32, -18, -30, -24);
+    ctx.lineTo(-30, -44);
+    ctx.lineTo(-16, -44);
+    ctx.lineTo(-16, -24);
+    ctx.bezierCurveTo(-14, -18, -6, -12, -6, 2);
+    ctx.lineTo(-6, 52);
+    ctx.closePath();
+    ctx.fill();
+
+    // la etiqueta, en hueco
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillRect(-37, 14, 28, 20);
+    ctx.restore();
+
+    // vaso: tronco de cono
+    ctx.beginPath();
+    ctx.moveTo(8, -18);
+    ctx.lineTo(44, -18);
+    ctx.lineTo(38, 52);
+    ctx.lineTo(14, 52);
+    ctx.closePath();
+    ctx.fill();
+
+    // la línea del líquido, en hueco
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.moveTo(10, -10);
+    ctx.lineTo(42, -10);
+    ctx.lineTo(41, -2);
+    ctx.lineTo(11, -2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  // Un bulto. El pariguayo no baila: cuida los bultos, y eso es lo que
+  // lo define mejor que cualquier otra cosa.
+  function drawBulto(ctx, cx, cy, s, fill) {
+    var k = s / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    ctx.fillStyle = fill;
+
+    // asa
+    ctx.beginPath();
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = fill;
+    ctx.arc(0, -30, 16, Math.PI, 0);
+    ctx.stroke();
+
+    // cuerpo
+    roundRect(ctx, -42, -30, 84, 78, 14);
+    ctx.fill();
+
+    // la tapa, en hueco
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillRect(-46, 0, 92, 7);
+    // y el cierre
+    ctx.beginPath();
+    ctx.arc(0, 24, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  // Cuál se dibuja. Vive aquí, como la paleta, y lo fija renderCarnet.
+  var EMBLEMA = 'palomo';
+
+  function dibujarEmblema(ctx, cx, cy, s, fill) {
+    if (EMBLEMA === 'copa')  { return drawCopa(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'bulto') { return drawBulto(ctx, cx, cy, s, fill); }
+    return drawPalomo(ctx, cx, cy, s, fill);
+  }
+
   function drawPalomo(ctx, cx, cy, s, fill) {
     var m = ctx.getTransform ? ctx.getTransform() : null;
     var dpr = m ? Math.hypot(m.a, m.b) || 1 : 1;
@@ -825,6 +922,7 @@
       hashtag: c.hashtag,
       sujeto: t(c.sujeto),
       plural: t(c.plural),
+      emblema: c.emblema || 'palomo',
       certificado: gen === 'f' ? 'CERTIFICADA' : 'CERTIFICADO',
       lema: t(c.lema),
       cintilla: t(c.cintilla),
@@ -856,6 +954,7 @@
 
   function renderCarnet(canvas, data, scale, estiloId) {
     C = estiloDe(estiloId || data.estilo);
+    EMBLEMA = (data && data.emblema) || 'palomo';
     scale = scale || 1;
     if (C.formato === 'viral')    { return renderViral(canvas, data, scale); }
     if (C.formato === 'vintage')  { return renderVintage(canvas, data, scale); }
@@ -890,7 +989,7 @@
     // datos y parece una mancha.
     ctx.save();
     ctx.globalAlpha = C.marcaAgua;
-    drawPalomo(ctx, 700, 300, 460, C.navy);
+    dibujarEmblema(ctx, 700, 300, 460, C.navy);
     ctx.restore();
 
     /* --- cabecera --- */
@@ -1171,7 +1270,7 @@
       ctx.arc(0, 0, 43, 0, Math.PI * 2);
       ctx.stroke();
 
-      drawPalomo(ctx, 0, -9, 60, C.red);
+      dibujarEmblema(ctx, 0, -9, 60, C.red);
 
       ctx.fillStyle = C.red;
       ctx.font = font(700, 8);
@@ -1223,7 +1322,7 @@
 
     ctx.save();
     ctx.globalAlpha = C.marcaAgua;
-    drawPalomo(ctx, w * 0.55, 360, 400, C.navy);
+    dibujarEmblema(ctx, w * 0.55, 360, 400, C.navy);
     ctx.restore();
 
     /* cabecera */
@@ -1263,7 +1362,7 @@
 
     ctx.save();
     ctx.globalAlpha = 0.9;
-    drawPalomo(ctx, 736, 122, 148, C.navy);
+    dibujarEmblema(ctx, 736, 122, 148, C.navy);
     ctx.restore();
 
     /* QR arriba a la derecha, que es donde queda sitio limpio */
@@ -1399,7 +1498,7 @@
 
     ctx.save();
     ctx.globalAlpha = C.marcaAgua * 2.2;
-    drawPalomo(ctx, 700, 392, 440, C.navy);
+    dibujarEmblema(ctx, 700, 392, 440, C.navy);
     ctx.restore();
 
     ctx.strokeStyle = C.suave; ctx.lineWidth = 2;
@@ -1538,7 +1637,7 @@
 
     ctx.save();
     ctx.globalAlpha = C.marcaAgua * 2.4;
-    drawPalomo(ctx, 690, 400, 450, C.navy);
+    dibujarEmblema(ctx, 690, 400, 450, C.navy);
     ctx.restore();
 
     ctx.strokeStyle = C.suave; ctx.lineWidth = 2.5;
@@ -1682,7 +1781,7 @@
 
     ctx.save();
     ctx.globalAlpha = C.marcaAgua * 0.8;
-    drawPalomo(ctx, 520, 340, 380, C.navy);
+    dibujarEmblema(ctx, 520, 340, 380, C.navy);
     ctx.restore();
 
     drawSello(ctx, 84, 88, 120, data.titulo, data.siglas || 'RD', C.navy);
@@ -1792,7 +1891,7 @@
     // El palomo enorme y desvaído a la derecha.
     ctx.save();
     ctx.globalAlpha = C.marcaAgua * 1.3;
-    drawPalomo(ctx, w * 0.80, 600, 450, C.navy);
+    dibujarEmblema(ctx, w * 0.80, 600, 450, C.navy);
     ctx.restore();
 
     // La ranura del cordón.
@@ -1951,7 +2050,7 @@
 
     ctx.save();
     ctx.globalAlpha = 0.08;
-    drawPalomo(ctx, w * 0.72, h * 0.54, 720, tinta);
+    dibujarEmblema(ctx, w * 0.72, h * 0.54, 720, tinta);
     ctx.restore();
 
     // Título arriba, en grande y apilado.
