@@ -601,3 +601,17 @@ img, canvas, video, svg{max-width:100%}
 }
 .diseno.elegido{border-color:var(--rojo)}
 .diseno.elegido span{color:#fff}
+
+/* ---------- el concepto ---------- */
+.field textarea{
+  width:100%;box-sizing:border-box;resize:none;
+  padding:12px 13px;
+  border:1px solid var(--line);border-radius:11px;
+  background:rgba(255,255,255,.06);color:#eaf0fb;
+  font:600 15px/1.45 'Archivo',system-ui,sans-serif;
+}
+.field textarea:focus{
+  outline:none;border-color:var(--red);
+  background:rgba(255,255,255,.09);
+}
+.field textarea::placeholder{color:#7d8ea8;font-weight:500}

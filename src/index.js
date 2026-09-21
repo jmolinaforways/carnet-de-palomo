@@ -351,6 +351,21 @@ function limpiarLugar(raw) {
     .toLocaleUpperCase('es');
 }
 
+// Frase propia: la escribe la persona y ocupa el sitio de la frase del
+// diseño. Ochenta caracteres es lo que entra en el formato más estrecho
+// sin que el cuerpo de letra baje de donde se lee.
+const CONCEPTO_MAX = 80;
+
+function limpiarConcepto(raw) {
+  if (typeof raw !== 'string') return '';
+  return raw
+    .normalize('NFC')
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, CONCEPTO_MAX);
+}
+
 // El contador vive en un único Durable Object, identificado por este
 // nombre. Cambiarlo crea uno nuevo que empieza en cero: es la forma de
 // reiniciar la numeración, y la única.
@@ -522,6 +537,9 @@ async function emitir(request, env) {
   // carnet lo dice; no le inventamos un pueblo.
   const lugar = limpiarLugar(body && body.lugar) || SIN_LUGAR;
 
+  // Su propia frase, si la escribió. Si no, el carnet usa la del diseño.
+  const concepto = limpiarConcepto(body && body.concepto);
+
   const secret = secretoDe(env, new URL(request.url));
   if (!secret) return json({ ok: false, error: SIN_LLAVE }, 503);
 
@@ -531,7 +549,8 @@ async function emitir(request, env) {
   const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo);
   const datos = await derive(secret, nombre, seq, tipo, estilo);
   const token = await makeToken(secret, {
-    n: nombre, e: emitido, q: seq, l: lugar, t: tipo.inicial
+    n: nombre, e: emitido, q: seq, l: lugar, t: tipo.inicial,
+    c: concepto || undefined
   });
 
   return json({
@@ -540,6 +559,7 @@ async function emitir(request, env) {
     secuencial: seq,
     ...datos,
     lugar,
+    concepto,
     emitido,
     token,
     verifyUrl: `${new URL(request.url).origin}/v/${token}`
@@ -565,9 +585,10 @@ async function verificar(request, env, token) {
   const tipo = tipoDe(payload.t);
   const datos = await derive(secret, nombre, payload.q, tipo, 'oficial');
   const lugar = limpiarLugar(payload.l) || SIN_LUGAR;
+  const concepto = limpiarConcepto(payload.c);
 
   return new Response(
-    paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, lugar, ...datos }),
+    paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, lugar, concepto, ...datos }),
     {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
@@ -678,6 +699,7 @@ y que sus datos no han sido alterados.</p>
   <div class="row"><span class="k">${esc(d.nivelEtiqueta)}</span><span class="v mono">${d.nivel.toFixed(1)}%</span></div>
   <div class="row"><span class="k">Antecedentes</span><span class="v">${esc(d.antecedentes)}</span></div>
   <div class="row"><span class="k">Lugar de tranquilidad</span><span class="v">${esc(d.lugar)}</span></div>
+  ${d.concepto ? `<div class="row"><span class="k">Su concepto</span><span class="v">${esc(d.concepto)}</span></div>` : ''}
   <div class="row"><span class="k">Ocupación u oficio</span><span class="v">${esc(d.oficio)}</span></div>
   <div class="row"><span class="k">Emitido</span><span class="v mono">${esc(d.emitido)}</span></div>
   <div class="row"><span class="k">Vence</span><span class="v">${esc(d.vence)}</span></div>

@@ -37,7 +37,7 @@
     },
 
     institucional: {
-      nombre: 'Institucional', familia: 'carnet', formato: 'credencial',
+      nombre: 'Dirección General', familia: 'carnet', formato: 'viral',
       cabecera: 'banda',
       banda: '#13294b',
       bandaTinta: '#ffffff',
@@ -52,7 +52,7 @@
     },
 
     crema: {
-      nombre: 'Crema', familia: 'carnet', formato: 'credencial',
+      nombre: 'Vintage', familia: 'carnet', formato: 'vintage',
       cabecera: 'banda',
       banda: '#a4122a',
       bandaTinta: '#fff6ec',
@@ -61,7 +61,7 @@
       label: '#8a7157', red: '#a4122a',
       line: 'rgba(19,41,75,.16)',
       guilloche: '#d9c7a5', guillocheAlfa: 0.55,
-      bandera: false,
+      
       marcaAgua: 0.05,
       pie: 'rgba(255,255,255,.86)', pieTinta: 'rgba(19,41,75,.85)',
       suave: 'rgba(19,41,75,.25)', tenue: 'rgba(19,41,75,.12)'
@@ -84,16 +84,16 @@
     },
 
     candela: {
-      nombre: 'Candela', familia: 'carnet', formato: 'credencial',
+      nombre: 'Sobrio', familia: 'carnet', formato: 'llano',
       cabecera: 'banda',
       banda: '#c8102e',
       bandaTinta: '#ffffff',
-      bg1: '#fff7f7', bg2: '#f6e3e5',
-      navy: '#4a1016', navy2: '#8d2230',
-      label: '#957075', red: '#c8102e',
+      bg1: '#ffffff', bg2: '#f3f6fa',
+      navy: '#141922', navy2: '#3b4656',
+      label: '#7b8798', red: '#c8102e',
       line: 'rgba(19,41,75,.16)',
-      guilloche: '#e8c4c9', guillocheAlfa: 0.5,
-      bandera: false,
+      guilloche: '#d7e0ea', guillocheAlfa: 0.5,
+      
       marcaAgua: 0.05,
       pie: 'rgba(255,255,255,.86)', pieTinta: 'rgba(19,41,75,.85)',
       suave: 'rgba(19,41,75,.25)', tenue: 'rgba(19,41,75,.12)'
@@ -462,6 +462,69 @@
     ctx.restore();
   }
 
+
+  /* ---------- piezas de las réplicas ---------- */
+
+  // Huella dactilar de adorno: arcos concéntricos partidos, que es lo
+  // que se lee como huella a este tamaño.
+  function drawHuella(ctx, cx, cy, size, color) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 0.75;
+    ctx.lineWidth = Math.max(0.9, size * 0.035);
+    for (var i = 1; i <= 6; i++) {
+      var rx = size * 0.08 * i, ry = size * 0.10 * i;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, Math.PI * 0.18, Math.PI * 1.82);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.ellipse(cx, cy - size * 0.04, size * 0.05, size * 0.07, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Parte un texto en renglones que quepan en un ancho dado.
+  function envolver(ctx, texto, maxW) {
+    var palabras = String(texto || '').split(' ');
+    var lineas = [], linea = '';
+    for (var i = 0; i < palabras.length; i++) {
+      var prueba = linea ? linea + ' ' + palabras[i] : palabras[i];
+      if (ctx.measureText(prueba).width > maxW && linea) {
+        lineas.push(linea);
+        linea = palabras[i];
+      } else {
+        linea = prueba;
+      }
+    }
+    if (linea) { lineas.push(linea); }
+    return lineas;
+  }
+
+  // Las citas manuscritas del costado. Van aquí y no en el servidor
+  // porque son adorno del diseño, no dato del carnet.
+  var CITAS = {
+    palomos: ['El que se queda en su casa, siempre gana.',
+              'Mejor tranquilo en mi casa que en líos en la calle.'],
+    pariguayos: ['El que no baila, observa.',
+                 'Yo vine fue a mirar, no a bailar.']
+  };
+
+  var LEMAS = {
+    palomos: 'PAZ · TRANQUILIDAD · VIDA SIN LÍOS',
+    pariguayos: 'MIRAR · CUIDAR · NO BAILAR'
+  };
+
+
+  // Si la persona escribió su concepto, ese es el que se imprime; si no,
+  // la frase que trae el diseño. Ocupa el mismo sitio en los dos casos,
+  // así que la maqueta no se mueve.
+  function lema(d) { return (d.concepto && d.concepto.trim()) || d.frase || ''; }
+
+  function citasDe(d) { return CITAS[d.hashtag] || CITAS.palomos; }
+  function lemaDe(d)  { return LEMAS[d.hashtag] || LEMAS.palomos; }
+  function sujeto(d)  { return d.hashtag === 'pariguayos' ? 'PARIGUAYO' : 'PALOMO'; }
+
   /* ---------- el palomo (emblema propio, no es símbolo patrio) ---------- */
 
   // Se pinta en coordenadas normalizadas, centrado en (0,0), ancho ~1.
@@ -810,6 +873,7 @@
       titulo: (m.titulos && m.titulos[estilo]) || m.titulo,
       frase: m.frases[estilo] || m.frases.oficial,
       hashtag: m.hashtag,
+      concepto: '',
       qrUrl: 'https://palomos.com.do',
       photo: foto
     };
@@ -833,6 +897,9 @@
   function renderCarnet(canvas, data, scale, estiloId) {
     C = estiloDe(estiloId || data.estilo);
     scale = scale || 1;
+    if (C.formato === 'viral')    { return renderViral(canvas, data, scale); }
+    if (C.formato === 'vintage')  { return renderVintage(canvas, data, scale); }
+    if (C.formato === 'llano')    { return renderLlano(canvas, data, scale); }
     if (C.formato === 'solapin')  { return renderSolapin(canvas, data, scale); }
     if (C.formato === 'cuadrado') { return renderCuadrado(canvas, data, scale); }
     return renderCredencial(canvas, data, scale);
@@ -1093,7 +1160,8 @@
     (function () {
       ctx.fillStyle = C.navy;
       ctx.font = 'italic ' + font(700, 17);
-      var f = data.frase || '';
+      var f = lema(data);
+      ctx.font = 'italic ' + font(700, fitText(ctx, f, 600, 700, 17, 11));
       ctx.fillText(f, 32, MY + 104);
 
       ctx.fillStyle = C.label;
@@ -1164,6 +1232,436 @@
   /* =======================================================================
      Solapín vertical — el de colgar del cuello, con su ranura arriba.
      ======================================================================= */
+
+
+  /* =======================================================================
+     Réplicas de los carnets que ya circulan. Se siguen de cerca porque es
+     lo que la gente reconoce; lo único que no se copia son los símbolos
+     patrios, que en los originales salen y aquí no.
+     ======================================================================= */
+
+  /* --- Dirección General: placa con el título y cintilla roja debajo --- */
+
+  function renderViral(canvas, data, scale) {
+    var w = 1012, h = 638;
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.textBaseline = 'alphabetic';
+
+    var seed = hash32(data.nombre + '|' + data.serial);
+    var nom = partirNombre(data.nombre);
+    var PIE = 52;
+
+    var g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, C.bg1); g.addColorStop(1, C.bg2);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    drawGuilloche(ctx, 0, 0, w, h, seed);
+
+    ctx.save();
+    ctx.globalAlpha = C.marcaAgua;
+    drawPalomo(ctx, w * 0.55, 360, 400, C.navy);
+    ctx.restore();
+
+    /* cabecera */
+    drawSello(ctx, 86, 98, 136, data.titulo, data.siglas || 'RD', C.navy);
+
+    var hx = 176;
+    ctx.fillStyle = C.navy;
+    var ze = fitText(ctx, data.emisor || '', 470, 800, 30, 17);
+    ctx.font = font(800, ze);
+    ctx.fillText(data.emisor || '', hx, 60);
+
+    ctx.fillStyle = C.navy2;
+    ctx.font = font(700, 17);
+    ctx.fillText('(' + (data.siglas || '') + ')  ·  RD', hx, 88);
+
+    ctx.fillStyle = C.red;  ctx.fillRect(hx, 98, 228, 5);
+    ctx.fillStyle = C.navy; ctx.fillRect(hx + 238, 98, 228, 5);
+
+    ctx.fillStyle = C.navy2;
+    ctx.font = font(700, 13);
+    tracked(ctx, lemaDe(data), hx, 126, 2.4);
+
+    /* placa del título y cintilla */
+    ctx.fillStyle = C.navy;
+    roundRect(ctx, 166, 142, 486, 62, 10); ctx.fill();
+    ctx.fillStyle = '#fff';
+    var zt = fitText(ctx, data.titulo, 440, 800, 42, 22);
+    ctx.font = font(800, zt);
+    ctx.fillText(data.titulo, 409 - ctx.measureText(data.titulo).width / 2, 188);
+
+    ctx.fillStyle = C.red;
+    roundRect(ctx, 192, 208, 434, 32, 5); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = font(800, 17);
+    var cin = 'OFICIALMENTE ' + sujeto(data);
+    tracked(ctx, cin, 409 - trackedWidth(ctx, cin, 3) / 2, 231, 3);
+
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    drawPalomo(ctx, 736, 122, 148, C.navy);
+    ctx.restore();
+
+    /* QR arriba a la derecha, que es donde queda sitio limpio */
+    var qs = 136, qx = 856, qy = 28;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, qx - 8, qy - 8, qs + 16, qs + 16, 7); ctx.fill();
+    ctx.strokeStyle = C.suave; ctx.lineWidth = 1;
+    roundRect(ctx, qx - 8, qy - 8, qs + 16, qs + 16, 7); ctx.stroke();
+    drawQR(ctx, data.qrUrl, qx, qy, qs);
+
+    /* foto y datos */
+    var px = 32, py = 252, pw = 204, ph = 250;
+    ctx.save();
+    roundRect(ctx, px, py, pw, ph, 4); ctx.clip();
+    if (data.photo) { ctx.drawImage(data.photo, px, py, pw, ph); }
+    else { ctx.fillStyle = '#c3d2e2'; ctx.fillRect(px, py, pw, ph); }
+    ctx.restore();
+    ctx.strokeStyle = C.navy; ctx.lineWidth = 2.5;
+    roundRect(ctx, px, py, pw, ph, 4); ctx.stroke();
+
+    var bx = 262, vx = 432, vmax = 745 - vx;
+    var filas = [
+      ['NOMBRE', nom.nombres + ' ' + nom.apellidos],
+      ['ESTATUS', data.categoria],
+      [(data.nivelEtiqueta || 'Nivel de tigueraje').toUpperCase(), Number(data.nivel).toFixed(1) + '%'],
+      ['ESPECIALIDAD', data.oficio],
+      ['ANTECEDENTES', data.antecedentes || 'NINGUNO'],
+      ['FECHA DE EMISIÓN', data.emitido || ''],
+      ['VIGENCIA', data.vence]
+    ];
+    filas.forEach(function (f, i) {
+      var y = 282 + i * 33;
+      ctx.fillStyle = C.label;
+      ctx.font = font(700, 12);
+      tracked(ctx, f[0] + ':', bx, y, 0.9);
+      ctx.fillStyle = C.navy;
+      var z = fitText(ctx, f[1], vmax, 800, 19, 11);
+      ctx.font = font(800, z);
+      ctx.fillText(f[1], vx, y);
+    });
+
+    /* citas manuscritas al costado */
+    (function () {
+      var citas = (data.concepto && data.concepto.trim())
+        ? ['«' + data.concepto.trim() + '»']
+        : citasDe(data);
+      var cx = 992, maxW = 224, y = 306;
+      citas.forEach(function (t) {
+        ctx.font = 'italic ' + font(600, 19, 'Georgia, serif');
+        ctx.fillStyle = C.navy;
+        envolver(ctx, t, maxW).forEach(function (ln) {
+          ctx.fillText(ln, cx - ctx.measureText(ln).width, y);
+          y += 25;
+        });
+        y += 26;
+      });
+    })();
+
+    /* pie interior */
+    ctx.strokeStyle = C.navy; ctx.lineWidth = 2;
+    roundRect(ctx, 32, 488, 300, 58, 9); ctx.stroke();
+    drawHuella(ctx, 64, 517, 44, C.navy);
+    ctx.fillStyle = C.label; ctx.font = font(700, 9);
+    tracked(ctx, 'NÚMERO DE CARNET', 94, 510, 1.1);
+    ctx.fillStyle = C.navy; ctx.font = font(800, 24, F.mono);
+    ctx.fillText(data.serial, 94, 538);
+    drawBarras(ctx, 32, 554, 300, 18, seed, C.navy);
+
+    drawSignature(ctx, 358, 486, 190, 54, seed);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(352, 550); ctx.lineTo(560, 550); ctx.stroke();
+    ctx.fillStyle = C.label; ctx.font = font(700, 10);
+    tracked(ctx, 'FIRMA DEL ' + sujeto(data), 352, 566, 1.1);
+
+    (function () {
+      ctx.strokeStyle = C.navy; ctx.lineWidth = 1.6;
+      roundRect(ctx, 600, 492, 196, 88, 7); ctx.stroke();
+      ctx.fillStyle = C.navy; ctx.font = font(800, 10);
+      var t = 'SELLO OFICIAL';
+      tracked(ctx, t, 698 - trackedWidth(ctx, t, 1.4) / 2, 510, 1.4);
+      var items = data.hashtag === 'pariguayos'
+        ? ['SIN BAILAR', 'CON EL VASO', 'EN LA ESQUINA', 'MIRANDO']
+        : ['SIN ENREDOS', 'SIN PROBLEMAS', 'EN MI CASA', 'TRANQUILO'];
+      ctx.font = font(700, 11);
+      items.forEach(function (it, i) {
+        ctx.fillStyle = C.red;  ctx.fillText('✓', 614, 530 + i * 15);
+        ctx.fillStyle = C.navy; ctx.fillText(it, 630, 530 + i * 15);
+      });
+    })();
+
+    (function () {
+      ctx.save(); ctx.translate(890, 536); ctx.rotate(-0.15);
+      ctx.globalAlpha = 0.6;
+      drawSello(ctx, 0, 0, 88, data.siglas || '', 'CERTIFICADO', C.navy);
+      ctx.restore();
+    })();
+
+    /* banda del pie */
+    ctx.fillStyle = C.navy;
+    ctx.fillRect(0, h - PIE, w, PIE);
+    ctx.fillStyle = '#fff';
+    // Aqui va la frase del diseno: el concepto de la persona ya sale
+    // arriba, de su puno y letra, y repetirlo abarrota el carnet.
+    var fr = data.frase || '';
+    var zf = fitText(ctx, fr, w - 140, 700, 20, 12);
+    ctx.font = 'italic ' + font(700, zf, 'Georgia, serif');
+    ctx.fillText(fr, w / 2 - ctx.measureText(fr).width / 2, h - PIE + 24);
+    ctx.font = font(600, 10);
+    ctx.globalAlpha = 0.82;
+    var av = SITIO + ' · PARODIA, SIN VALIDEZ LEGAL · #team' + (data.hashtag || 'palomos');
+    ctx.fillText(av, w / 2 - ctx.measureText(av).width / 2, h - 14);
+    ctx.globalAlpha = 1;
+
+    return canvas;
+  }
+
+  /* --- Vintage: crema, corona, sello de PARODIA y firma grande --- */
+
+  function renderVintage(canvas, data, scale) {
+    var w = 1012, h = 638;
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.textBaseline = 'alphabetic';
+
+    var seed = hash32(data.nombre + '|' + data.serial);
+    var nom = partirNombre(data.nombre);
+
+    var g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, C.bg1); g.addColorStop(1, C.bg2);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    drawGuilloche(ctx, 0, 0, w, h, seed);
+
+    ctx.save();
+    ctx.globalAlpha = C.marcaAgua * 2.2;
+    drawPalomo(ctx, 700, 392, 440, C.navy);
+    ctx.restore();
+
+    ctx.strokeStyle = C.suave; ctx.lineWidth = 2;
+    roundRect(ctx, 16, 16, w - 32, h - 32, 12); ctx.stroke();
+    ctx.lineWidth = 1;
+    roundRect(ctx, 24, 24, w - 48, h - 48, 9); ctx.stroke();
+
+    /* corona y lema de arriba */
+    drawCorona(ctx, 68, 62, 38, C.navy);
+    ctx.fillStyle = C.navy2; ctx.font = font(700, 12);
+    tracked(ctx, "«PA' LOS " + sujeto(data) + 'S', 96, 56, 1.4);
+    tracked(ctx, 'DE VERDAD»', 96, 74, 1.4);
+
+    /* foto con cintilla */
+    var px = 46, py = 96, pw = 216, ph = 262;
+    ctx.save();
+    roundRect(ctx, px, py, pw, ph, 3); ctx.clip();
+    if (data.photo) { ctx.drawImage(data.photo, px, py, pw, ph); }
+    else { ctx.fillStyle = '#d6cbb4'; ctx.fillRect(px, py, pw, ph); }
+    ctx.restore();
+    ctx.strokeStyle = C.navy; ctx.lineWidth = 3;
+    roundRect(ctx, px, py, pw, ph, 3); ctx.stroke();
+
+    ctx.fillStyle = C.navy;
+    roundRect(ctx, px, py + ph + 6, pw, 34, 5); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'italic ' + font(700, 16, 'Georgia, serif');
+    var cin = 'Un ' + sujeto(data).charAt(0) + sujeto(data).slice(1).toLowerCase() + ' Certificado';
+    ctx.fillText(cin, px + pw / 2 - ctx.measureText(cin).width / 2, py + ph + 29);
+
+    /* título en tres alturas */
+    var tx = 296;
+    ctx.fillStyle = C.navy;
+    ctx.font = font(800, 28);
+    tracked(ctx, data.titulo.split(' ')[0] + ' DE', tx, 128, 2);
+
+    var suj = sujeto(data);
+    var zs = fitText(ctx, suj, 336, 900, 86, 46);
+    ctx.font = font(800, zs);
+    ctx.fillText(suj, tx, 196);
+
+    ctx.font = font(700, 19);
+    tracked(ctx, 'CERTIFICADO', tx + 8, 228, 5);
+
+
+    drawCorona(ctx, 736, 112, 44, C.navy);
+    drawPalomo(ctx, 736, 172, 116, C.navy);
+
+    /* sello de parodia */
+    ctx.save();
+    ctx.translate(892, 128); ctx.rotate(0.04);
+    ctx.strokeStyle = C.red; ctx.lineWidth = 3;
+    roundRect(ctx, -96, -38, 192, 76, 6); ctx.stroke();
+    ctx.lineWidth = 1;
+    roundRect(ctx, -89, -31, 178, 62, 4); ctx.stroke();
+    ctx.fillStyle = C.red; ctx.font = font(800, 21);
+    ['FICTICIO', 'PARODIA'].forEach(function (t, i) {
+      ctx.fillText(t, -ctx.measureText(t).width / 2, -2 + i * 26);
+    });
+    ctx.restore();
+
+    /* datos */
+    var bx = 296, bw = 300;
+    [['NOMBRE', nom.nombres + ' ' + nom.apellidos],
+     ['CATEGORÍA', data.categoria],
+     ['NACIONALIDAD', 'RD'],
+     ['OCUPACIÓN', data.oficio],
+     ['ANTECEDENTES', data.antecedentes || 'NINGUNO']].forEach(function (f, i) {
+      var y = 274 + i * 46;
+      ctx.fillStyle = C.label; ctx.font = font(700, 11);
+      tracked(ctx, f[0] + ':', bx, y, 1.1);
+      ctx.fillStyle = C.navy;
+      var z = fitText(ctx, f[1], bw, 800, 19, 11);
+      ctx.font = font(800, z);
+      ctx.fillText(f[1], bx, y + 22);
+    });
+
+    /* cita al costado */
+    (function () {
+      ctx.font = 'italic ' + font(600, 19, 'Georgia, serif');
+      ctx.fillStyle = C.navy;
+      var y = 330;
+      envolver(ctx, '«' + lema(data) + '»', 216).forEach(function (ln) {
+        ctx.fillText(ln, 986 - ctx.measureText(ln).width, y);
+        y += 26;
+      });
+    })();
+
+    /* pie */
+    drawBarras(ctx, 46, 520, 216, 42, seed, C.navy);
+    ctx.fillStyle = C.navy; ctx.font = font(700, 15, F.mono);
+    ctx.fillText(data.serial, 46, 582);
+
+    drawSignature(ctx, 312, 498, 208, 58, seed);
+    ctx.strokeStyle = C.navy; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(306, 566); ctx.lineTo(530, 566); ctx.stroke();
+    ctx.fillStyle = C.label; ctx.font = font(700, 10);
+    tracked(ctx, 'FIRMA DEL ' + sujeto(data), 306, 582, 1.2);
+
+    if (C.bandera !== false) { drawBandera(ctx, 636, 498, 88); }
+
+    var qs = 112, qx = 804, qy = 480;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, qx - 7, qy - 7, qs + 14, qs + 14, 6); ctx.fill();
+    drawQR(ctx, data.qrUrl, qx, qy, qs);
+
+    ctx.fillStyle = C.navy2; ctx.font = font(700, 10);
+    tracked(ctx, '100% PARODIA', 636, 576, 1.4);
+    ctx.font = font(600, 10);
+    ctx.globalAlpha = 0.72;
+    ctx.fillText(SITIO + ' · SIN VALIDEZ LEGAL', 636, 594);
+    ctx.globalAlpha = 1;
+
+    return canvas;
+  }
+
+  /* --- Sobrio: el de renglones planos y la frase enorme abajo --- */
+
+  function renderLlano(canvas, data, scale) {
+    var w = 1012, h = 638;
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.textBaseline = 'alphabetic';
+
+    var seed = hash32(data.nombre + '|' + data.serial);
+    var nom = partirNombre(data.nombre);
+
+    var g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, C.bg1); g.addColorStop(1, C.bg2);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.globalAlpha = C.marcaAgua * 0.8;
+    drawPalomo(ctx, 520, 340, 380, C.navy);
+    ctx.restore();
+
+    drawSello(ctx, 84, 88, 120, data.titulo, data.siglas || 'RD', C.navy);
+
+    var hx = 176;
+    ctx.fillStyle = C.navy2; ctx.font = font(800, 16);
+    tracked(ctx, 'RD', hx, 56, 3);
+
+    ctx.fillStyle = C.navy;
+    var ze = fitText(ctx, (data.emisor || '') + ' (' + (data.siglas || '') + ')', 700, 800, 27, 15);
+    ctx.font = font(800, ze);
+    ctx.fillText((data.emisor || '') + ' (' + (data.siglas || '') + ')', hx, 92);
+    ctx.fillStyle = C.red;
+    ctx.fillRect(hx, 102, 700, 3);
+
+    ctx.fillStyle = C.navy;
+    var zt = fitText(ctx, data.titulo + ' CERTIFICADO', 660, 800, 33, 19);
+    ctx.font = font(800, zt);
+    ctx.fillText(data.titulo + ' CERTIFICADO', hx, 156);
+
+    var px = 44, py = 196, pw = 196, ph = 242;
+    ctx.save();
+    roundRect(ctx, px, py, pw, ph, 3); ctx.clip();
+    if (data.photo) { ctx.drawImage(data.photo, px, py, pw, ph); }
+    else { ctx.fillStyle = '#c9d4e2'; ctx.fillRect(px, py, pw, ph); }
+    ctx.restore();
+    ctx.strokeStyle = C.navy; ctx.lineWidth = 2;
+    roundRect(ctx, px, py, pw, ph, 3); ctx.stroke();
+
+    /* renglones planos: etiqueta y dato en la misma línea */
+    var bx = 268;
+    [['NOMBRE', nom.nombres],
+     ['APELLIDO', nom.apellidos],
+     ['ID ÚNICO', data.serial],
+     [(data.nivelEtiqueta || 'Nivel de tigueraje').toUpperCase(), Number(data.nivel).toFixed(1) + '%'],
+     ['ESTATUS', data.categoria],
+     ['EMISIÓN', data.emitido || ''],
+     ['VENCIMIENTO', data.vence]].forEach(function (f, i) {
+      var y = 224 + i * 34;
+      ctx.fillStyle = C.navy2; ctx.font = font(700, 18);
+      var et = f[0] + ': ';
+      ctx.fillText(et, bx, y);
+      var vx = bx + ctx.measureText(et).width;
+      ctx.fillStyle = C.navy;
+      var z = fitText(ctx, f[1], 840 - vx, 800, 20, 12);
+      ctx.font = font(800, z);
+      ctx.fillText(f[1], vx, y);
+    });
+
+    ctx.fillStyle = C.navy2; ctx.font = font(700, 18);
+    ctx.fillText('FIRMA:', bx, 462);
+    drawSignature(ctx, bx + 78, 424, 190, 54, seed);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(bx + 72, 470); ctx.lineTo(bx + 280, 470); ctx.stroke();
+
+    var qs = 118, qx = 856, qy = 200;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, qx - 7, qy - 7, qs + 14, qs + 14, 6); ctx.fill();
+    ctx.strokeStyle = C.suave; ctx.lineWidth = 1;
+    roundRect(ctx, qx - 7, qy - 7, qs + 14, qs + 14, 6); ctx.stroke();
+    drawQR(ctx, data.qrUrl, qx, qy, qs);
+    ctx.fillStyle = C.red; ctx.font = font(700, 11);
+    ctx.fillText(SITIO, qx + qs / 2 - ctx.measureText(SITIO).width / 2, qy + qs + 20);
+
+    if (C.bandera !== false) { drawBandera(ctx, 856, 356, 96); }
+
+    /* la frase, enorme, entre dos filetes */
+    ctx.strokeStyle = C.navy; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(44, 502); ctx.lineTo(968, 502); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(44, 578); ctx.lineTo(968, 578); ctx.stroke();
+
+    ctx.fillStyle = C.navy;
+    var fr = lema(data).toUpperCase();
+    var zf = fitText(ctx, fr, 880, 800, 46, 20);
+    ctx.font = font(800, zf);
+    ctx.fillText(fr, w / 2 - ctx.measureText(fr).width / 2, 552);
+
+    ctx.fillStyle = C.label; ctx.font = font(600, 11);
+    var av = 'DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · #team' + (data.hashtag || 'palomos') +
+             ' · MEME DE @javimolinax';
+    ctx.fillText(av, w / 2 - ctx.measureText(av).width / 2, 606);
+
+    return canvas;
+  }
 
   function renderSolapin(canvas, data, scale) {
     var w = 760, h = 1060;
@@ -1300,7 +1798,7 @@
     ctx.fillRect(0, h - PIE, w, PIE);
 
     ctx.fillStyle = C.bandaTinta || '#fff';
-    var fr = (data.frase || '').toUpperCase();
+    var fr = lema(data).toUpperCase();
     var zf = fitText(ctx, fr, w - 150, 800, 22, 12);
     ctx.font = 'italic ' + font(800, zf);
     var af = ctx.measureText(fr).width;
@@ -1437,9 +1935,9 @@
     // Frase y avisos al pie, dentro de su franja y sin pisar el QR.
     var libre = qx - 84;
     ctx.fillStyle = tinta;
-    var zf = fitText(ctx, data.frase || '', libre, 700, 24, 14);
+    var zf = fitText(ctx, lema(data), libre, 700, 24, 14);
     ctx.font = 'italic ' + font(700, zf);
-    ctx.fillText(data.frase || '', 60, h - 118);
+    ctx.fillText(lema(data), 60, h - 118);
 
     ctx.font = font(800, 22);
     ctx.globalAlpha = 0.95;

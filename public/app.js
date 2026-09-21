@@ -318,6 +318,7 @@
       body: JSON.stringify({
         nombre: cleanName($('inNombre').value),
         lugar: cleanName($('inLugar').value),
+        concepto: ($('inConcepto') ? $('inConcepto').value : ''),
         tipo: state.tipo,
         estilo: state.estilo
       })
@@ -508,6 +509,14 @@
       var destino = b.getAttribute('data-back') || 'step-intro';
       b.addEventListener('click', function () { go(destino); });
     });
+
+    (function () {
+      var c = $('inConcepto'), n = $('cuentaConcepto');
+      if (!c || !n) { return; }
+      c.addEventListener('input', function () {
+        n.textContent = String(80 - c.value.length);
+      });
+    })();
 
     $('inNombre').addEventListener('input', validate);
     $('inAcepto').addEventListener('change', validate);
