@@ -18,6 +18,7 @@
     carnet: null,     // datos emitidos por el servidor
     blob: null,       // PNG listo para descargar/compartir
     familia: 'carnet',
+    exp: 'A',
     prevStep: 'step-form',
     tipo: 'palomo',
     estilo: 'oficial'
@@ -159,6 +160,47 @@
     }
   }
 
+  /* ---------------- el experimento ---------------- */
+
+  // Dos ramas: A enseña los diez diseños, B enseña uno solo y sin
+  // elección. Lo que se compara es la elección, no un diseño concreto:
+  // por eso en B el que sale es igual de aleatorio que en A.
+  //
+  // La rama se queda en el navegador de cada quien. No viaja ningún
+  // identificador de persona: al servidor solo llega la letra.
+  function ramaDelExperimento() {
+    var guardada = null;
+    try { guardada = localStorage.getItem('palomos.exp'); } catch (e) { /* modo privado */ }
+    if (guardada === 'A' || guardada === 'B') { return guardada; }
+    var nueva = Math.random() < 0.5 ? 'A' : 'B';
+    try { localStorage.setItem('palomos.exp', nueva); } catch (e) { /* da igual */ }
+    return nueva;
+  }
+
+  function anotarPaso(paso) {
+    var cuerpo = JSON.stringify({ exp: state.exp, paso: paso });
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/paso', new Blob([cuerpo], { type: 'application/json' }));
+        return;
+      }
+    } catch (e) { /* seguimos por fetch */ }
+    fetch('/api/paso', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: cuerpo,
+      keepalive: true
+    }).catch(function () { /* una métrica no puede romper nada */ });
+  }
+
+  // El que viene marcado de serie se lleva la mitad de las elecciones
+  // sin que nadie lo elija. Rotándolo, el sesgo se reparte entre los
+  // diez y en unos días la medición sirve para algo.
+  function disenoDeSalida() {
+    var todos = window.Carnet.estilos();
+    return todos[Math.floor(Math.random() * todos.length)];
+  }
+
   function deLaFamilia() {
     return window.Carnet.estilos().filter(function (e) {
       return e.familia === state.familia;
@@ -208,6 +250,9 @@
     // familia nueva: se toma el primero para que el botón siga vivo.
     var sigue = lista.some(function (e) { return e.id === state.estilo; });
     if (!sigue) { state.estilo = lista[0].id; }
+
+    // En la rama B no hay nada que elegir: sale el suyo y ya.
+    if (state.exp === 'B') { lista = lista.filter(function (e) { return e.id === state.estilo; }); }
 
     cont.innerHTML = '';
     lista.forEach(function (e) {
@@ -432,6 +477,7 @@
         nombre: cleanName($('inNombre').value),
         lugar: cleanName($('inLugar').value),
         concepto: ($('inConcepto') ? $('inConcepto').value : ''),
+        exp: state.exp,
         tipo: state.tipo,
         estilo: state.estilo
       })
@@ -466,14 +512,6 @@
   }
 
   function drawResult(j) {
-    window.Carnet.alLlegarLaBandera(function () {
-      // Las miniaturas se dibujaron sin ella; ahora que está, se rehacen.
-      pintarSlider();
-      if (document.getElementById('step-estilo').hasAttribute('data-active')) {
-        pintarSelector(false);
-      }
-    });
-
     return Promise.all([loadFonts(), window.Carnet.loadAssets()]).then(function () {
       var data = Object.assign({}, j, {
         qrUrl: j.verifyUrl,
@@ -618,9 +656,43 @@
   }
 
   function init() {
+    state.exp = ramaDelExperimento();
+
+    // Sale un diseño distinto en cada visita, y en la rama B ese es el
+    // único que se ve.
+    (function () {
+      var d = disenoDeSalida();
+      state.estilo = d.id;
+      state.familia = d.familia;
+    })();
+
+    if (state.exp === 'B') {
+      var tabs = document.querySelectorAll('.tipos-sm');
+      for (var i = 0; i < tabs.length; i++) { tabs[i].hidden = true; }
+      var f1 = $('disenoAtras'), f2 = $('disenoAlante');
+      if (f1) { f1.hidden = true; }
+      if (f2) { f2.hidden = true; }
+      var pista = document.querySelector('#step-estilo .hint');
+      if (pista) { pista.textContent = 'Este es el tuyo, ya con tu cara y tu nombre.'; }
+    }
+
+    // La bandera es un archivo y tarda. Se pide aqui y, cuando llega,
+    // se repinta lo que la lleva.
+    //
+    // Antes la unica llamada a loadAssets() estaba dentro de
+    // drawResult, asi que la bandera solo existia en el carnet ya
+    // emitido: en la portada y en el selector salia el hueco vacio.
+    window.Carnet.loadAssets();
+    window.Carnet.alLlegarLaBandera(function () {
+      pintarSlider();
+      pintarSelector(false);
+    });
+
     loadFonts().then(function () {
       pintarSlider();
-      pintarSelector();
+      // elegirFamilia y no pintarSelector: el diseno de salida es
+      // aleatorio y su pestana de formato tiene que venir marcada.
+      elegirFamilia(state.familia);
     });
 
     $('btnStart').addEventListener('click', function () { go('step-form'); });
@@ -673,6 +745,7 @@
       if (!validate()) { return; }
       go('step-estilo');
       pintarSelector();
+      anotarPaso('elegir');
     });
     $('btnDescargar').addEventListener('click', descargar);
     $('btnWhatsapp').addEventListener('click', function () { compartir('whatsapp'); });

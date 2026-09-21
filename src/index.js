@@ -212,7 +212,20 @@ export class Secuencia {
     // por diseño, no por persona: no sabe quién eligió qué.
     if (url.pathname === '/stats') {
       const disenos = (await this.state.storage.get('disenos')) || {};
-      return new Response(JSON.stringify({ n: actual, disenos }), { headers: cab });
+      const experimento = (await this.state.storage.get('experimento')) || {};
+      return new Response(JSON.stringify({ n: actual, disenos, experimento }), { headers: cab });
+    }
+
+    // Llegadas al paso de elegir. No gasta numero del contador: solo
+    // anota que alguien de esta rama llego hasta ahi.
+    if (url.pathname === '/exp') {
+      const clave = url.searchParams.get('k');
+      if (clave) {
+        const exp = (await this.state.storage.get('experimento')) || {};
+        exp[clave] = (exp[clave] || 0) + 1;
+        await this.state.storage.put('experimento', exp);
+      }
+      return new Response(JSON.stringify({ ok: true }), { headers: cab });
     }
 
     const siguiente = actual + 1;
@@ -223,6 +236,14 @@ export class Secuencia {
       const disenos = (await this.state.storage.get('disenos')) || {};
       disenos[clave] = (disenos[clave] || 0) + 1;
       await this.state.storage.put('disenos', disenos);
+    }
+
+    const rama = url.searchParams.get('x');
+    if (rama === 'A' || rama === 'B') {
+      const exp = (await this.state.storage.get('experimento')) || {};
+      const k = rama + ':emitido';
+      exp[k] = (exp[k] || 0) + 1;
+      await this.state.storage.put('experimento', exp);
     }
 
     return new Response(JSON.stringify({ n: siguiente }), { headers: cab });
@@ -378,11 +399,14 @@ function contador(env) {
   return env.SECUENCIA.get(env.SECUENCIA.idFromName(CONTADOR));
 }
 
-async function siguienteSecuencial(env, diseno) {
+async function siguienteSecuencial(env, diseno, rama) {
   // Si el contador falla, el sitio no se cae: damos un número basado en
   // el reloj. No es correlativo, pero sigue siendo único.
   try {
-    const q = diseno ? '?d=' + encodeURIComponent(diseno) : '';
+    const partes = [];
+    if (diseno) { partes.push('d=' + encodeURIComponent(diseno)); }
+    if (rama === 'A' || rama === 'B') { partes.push('x=' + rama); }
+    const q = partes.length ? '?' + partes.join('&') : '';
     const res = await contador(env).fetch('https://secuencia/next' + q);
     const { n } = await res.json();
     if (Number.isInteger(n) && n > 0) return n;
@@ -546,7 +570,10 @@ async function emitir(request, env) {
   const tipo = tipoDe(body && body.tipo);
   const estilo = estiloDe(body && body.estilo);
   const emitido = hoyRD();
-  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo);
+  // La rama del experimento, si el navegador la manda. Es una letra:
+  // cualquier otra cosa se ignora.
+  const rama = (body && body.exp) === 'A' || (body && body.exp) === 'B' ? body.exp : null;
+  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo, rama);
   const datos = await derive(secret, nombre, seq, tipo, estilo);
   const token = await makeToken(secret, {
     n: nombre, e: emitido, q: seq, l: lugar, t: tipo.inicial,
@@ -954,11 +981,30 @@ export default {
       return verificar(request, env, decodeURIComponent(path.slice(3)));
     }
 
+    // Anota que alguien llego al paso de elegir. Es una escritura
+    // abierta, asi que solo acepta dos letras y un nombre de evento de
+    // una lista cerrada: lo peor que puede pasar es que alguien infle
+    // un contador de un meme.
+    if (path === '/api/paso') {
+      if (request.method !== 'POST') return json({ ok: false, error: 'Usa POST' }, 405);
+      let cuerpo = null;
+      try { cuerpo = await request.json(); } catch { cuerpo = null; }
+      const rama = cuerpo && cuerpo.exp;
+      const evento = cuerpo && cuerpo.paso;
+      if ((rama !== 'A' && rama !== 'B') || evento !== 'elegir') {
+        return json({ ok: false }, 400);
+      }
+      try {
+        await contador(env).fetch('https://secuencia/exp?k=' + rama + '%3Aelegir');
+      } catch { /* si el registro no responde, no pasa nada */ }
+      return json({ ok: true });
+    }
+
     if (path === '/api/populares') {
       try {
         const res = await contador(env).fetch('https://secuencia/stats');
-        const { n, disenos } = await res.json();
-        return json({ ok: true, total: n, disenos: disenos || {} });
+        const { n, disenos, experimento } = await res.json();
+        return json({ ok: true, total: n, disenos: disenos || {}, experimento: experimento || {} });
       } catch {
         return json({ ok: false, error: 'El registro no responde.' }, 503);
       }
