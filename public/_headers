@@ -1,0 +1,13 @@
+# Los ficheros estáticos —el CSS, el JS, las imágenes— se sirven desde el
+# borde sin invocar al Worker: es lo que los hace rápidos, pero también
+# significa que no pasan por blindar() y salían sin ninguna cabecera.
+# Esto se las pone ahí mismo.
+#
+# La política de contenidos no está aquí a propósito: lleva un nonce
+# distinto en cada respuesta y solo tiene sentido en los documentos, que
+# sí los pinta el Worker.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000

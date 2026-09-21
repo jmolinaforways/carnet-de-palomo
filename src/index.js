@@ -477,14 +477,14 @@ async function emitir(request, env) {
 
 /* ---------------- GET /v/<token> ---------------- */
 
-async function verificar(request, env, token) {
+async function verificar(request, env, token, nonce) {
   const secret = secretoDe(env, new URL(request.url));
   if (!secret) return new Response(SIN_LLAVE, { status: 503 });
   const payload = await readToken(secret, token);
 
   const seqOk = payload && Number.isInteger(payload.q) && payload.q > 0;
   if (!payload || !esFecha(payload.e) || !seqOk) {
-    return new Response(paginaFalso(), {
+    return new Response(paginaFalso(nonce), {
       status: 404,
       headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
     });
@@ -498,7 +498,7 @@ async function verificar(request, env, token) {
   const concepto = limpiarConcepto(payload.c);
 
   return new Response(
-    paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, lugar, concepto, ...datos }),
+    paginaVerificado({ nombre, emitido: payload.e, secuencial: payload.q, lugar, concepto, ...datos }, nonce),
     {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
@@ -560,10 +560,12 @@ footer a{color:#c3d2ec}
 .doc p{margin:0 0 12px;font-size:14.5px;line-height:1.68;color:#c3d2ec}
 .doc strong{color:#fff}
 .doc em{color:#fff;font-style:italic}
+.stamp-ok{color:#5fd39a}
+.stamp-no{color:#ff8b9a}
 .doc a{color:#7fb2ff}
 `;
 
-function envoltura(titulo, cuerpo, indexar) {
+function envoltura(titulo, cuerpo, indexar, nonce) {
   return `<!DOCTYPE html><html lang="es-DO"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(titulo)}</title><meta name="theme-color" content="#0b1b3a">
@@ -580,7 +582,7 @@ ${indexar ? '' : '<meta name="robots" content="noindex">'}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
-<style>${ESTILO}</style>
+<style nonce="${nonce}">${ESTILO}</style>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
         data-cf-beacon='{"token": "5252e7034c504b9ebe41f551a96ef465"}'></script></head>
 <body><div class="flagbar"></div><main>${cuerpo}</main>
@@ -592,11 +594,11 @@ en Instagram y <a href="https://www.tiktok.com/@javimolinaxt" target="_blank" re
 </footer></body></html>`;
 }
 
-function paginaVerificado(d) {
+function paginaVerificado(d, nonce) {
   return envoltura(
     `Carnet verificado — ${d.nombre}`,
     `
-<div class="stamp" style="color:#5fd39a">✓</div>
+<div class="stamp stamp-ok">✓</div>
 <h1>Carnet auténtico</h1>
 <p class="lead">El ${esc(d.emisor)} confirma que este carnet fue emitido por nosotros
 y que sus datos no han sido alterados.</p>
@@ -615,25 +617,29 @@ y que sus datos no han sido alterados.</p>
   <div class="row"><span class="k">Vence</span><span class="v">${esc(d.vence)}</span></div>
 </div>
 
-<a class="cta" href="/">Sacar mi propio carnet</a>`
+<a class="cta" href="/">Sacar mi propio carnet</a>`,
+    false,
+    nonce
   );
 }
 
-function paginaFalso() {
+function paginaFalso(nonce) {
   return envoltura(
     'Carnet no válido',
     `
-<div class="stamp" style="color:#ff8b9a">✕</div>
+<div class="stamp stamp-no">✕</div>
 <h1>Este carnet es falso</h1>
 <p class="lead">La firma no cuadra. O el enlace se copió mal, o alguien trató de hacerse
 el palomo sin serlo. El Ministerio no reconoce este documento.</p>
-<a class="cta" href="/">Sacar un carnet de verdad</a>`
+<a class="cta" href="/">Sacar un carnet de verdad</a>`,
+    false,
+    nonce
   );
 }
 
 /* ---------------- /verificar: por número, sin QR ---------------- */
 
-function paginaVerificar(consulta, resultado, emitidos) {
+function paginaVerificar(consulta, resultado, emitidos, nonce) {
   let bloque = '';
   if (resultado) {
     const bien = resultado.valido;
@@ -673,7 +679,8 @@ guardamos nombres ni fotos de nadie. Para ver los datos completos de un carnet,
 escanea su código QR, que los lleva firmados dentro.</p>
 
 <a class="cta" href="/">Sacar mi propio carnet</a>`,
-    true
+    true,
+    nonce
   );
 }
 
@@ -682,7 +689,7 @@ escanea su código QR, que los lleva firmados dentro.</p>
 const CONTACTO =
   '<a href="https://www.instagram.com/javimolinax/" target="_blank" rel="noopener">@javimolinax</a>';
 
-function paginaTerminos() {
+function paginaTerminos(nonce) {
   return envoltura(
     'Términos y condiciones',
     `
@@ -762,11 +769,12 @@ lo que hagas con él es cosa tuya.</p>
 </div>
 
 <a class="cta" href="/">Volver al inicio</a>`,
-    true
+    true,
+    nonce
   );
 }
 
-function paginaPrivacidad() {
+function paginaPrivacidad(nonce) {
   return envoltura(
     'Política de privacidad',
     `
@@ -847,16 +855,17 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
 </div>
 
 <a class="cta" href="/">Volver al inicio</a>`,
-    true
+    true,
+    nonce
   );
 }
 
-async function rutaVerificar(request, env) {
+async function rutaVerificar(request, env, nonce) {
   const consulta = (new URL(request.url).searchParams.get('s') || '').slice(0, 32);
   const resultado = consulta ? await verificarSerial(env, consulta, new URL(request.url)) : null;
   const emitidos = await emitidosHasta(env);
 
-  return new Response(paginaVerificar(consulta, resultado, emitidos), {
+  return new Response(paginaVerificar(consulta, resultado, emitidos, nonce), {
     status: 200,
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
   });
@@ -903,7 +912,7 @@ function cabezaDe(carnet, canonica) {
   ].join('\n');
 }
 
-function fichaDe(carnet, canonica) {
+function fichaDe(carnet, canonica, nonce) {
   const ficha = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -925,7 +934,7 @@ function fichaDe(carnet, canonica) {
       ]
     }
   };
-  return '<script type="application/ld+json">\n' +
+  return '<script type="application/ld+json" nonce="' + nonce + '">\n' +
     JSON.stringify(ficha, null, 2).replace(/</g, '\\u003c') +
     '\n</script>';
 }
@@ -941,14 +950,14 @@ function portadaDe(carnet) {
 
 // El registro entero viaja a la página. Antes el cliente tenía su
 // propia copia del catálogo y había que mantener las dos a la vez.
-function registroDe(carnet) {
+function registroDe(carnet, nonce) {
   const datos = { carnets: CARNETS, orden: ORDEN_CARNETS, activo: carnet.id };
-  return '<script>window.PALOMOS=' +
+  return '<script nonce="' + nonce + '">window.PALOMOS=' +
     JSON.stringify(datos).replace(/</g, '\\u003c') +
     ';</script>';
 }
 
-async function paginaDeCarnet(request, env, carnet, canonica) {
+async function paginaDeCarnet(request, env, carnet, canonica, nonce) {
   const base = new URL(request.url);
   base.pathname = '/index.html';
   base.search = '';
@@ -959,9 +968,9 @@ async function paginaDeCarnet(request, env, carnet, canonica) {
   let html = await res.text();
   html = html
     .replace('<!--CABEZA-->', cabezaDe(carnet, canonica))
-    .replace('<!--FICHA-->', fichaDe(carnet, canonica))
+    .replace('<!--FICHA-->', fichaDe(carnet, canonica, nonce))
     .replace('<!--PORTADA-->', portadaDe(carnet))
-    .replace('<!--REGISTRO-->', registroDe(carnet));
+    .replace('<!--REGISTRO-->', registroDe(carnet, nonce));
 
   const headers = {
     'Content-Type': 'text/html; charset=utf-8',
@@ -991,13 +1000,95 @@ function sitemapDe(env) {
     cuerpo + '\n</urlset>\n';
 }
 
+/* ==================== el escudo ====================
+
+   Tres agujeros, y el peor era el primero:
+
+   1. No habia politica de contenidos. Si algun dia se cuela un script
+      -por una dependencia, por un fallo mio- el navegador lo ejecuta sin
+      chistar. Page Shield avisa, pero avisar no es impedir.
+   2. No habia nada que prohibiera enmarcar el sitio. Cualquiera podia
+      meterlo en un iframe invisible encima de otra cosa.
+   3. Las dos cabeceras que si poniamos solo llegaban a las paginas de
+      carnet. /verificar, /terminos, /privacidad y las rutas de API
+      salian desnudas.
+
+   La CSP va con nonce y SIN unsafe-inline, que es la unica que sirve de
+   algo. Se puede porque el HTML no trae ni un script ni un estilo propio
+   en linea: los unicos los pinta el Worker, asi que los puede firmar.
+   ==================================================== */
+
+// Un numero de un solo uso por respuesta. Lo llevan los scripts y
+// estilos que pintamos nosotros; cualquier otro que alguien logre meter
+// en la pagina no lo tendra, y el navegador se niega a ejecutarlo.
+function nonceNuevo() {
+  const b = new Uint8Array(16);
+  crypto.getRandomValues(b);
+  return btoa(String.fromCharCode.apply(null, b)).replace(/[+/=]/g, '');
+}
+
+function politica(n) {
+  return [
+    "default-src 'self'",
+    // El beacon de Cloudflare es el unico script de fuera.
+    "script-src 'self' 'nonce-" + n + "' https://static.cloudflareinsights.com",
+    "style-src 'self' 'nonce-" + n + "' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    // data: y blob: hacen falta: la foto entra del telefono y el carnet
+    // se dibuja en un lienzo, sin pasar por ningun servidor.
+    "img-src 'self' data: blob:",
+    "media-src 'self' blob:",
+    "connect-src 'self' https://cloudflareinsights.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'"
+  ].join('; ');
+}
+
+function blindar(res, n, entorno) {
+  const h = new Headers(res.headers);
+  const tipo = h.get('Content-Type') || '';
+
+  h.set('X-Content-Type-Options', 'nosniff');
+  h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  h.set('Cross-Origin-Opener-Policy', 'same-origin');
+
+  // Un ano. El sitio solo vive en https y el certificado lo pone
+  // Cloudflare, asi que prometerlo no cuesta nada. Sin includeSubDomains
+  // ni preload: eso obliga tambien a subdominios que todavia no existen
+  // y se tarda meses en deshacer.
+  h.set('Strict-Transport-Security', 'max-age=31536000');
+
+  // La politica de contenidos solo tiene sentido en documentos.
+  if (tipo.indexOf('text/html') >= 0) {
+    h.set('Content-Security-Policy', politica(n));
+    h.set('Cache-Control', 'private, no-cache, must-revalidate');
+    h.set('X-Frame-Options', 'DENY');
+    h.set('Permissions-Policy', 'geolocation=(), microphone=(), payment=(), usb=()');
+  }
+
+  if (entorno === 'staging') { h.set('X-Robots-Tag', 'noindex, nofollow'); }
+
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+}
+
 export default {
   async fetch(request, env) {
+    // El nonce se saca antes de pintar nada: tiene que ir dentro del
+    // HTML y dentro de la cabecera, y ser el mismo.
+    const n = nonceNuevo();
+    const res = await manejar(request, env, n);
+    return blindar(res, n, env.ENTORNO);
+  }
+};
+
+async function manejar(request, env, nonce) {
     const path = new URL(request.url).pathname;
 
     // La raíz y una dirección por carnet.
     if (path === '/' || path === '/index.html') {
-      return paginaDeCarnet(request, env, CARNETS[POR_DEFECTO], SITIO_URL + '/');
+      return paginaDeCarnet(request, env, CARNETS[POR_DEFECTO], SITIO_URL + '/', nonce);
     }
 
     if (path.startsWith('/carnet-de-')) {
@@ -1010,7 +1101,7 @@ export default {
       if (carnet.id === POR_DEFECTO) {
         return Response.redirect(SITIO_URL + '/', 301);
       }
-      return paginaDeCarnet(request, env, carnet, SITIO_URL + '/' + carnet.slug);
+      return paginaDeCarnet(request, env, carnet, SITIO_URL + '/' + carnet.slug, nonce);
     }
 
     if (path === '/sitemap.xml') {
@@ -1028,7 +1119,7 @@ export default {
     }
 
     if (path.startsWith('/v/')) {
-      return verificar(request, env, decodeURIComponent(path.slice(3)));
+      return verificar(request, env, decodeURIComponent(path.slice(3)), nonce);
     }
 
     // Anota que alguien llego al paso de elegir. Es una escritura
@@ -1080,10 +1171,10 @@ export default {
       }
     }
 
-    if (path === '/verificar') return rutaVerificar(request, env);
+    if (path === '/verificar') return rutaVerificar(request, env, nonce);
 
     if (path === '/terminos' || path === '/privacidad') {
-      const html = path === '/terminos' ? paginaTerminos() : paginaPrivacidad();
+      const html = path === '/terminos' ? paginaTerminos(nonce) : paginaPrivacidad(nonce);
       return new Response(html, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
@@ -1120,5 +1211,4 @@ export default {
     }
 
     return new Response(res.body, { status: res.status, headers });
-  }
-};
+}
