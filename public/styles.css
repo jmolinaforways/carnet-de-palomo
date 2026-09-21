@@ -683,3 +683,47 @@ img, canvas, video, svg{max-width:100%}
   background:rgba(255,255,255,.09);
 }
 .field textarea::placeholder{color:#7d8ea8;font-weight:500}
+
+/* ---------- «síguanme» en el resultado ---------- */
+
+/* Discreto pero primero: sale justo cuando la persona acaba de ver su
+   carnet y todavía no ha empezado a compartirlo. */
+.sigueme{
+  display:flex;align-items:center;gap:11px;
+  margin:0 0 16px;padding:9px 10px 9px 9px;
+  border:1px solid var(--line);border-radius:14px;
+  background:rgba(255,255,255,.05);
+  text-decoration:none;
+  transition:background .16s,border-color .16s;
+}
+.sigueme:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.26)}
+.sigueme-foto{
+  position:relative;flex:0 0 auto;
+  width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#8a3ab9,#e95950 55%,#fccc63);
+  color:#fff;font:800 14px/1 'Archivo',system-ui,sans-serif;
+  letter-spacing:.04em;overflow:hidden;
+}
+.sigueme-foto img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.sigueme-txt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.sigueme-txt strong{
+  font:700 14px/1.25 'Archivo',system-ui,sans-serif;color:#eaf0fb;
+}
+.sigueme-txt span{
+  font:600 12.5px/1.25 'Archivo',system-ui,sans-serif;color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sigueme-btn{
+  flex:0 0 auto;
+  padding:8px 15px;border-radius:9px;
+  background:linear-gradient(135deg,#8a3ab9,#e95950 60%);
+  color:#fff;font:700 13px/1 'Archivo',system-ui,sans-serif;
+}
+@media (max-width:359px){
+  .sigueme-btn{padding:8px 11px;font-size:12px}
+  .sigueme{gap:9px}
+}

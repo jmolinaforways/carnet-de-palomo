@@ -441,11 +441,19 @@ async function emitidosHasta(env) {
 
 /* ---------------- verificación por número ---------------- */
 
-// Acepta «PAL-000123-4», «000123-4», «123-4» o «123».
+// Acepta «PAL-000123-4», «BEB-000123-4», «000123-4», «123-4» o «123».
+//
+// El prefijo dice de qué carnet es, pero la numeración es única para
+// todo el sitio: PAL-000500 y BEB-000501 son dos carnets seguidos. Por
+// eso aquí el prefijo se acepta y se descarta: sin base de datos, el
+// número por sí solo no puede decir de qué tipo es.
+//
+// Antes solo aceptaba «PAL-», así que quien tenía un carnet de
+// pariguayo no podía verificar su número a mano.
 function parsearSerial(raw) {
   if (typeof raw !== 'string') return null;
   const s = raw.toUpperCase().replace(/[\s.]/g, '');
-  const m = s.match(/^(?:PAL-?)?(\d{1,9})(?:-(\d))?$/);
+  const m = s.match(/^(?:[A-Z]{2,4}-?)?(\d{1,9})(?:-(\d))?$/);
   if (!m) return null;
 
   const seq = parseInt(m[1], 10);
@@ -456,7 +464,7 @@ function parsearSerial(raw) {
 async function verificarSerial(env, raw, url) {
   const parsed = parsearSerial(raw);
   if (!parsed) {
-    return { valido: false, motivo: 'formato', mensaje: 'Ese número no tiene forma de carnet de palomo.' };
+    return { valido: false, motivo: 'formato', mensaje: 'Ese número no tiene forma de número de carnet.' };
   }
 
   const { seq, chk } = parsed;
@@ -485,15 +493,15 @@ async function verificarSerial(env, raw, url) {
   if (seq > emitidos) {
     return {
       valido: false, secuencial: seq, motivo: 'rango',
-      mensaje: `Todavía no se ha emitido el palomo número ${seq}. Van ${emitidos}.`
+      mensaje: `Todavía no se ha emitido el carnet número ${seq}. Van ${emitidos}.`
     };
   }
 
   return {
     valido: true, secuencial: seq, emitidos,
     mensaje: chk === null
-      ? `El palomo número ${seq} sí fue emitido por el Ministerio. Para estar seguro del todo, escribe también el dígito que va al final del número.`
-      : `El palomo número ${seq} fue emitido por el Ministerio y su dígito verificador cuadra.`
+      ? `El carnet número ${seq} sí fue emitido. Para estar seguro del todo, escribe también el dígito que va al final del número.`
+      : `El carnet número ${seq} fue emitido y su dígito verificador cuadra.`
   };
 }
 

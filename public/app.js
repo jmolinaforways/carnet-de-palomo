@@ -693,7 +693,18 @@
     validate();
   }
 
+  // Si todavía no hay foto en /javi.jpg, la quitamos y se queda el
+  // círculo con las iniciales. Así el CTA nunca sale con un roto.
+  function fotoDelCTA() {
+    var img = $('ctaFoto');
+    if (!img) { return; }
+    img.addEventListener('error', function () { img.remove(); });
+    if (img.complete && !img.naturalWidth) { img.remove(); }
+  }
+
   function init() {
+    fotoDelCTA();
+
     state.exp = ramaDelExperimento();
 
     // Sale un diseño distinto en cada visita, y en la rama B ese es el
