@@ -57,8 +57,8 @@
       banda: '#a4122a',
       bandaTinta: '#fff6ec',
       bg1: '#fdfaf2', bg2: '#f0e6d2',
-      navy: '#3a2416', navy2: '#7a4a2c',
-      label: '#8a7157', red: '#a4122a',
+      navy: '#16305e', navy2: '#3f5f96',
+      label: '#8a7157', red: '#b30f22',
       line: 'rgba(19,41,75,.16)',
       guilloche: '#d9c7a5', guillocheAlfa: 0.55,
       
@@ -68,15 +68,15 @@
     },
 
     carbon: {
-      nombre: 'Carbón', familia: 'carnet', formato: 'credencial',
+      nombre: 'Ultramar', familia: 'carnet', formato: 'credencial',
       cabecera: 'banda',
-      banda: '#1a1d22',
-      bandaTinta: '#f2f4f7',
-      bg1: '#2a2f36', bg2: '#15181d',
-      navy: '#f2f4f7', navy2: '#9aa7b8',
-      label: '#8d97a5', red: '#ff5f74',
+      banda: '#071731',
+      bandaTinta: '#f2f6fc',
+      bg1: '#1b3358', bg2: '#0a1c38',
+      navy: '#f2f6fc', navy2: '#9dbdea',
+      label: '#8fa6c8', red: '#e11d33',
       line: 'rgba(255,255,255,.16)',
-      guilloche: '#3c434d', guillocheAlfa: 0.5,
+      guilloche: '#33558c', guillocheAlfa: 0.5,
       bandera: false,
       marcaAgua: 0.07,
       pie: 'rgba(4,10,22,.5)', pieTinta: 'rgba(238,243,251,.88)',
@@ -136,7 +136,7 @@
       bandaTinta: '#ffffff',
       bg1: '#16294d', bg2: '#0a1730',
       navy: '#eef3fb', navy2: '#7fb2ff',
-      label: '#8ea2c4', red: '#ff5f74',
+      label: '#8ea2c4', red: '#e11d33',
       line: 'rgba(255,255,255,.16)',
       guilloche: '#2f4c80', guillocheAlfa: 0.55,
       bandera: false,
@@ -161,15 +161,15 @@
     },
 
     esmeralda: {
-      nombre: 'Esmeralda', familia: 'credencial', formato: 'cuadrado',
+      nombre: 'Bandera', familia: 'credencial', formato: 'cuadrado',
       cabecera: 'banda',
-      grad: ['#0d6b4f', '#04281f'],
+      grad: ['#ce1126', '#7d0b1e'],
       bandaTinta: '#ffffff',
-      bg1: '#0f5f47', bg2: '#052a20',
-      navy: '#eafaf3', navy2: '#6fd8b0',
-      label: '#9dc9b8', red: '#ffd166',
-      line: 'rgba(255,255,255,.16)',
-      guilloche: '#1d7a5c', guillocheAlfa: 0.5,
+      bg1: '#c20f23', bg2: '#7a0a1c',
+      navy: '#ffffff', navy2: '#ffd2d8',
+      label: '#f0b3bb', red: '#ffffff',
+      line: 'rgba(255,255,255,.18)',
+      guilloche: '#e04a5c', guillocheAlfa: 0.5,
       bandera: false,
       marcaAgua: 0.07,
       pie: 'rgba(4,10,22,.5)', pieTinta: 'rgba(238,243,251,.88)',
@@ -268,8 +268,21 @@
      ------------------------------------------------------------------- */
 
   // Nada que cargar: el carnet se dibuja entero con código.
+  // El escudo nacional, si el sitio lo sirve. No se dibuja con trazos:
+  // a veinte pixeles saldria una mancha, y una mancha es exactamente lo
+  // que la Ley 210-19 llama alterar el simbolo. O es el escudo de
+  // verdad, o la bandera se queda en su forma civil, que tambien es
+  // oficial y no lleva escudo.
+  var ESCUDO = null;
+
   function loadAssets() {
-    return Promise.resolve();
+    if (ESCUDO !== null) { return Promise.resolve(); }
+    return new Promise(function (listo) {
+      var img = new Image();
+      img.onload = function () { ESCUDO = img; listo(); };
+      img.onerror = function () { ESCUDO = false; listo(); };
+      img.src = '/escudo.png';
+    });
   }
 
   // El emblema del Ministerio: el palomo dentro de un sello.
@@ -298,7 +311,7 @@
   // Ley 210-19 pide que no se altere; por eso aquí no se estiliza.
   function drawBandera(ctx, x, y, w) {
     var h = w * 0.625;            // proporción oficial 5:8
-    var t = h * 0.17;             // grosor de la cruz
+    var t = w / 9;                // la cruz mide un noveno del largo
     ctx.save();
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(x, y, w, h);
@@ -310,6 +323,13 @@
     ctx.fillStyle = '#CE1126';                          // rojo bermellón
     ctx.fillRect(cx + t, y, x + w - cx - t, cy - y);    // superior derecho
     ctx.fillRect(x, cy + t, cx - x, y + h - cy - t);
+
+    // El escudo va en el centro de la cruz, como en la bandera del
+    // Estado. Si no hay archivo, queda la bandera civil.
+    if (ESCUDO) {
+      var e = h * 0.52;
+      ctx.drawImage(ESCUDO, x + w / 2 - e / 2, y + h / 2 - e / 2, e, e);
+    }
 
     ctx.strokeStyle = 'rgba(0,0,0,.22)';
     ctx.lineWidth = 1;

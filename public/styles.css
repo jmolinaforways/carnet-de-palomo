@@ -604,6 +604,12 @@ img, canvas, video, svg{max-width:100%}
   border-color:transparent;color:#fff;
 }
 
+/* Categoria en rojo, formato en azul: los dos colores de RD, y de
+   paso se distingue de un vistazo que son dos filtros distintos. */
+.tipos-sm .tipo.activo{
+  background:linear-gradient(180deg,#1d56b0,#0b3070);
+}
+
 /* ---------- rejilla de diseños ---------- */
 .carrusel{
   display:flex;gap:12px;
