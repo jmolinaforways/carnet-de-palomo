@@ -1051,6 +1051,25 @@ export default {
       return json({ ok: true });
     }
 
+    // Solo el numero, para ensenarlo en la portada. Va aparte y
+    // cacheado un minuto: si cada visita despertara al Durable Object,
+    // lo estariamos pagando por nada. Que el numero llegue con un
+    // minuto de retraso no le importa a nadie.
+    if (path === '/api/cuantos') {
+      try {
+        const res = await contador(env).fetch('https://secuencia/peek');
+        const { n } = await res.json();
+        return new Response(JSON.stringify({ ok: true, total: n }), {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'public, max-age=60'
+          }
+        });
+      } catch {
+        return json({ ok: false }, 503);
+      }
+    }
+
     if (path === '/api/populares') {
       try {
         const res = await contador(env).fetch('https://secuencia/stats');

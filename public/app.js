@@ -309,6 +309,16 @@
 
     if ($('sinCarnets')) { $('sinCarnets').hidden = lista.length > 0; }
 
+    // Cuantos hay de verdad. Dice que dentro hay mas: quien ve tres
+    // tarjetas no sabe que cada una trae once disenos detras.
+    if ($('cuentaModelos')) {
+      var nCarnets = carnetsDisponibles().length;
+      var nDisenos = nCarnets * window.Carnet.estilos().length;
+      $('cuentaModelos').innerHTML =
+        '<b>' + nCarnets + '</b> ' + (nCarnets === 1 ? 'carnet' : 'carnets') +
+        ' · <b>' + nDisenos + '</b> diseños para elegir';
+    }
+
     // Siempre visible: con tres carnets sobra, pero la lista va a
     // crecer y aprender donde esta el buscador tiene que costar una vez.
   }
@@ -703,7 +713,24 @@
     if (img.complete && !img.naturalWidth) { img.remove(); }
   }
 
+  // Cuanta gente lleva su carnet. Si no responde, la linea no aparece:
+  // mejor callarse que ensenar un cero.
+  function contadorVivo() {
+    var el = $('contadorVivo');
+    if (!el) { return; }
+    fetch('/api/cuantos')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok || !j.total) { return; }
+        el.innerHTML = 'Ya son <b>' + j.total.toLocaleString('es-DO') +
+                       '</b> carnets emitidos';
+        el.hidden = false;
+      })
+      .catch(function () { /* se queda escondido */ });
+  }
+
   function init() {
+    contadorVivo();
     fotoDelCTA();
 
     state.exp = ramaDelExperimento();
