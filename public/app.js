@@ -17,6 +17,7 @@
     stream: null,
     carnet: null,     // datos emitidos por el servidor
     blob: null,       // PNG listo para descargar/compartir
+    familia: 'carnet',
     prevStep: 'step-form',
     tipo: 'palomo',
     estilo: 'oficial'
@@ -124,37 +125,82 @@
     }
   }
 
-  var FAMILIAS = [
-    ['carnet',     'Carnet · apaisado'],
-    ['credencial', 'Credencial · cuadrada']
-  ];
+  function deLaFamilia() {
+    return window.Carnet.estilos().filter(function (e) {
+      return e.familia === state.familia;
+    });
+  }
 
-  function pintarSelector() {
+  function marcarElegido() {
+    var cont = $('disenos');
+    var nombre = $('disenoNombre');
+    if (!cont) { return; }
+    for (var i = 0; i < cont.children.length; i++) {
+      var b = cont.children[i];
+      var suyo = b.getAttribute('data-estilo') === state.estilo;
+      b.classList.toggle('elegido', suyo);
+      b.setAttribute('aria-pressed', suyo ? 'true' : 'false');
+      if (suyo && nombre) { nombre.textContent = b.getAttribute('data-nombre'); }
+    }
+  }
+
+  // La miniatura del selector lleva sus propios datos, no los de muestra.
+  // Se dibuja en su teléfono, así que verlas todas no gasta ningún número
+  // del contador: eso solo pasa al emitir.
+  function miniaturaPropia(estilo) {
+    var d = window.Carnet.datosMuestra(state.tipo, estilo, state.photo || fotoDemo());
+    var nombre = cleanName($('inNombre').value);
+    if (nombre) { d.nombre = nombre.toLocaleUpperCase('es'); }
+    var lugar = cleanName($('inLugar').value);
+    if (lugar) { d.lugar = lugar.toLocaleUpperCase('es'); }
+    var c = $('inConcepto') ? $('inConcepto').value.trim() : '';
+    if (c) { d.concepto = c; }
+
+    var cv = document.createElement('canvas');
+    window.Carnet.render(cv, d, 0.42, estilo);
+    var url = cv.toDataURL('image/jpeg', 0.8);
+    cv.width = cv.height = 0;
+    return url;
+  }
+
+  function pintarSelector(centrar) {
     var cont = $('disenos');
     if (!cont || !window.Carnet) { return; }
+
+    var lista = deLaFamilia();
+    if (!lista.length) { return; }
+
+    // Al cambiar de formato, el estilo elegido puede no existir ya en la
+    // familia nueva: se toma el primero para que el botón siga vivo.
+    var sigue = lista.some(function (e) { return e.id === state.estilo; });
+    if (!sigue) { state.estilo = lista[0].id; }
+
     cont.innerHTML = '';
-    var todos = window.Carnet.estilos();
-
-    FAMILIAS.forEach(function (f) {
-      var titulo = document.createElement('p');
-      titulo.className = 'familia';
-      titulo.textContent = f[1];
-      cont.appendChild(titulo);
-
-      todos.filter(function (e) { return e.familia === f[0]; }).forEach(function (e) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'diseno' + (e.id === state.estilo ? ' elegido' : '');
-        b.innerHTML = '<span class="caja"><img src="' + miniatura(state.tipo, e.id) +
-                      '" alt=""></span><span>' + e.nombre + '</span>';
-        b.addEventListener('click', function () {
-          state.estilo = e.id;
-          pintarSelector();
-          $('btnSeguir').disabled = false;
-        });
-        cont.appendChild(b);
+    lista.forEach(function (e) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diseno';
+      b.setAttribute('data-estilo', e.id);
+      b.setAttribute('data-nombre', e.nombre);
+      b.setAttribute('aria-label', 'Diseño ' + e.nombre);
+      b.innerHTML = '<span class="caja"><img src="' + miniaturaPropia(e.id) + '" alt=""></span>';
+      b.addEventListener('click', function () {
+        state.estilo = e.id;
+        marcarElegido();
+        b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       });
+      cont.appendChild(b);
     });
+
+    marcarElegido();
+    if (centrar !== false) { cont.scrollLeft = 0; }
+  }
+
+  function elegirFamilia(f) {
+    state.familia = f;
+    $('famCarnet').classList.toggle('activo', f === 'carnet');
+    $('famCredencial').classList.toggle('activo', f === 'credencial');
+    pintarSelector();
   }
 
   function elegirTipo(t) {
@@ -307,10 +353,12 @@
   function emitir() {
     if (!validate()) { return; }
 
-    var btn = $('btnGenerar');
+    var btn = $('btnSeguir');
     btn.disabled = true;
     btn.textContent = 'Emitiendo…';
-    hideError('formError');
+    // El aviso va en la pantalla donde esta la persona, que ya no es
+    // la de los datos sino la de los disenos.
+    hideError('estiloError');
 
     fetch('/api/emitir', {
       method: 'POST',
@@ -333,10 +381,10 @@
     }).then(function () {
       go('step-result');
     }).catch(function (err) {
-      showError('formError', 'No se pudo emitir el carnet: ' + err.message + '. Intenta de nuevo.');
+      showError('estiloError', 'No se pudo emitir el carnet: ' + err.message + '. Intenta de nuevo.');
     }).finally(function () {
       btn.disabled = false;
-      btn.textContent = 'Emitir carnet';
+      btn.textContent = 'Emitir mi carnet';
     });
   }
 
@@ -489,7 +537,9 @@
     $('inLugar').value = '';
     $('inAcepto').checked = false;
     $('photoPreview').classList.remove('has-photo');
-    go('step-estilo');
+    if ($('inConcepto')) { $('inConcepto').value = ''; }
+    if ($('cuentaConcepto')) { $('cuentaConcepto').textContent = '80'; }
+    go('step-form');
     $('fileInput').value = '';
     validate();
   }
@@ -500,14 +550,19 @@
       pintarSelector();
     });
 
-    $('btnStart').addEventListener('click', function () { go('step-estilo'); });
+    $('btnStart').addEventListener('click', function () { go('step-form'); });
     $('tipoPalomo').addEventListener('click', function () { elegirTipo('palomo'); });
     $('tipoPariguayo').addEventListener('click', function () { elegirTipo('pariguayo'); });
-    $('btnSeguir').addEventListener('click', function () { go('step-form'); });
+    $('famCarnet').addEventListener('click', function () { elegirFamilia('carnet'); });
+    $('famCredencial').addEventListener('click', function () { elegirFamilia('credencial'); });
+    $('btnSeguir').addEventListener('click', emitir);
 
     document.querySelectorAll('[data-back]').forEach(function (b) {
       var destino = b.getAttribute('data-back') || 'step-intro';
-      b.addEventListener('click', function () { go(destino); });
+      b.addEventListener('click', function () {
+        go(destino);
+        if (destino === 'step-estilo') { pintarSelector(false); }
+      });
     });
 
     (function () {
@@ -537,7 +592,13 @@
       go(state.prevStep);
     });
 
-    $('btnGenerar').addEventListener('click', emitir);
+    // Del paso de datos se pasa a elegir, y las vistas previas se
+    // redibujan para que salgan con la foto y el nombre recién puestos.
+    $('btnGenerar').addEventListener('click', function () {
+      if (!validate()) { return; }
+      go('step-estilo');
+      pintarSelector();
+    });
     $('btnDescargar').addEventListener('click', descargar);
     $('btnWhatsapp').addEventListener('click', function () { compartir('whatsapp'); });
     $('shInstagram').addEventListener('click', function () { compartir('instagram'); });

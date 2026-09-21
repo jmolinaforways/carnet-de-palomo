@@ -169,6 +169,13 @@ h2.mt{margin-top:26px}
 .wide{width:100%;margin-top:22px}
 
 .row-actions{display:flex;gap:10px;margin-top:24px}
+.row-actions.pegado .btn-quiet{flex:0 0 33%}
+.row-actions.pegado{
+  position:sticky;bottom:0;z-index:4;
+  margin:14px -18px 0;
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(11,22,44,0),rgba(11,22,44,.94) 34%);
+}
 .row-actions .btn{flex:1}
 
 
@@ -555,7 +562,9 @@ img, canvas, video, svg{max-width:100%}
 }
 
 /* ---------- elegir categoría ---------- */
-.tipos{display:flex;gap:9px;margin:18px 0 16px}
+.tipos{display:flex;gap:9px;margin:18px 0 10px}
+.tipos-sm{margin:0 0 4px}
+.tipos-sm .tipo{min-height:42px;font-size:14px}
 .tipo{
   flex:1;min-height:50px;
   border:1px solid var(--line);border-radius:12px;cursor:pointer;
@@ -569,20 +578,35 @@ img, canvas, video, svg{max-width:100%}
 }
 
 /* ---------- rejilla de diseños ---------- */
-.disenos{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;
-  margin-bottom:6px;
+.carrusel{
+  display:flex;gap:12px;
+  margin:16px -18px 6px;
+  padding:6px 18px 10px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.carrusel::-webkit-scrollbar{display:none}
+.carrusel-pie{
+  margin:0;min-height:18px;text-align:center;
+  font:700 13px/1 'Archivo',system-ui,sans-serif;color:#c3d2ec;
 }
 .diseno{
+  flex:0 0 auto;
+  scroll-snap-align:center;
+  display:flex;align-items:center;justify-content:center;
   padding:0;border:2px solid transparent;border-radius:12px;
   background:rgba(255,255,255,.05);cursor:pointer;overflow:hidden;
-  transition:border-color .16s,transform .12s;
+  transition:border-color .16s,transform .12s,opacity .16s;
+  opacity:.62;
 }
+.diseno.elegido{opacity:1}
 .diseno:active{transform:scale(.98)}
 .diseno .caja{
-  height:clamp(132px,27vw,178px);
+  height:clamp(150px,34vh,220px);
   display:flex;align-items:center;justify-content:center;
-  padding:9px 9px 3px;
+  padding:10px;
 }
 .diseno img{
   max-width:100%;max-height:100%;
