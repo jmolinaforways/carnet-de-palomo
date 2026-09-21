@@ -335,30 +335,67 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
-  // El carnet con su texto debajo. A WhatsApp no se le puede mandar un
-  // archivo por enlace: solo la hoja de compartir del sistema lo permite.
-  // Por eso se usa esa, y el enlace queda de respaldo donde no exista.
-  function compartir() {
-    if (!state.blob) { return; }
+  // El carnet con su texto debajo.
+  //
+  // A Instagram y a TikTok no se les puede mandar una imagen desde una
+  // web: no existe enlace ni API que lo permita. La única vía es la hoja
+  // de compartir del sistema, donde esas apps aparecen como destino. Por
+  // eso los tres botones abren la misma hoja: es lo máximo que la
+  // plataforma deja hacer, no una simplificación nuestra.
+  //
+  // Facebook sí acepta un enlace, y lo usamos donde no haya hoja nativa.
 
-    var texto = [
+  function textoCompartir() {
+    return [
       'Ya soy palomo certificado.',
       '',
       'Ahora saca el tuyo: ' + SITIO
     ].join('\n');
+  }
 
-    var file = new File([state.blob], fileName(), { type: 'image/png' });
+  function archivoCarnet() {
+    return new File([state.blob], fileName(), { type: 'image/png' });
+  }
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], text: texto })
+  function puedeCompartirArchivo() {
+    if (!navigator.canShare || !state.blob) { return false; }
+    try {
+      return navigator.canShare({ files: [archivoCarnet()] });
+    } catch (e) { return false; }
+  }
+
+  function pista(msg) {
+    var el = $('shareHint');
+    el.textContent = msg;
+    el.hidden = false;
+  }
+
+  function compartir(red) {
+    if (!state.blob) { return; }
+    $('shareHint').hidden = true;
+
+    var texto = textoCompartir();
+
+    // Con hoja nativa va la imagen y el texto juntos, a la app que elijan.
+    if (puedeCompartirArchivo()) {
+      navigator.share({ files: [archivoCarnet()], text: texto })
         .catch(function () { /* el usuario canceló */ });
       return;
     }
 
-    // Escritorio sin compartir de archivos: va el texto, y la imagen se
-    // descarga aparte.
-    window.open('https://wa.me/?text=' + encodeURIComponent(texto),
-                '_blank', 'noopener');
+    // Sin hoja nativa (escritorio), solo el enlace, y solo donde se pueda.
+    if (red === 'whatsapp') {
+      window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+      return;
+    }
+    if (red === 'facebook') {
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SITIO),
+                  '_blank', 'noopener');
+      return;
+    }
+
+    pista('Instagram y TikTok no dejan publicar desde el navegador. ' +
+          'Descarga el carnet y súbelo desde la app, o abre esta página en tu teléfono.');
   }
 
   /* ---------------- arranque ---------------- */
@@ -407,7 +444,10 @@
 
     $('btnGenerar').addEventListener('click', emitir);
     $('btnDescargar').addEventListener('click', descargar);
-    $('btnWhatsapp').addEventListener('click', compartir);
+    $('btnWhatsapp').addEventListener('click', function () { compartir('whatsapp'); });
+    $('shInstagram').addEventListener('click', function () { compartir('instagram'); });
+    $('shFacebook').addEventListener('click', function () { compartir('facebook'); });
+    $('shTiktok').addEventListener('click', function () { compartir('tiktok'); });
     $('btnOtro').addEventListener('click', reset);
 
     $('carnetStage').addEventListener('click', abrirVisor);

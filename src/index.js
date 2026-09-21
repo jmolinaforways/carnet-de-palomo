@@ -174,7 +174,7 @@ function limpiarLugar(raw) {
 //
 // Hacerlo después de lanzar significaría repartir números que ya tiene
 // otra gente. Si alguna vez hace falta, que sea antes de anunciar.
-const CONTADOR = 'palomos-com-do';
+const CONTADOR = 'lanzamiento-limpio';
 
 function contador(env) {
   return env.SECUENCIA.get(env.SECUENCIA.idFromName(CONTADOR));

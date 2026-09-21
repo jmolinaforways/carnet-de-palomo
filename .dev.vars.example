@@ -1,0 +1,12 @@
+# Copia este archivo a .dev.vars para desarrollar en local.
+#
+# Hace falta porque el Worker se niega a firmar carnets con una llave que
+# esté escrita en el código público: si alguien la conociera, podría
+# fabricar carnets «auténticos». El respaldo de desarrollo solo se entrega
+# en localhost, y desde que el proyecto tiene dominio propio, `wrangler
+# dev` simula las peticiones como si llegaran a palomos.com.do.
+#
+# Genera la tuya así:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+SIGNING_SECRET=pon-aqui-una-llave-cualquiera-para-desarrollo

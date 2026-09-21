@@ -482,3 +482,28 @@ img, canvas, video, svg{max-width:100%}
   color:#fff;
 }
 .btn-wa:hover{background:#1a9349}
+
+/* ---------- compartir en redes ---------- */
+.share-label{
+  margin:22px 0 10px;
+  font-size:12px;letter-spacing:.11em;text-transform:uppercase;
+  font-weight:700;color:var(--muted);
+}
+.share-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.sh{
+  flex:1 1 0;min-width:96px;min-height:48px;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1px solid var(--line);border-radius:12px;cursor:pointer;
+  background:rgba(255,255,255,.075);color:#eef3fb;
+  font:700 13.5px/1 'Archivo',system-ui,sans-serif;
+  transition:background .16s, transform .12s;
+}
+.sh:active{transform:scale(.97)}
+.sh-ig:hover{background:rgba(214,41,118,.28)}
+.sh-fb:hover{background:rgba(24,119,242,.28)}
+.sh-tt:hover{background:rgba(255,255,255,.18)}
+
+.share-hint{
+  margin:12px 0 0;
+  font-size:12.5px;line-height:1.55;color:var(--muted);
+}
