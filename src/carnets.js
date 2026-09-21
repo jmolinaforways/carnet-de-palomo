@@ -355,7 +355,7 @@ export const CARNETS = {
     // nombre del organismo.
     emisores: {
       oficial: { nombre: 'Ministerio de Bebedores', siglas: 'MINBE' },
-      institucional: { nombre: 'Dirección General del Bebedaje', siglas: 'DGB' },
+      institucional: { nombre: 'Dirección Nacional de Bebedores', siglas: 'DNB' },
       crema: { nombre: 'Instituto Nacional de la Fría', siglas: 'INAFRIA' },
       hielo: { nombre: 'Comisión Nacional de Bebedores', siglas: 'CONABE' },
       carbon: { nombre: 'Consejo Superior de Bebedores', siglas: 'CONSUBE' },
