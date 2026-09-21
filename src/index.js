@@ -30,6 +30,7 @@ const TIPOS = {
     titulo: 'CARNET DE PALOMO',
     titulos: {
         oficial: 'CARNET DE PALOMO',
+        hielo: 'CARNET DE PALOMO',
         institucional: 'CARNET DE PALOMO',
         crema: 'CERTIFICADO DE PALOMO',
         carbon: 'CARNET DE PALOMO',
@@ -50,6 +51,7 @@ const TIPOS = {
         oficial: { nombre: 'Ministerio de Palomos', siglas: 'MINPAL' },
         institucional: { nombre: 'Dirección General del Palomaje', siglas: 'DGP' },
         crema: { nombre: 'Instituto Nacional del Palomaje', siglas: 'INAPAL' },
+        hielo: { nombre: 'Comisión Nacional de Palomos', siglas: 'CONAPAL' },
         carbon: { nombre: 'Consejo Superior de Palomos', siglas: 'CONSUPAL' },
         candela: { nombre: 'Registro Nacional de Palomos', siglas: 'RENAPAL' },
         solapin: { nombre: 'Federación Dominicana de Palomos', siglas: 'FEDOPAL' },
@@ -61,6 +63,7 @@ const TIPOS = {
 
     frases: {
         oficial: 'La paz también es una forma de éxito.',
+        hielo: 'Aquí no hay líos, aquí hay carnet.',
         institucional: 'El que se queda en su casa, siempre gana.',
         crema: 'Aquí no andamos en gente.',
         carbon: 'El que no debe, duerme tranquilo.',
@@ -106,6 +109,7 @@ const TIPOS = {
     titulo: 'CARNET DE PARIGUAYO',
     titulos: {
         oficial: 'CARNET DE PARIGUAYO',
+        hielo: 'CARNET DE PARIGUAYO',
         institucional: 'CARNET DE PARIGUAYO',
         crema: 'CERTIFICADO DE PARIGUAYO',
         carbon: 'CARNET DE PARIGUAYO',
@@ -125,6 +129,7 @@ const TIPOS = {
         oficial: { nombre: 'Ministerio de Pariguayos', siglas: 'MINPAR' },
         institucional: { nombre: 'Dirección General del Pariguayaje', siglas: 'DGPAR' },
         crema: { nombre: 'Instituto Nacional del Pariguayaje', siglas: 'INAPARI' },
+        hielo: { nombre: 'Comisión Nacional de Pariguayos', siglas: 'CONAPARI' },
         carbon: { nombre: 'Consejo Superior de Pariguayos', siglas: 'CONSUPARI' },
         candela: { nombre: 'Registro Nacional de Pariguayos', siglas: 'RENAPARI' },
         solapin: { nombre: 'Federación Dominicana de Pariguayos', siglas: 'FEDOPARI' },
@@ -136,6 +141,7 @@ const TIPOS = {
 
     frases: {
         oficial: 'El que no baila, observa.',
+        hielo: 'Aquí no se baila, aquí se observa.',
         institucional: 'Yo no bailo, yo cuido los bultos.',
         crema: 'Yo vine fue a mirar.',
         carbon: 'El que graba no baila.',
@@ -182,7 +188,7 @@ function tipoDe(v) {
 
 // Los cinco estilos. El servidor solo necesita saber cuáles existen para
 // entregar el emisor y la frase que le tocan a cada uno.
-const ESTILOS = ["oficial","institucional","crema","carbon","candela","solapin","asodopa","nocturno","tricolor","esmeralda"];
+const ESTILOS = ["oficial","institucional","crema","hielo","carbon","candela","solapin","asodopa","nocturno","tricolor","esmeralda"];
 const estiloDe = (v) => (ESTILOS.includes(v) ? v : 'oficial');
 
 // Lo que sale en el carnet cuando no escriben de dónde son. El lugar viaja

@@ -295,7 +295,19 @@
     });
 
     marcarElegido();
-    if (centrar !== false) { cont.scrollLeft = 0; }
+
+    // El carrusel abria siempre en el primero, asi que el diseno
+    // elegido podia quedar fuera de pantalla: se marcaba uno y se
+    // ensenaba otro. Y de paso el primero de la lista se llevaba
+    // elecciones por estar delante, no por gustar mas.
+    if (centrar !== false) {
+      var i = 0;
+      lista.forEach(function (e, n) { if (e.id === state.estilo) { i = n; } });
+      if (cont.children[i]) {
+        cont.children[i].scrollIntoView({ block: 'nearest', inline: 'center' });
+      }
+    }
+
     flechasSelector();
   }
 
