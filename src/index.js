@@ -892,6 +892,11 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
   Cloudflare, nuestro proveedor de infraestructura, con fines de seguridad, prevención
   de abuso y funcionamiento del servicio. No usamos esos datos para identificarte ni
   los cruzamos con tu carnet.</p>
+  <p>Hay una excepción que nos toca a nosotros y conviene que la sepas: para que nadie
+  pueda inflar el contador con un programa, contamos cuántos carnets se emiten por
+  minuto desde cada dirección IP. Esa cuenta vive en memoria un minuto y se borra sola;
+  no se escribe en disco, no se cruza con tu nombre ni con tu carnet, y no queda
+  ningún registro de qué dirección emitió qué.</p>
 
   <h2>Medición, sin cookies</h2>
   <p>Para saber cuánta gente nos visita usamos <strong>Cloudflare Web Analytics</strong>,
