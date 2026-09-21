@@ -1495,8 +1495,11 @@
     ctx.fillStyle = C.navy;
     roundRect(ctx, px, py + ph + 6, pw, 34, 5); ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.font = 'italic ' + font(700, 16, 'Georgia, serif');
     var cin = 'Un ' + sujeto(data).charAt(0) + sujeto(data).slice(1).toLowerCase() + ' Certificado';
+    // «Un Pariguayo Certificado» no cabe donde cabia «Un Palomo
+    // Certificado»: se encoge hasta entrar en la cintilla.
+    var zc = fitText(ctx, cin, pw - 20, 700, 16, 11, 'Georgia, serif');
+    ctx.font = 'italic ' + font(700, zc, 'Georgia, serif');
     ctx.fillText(cin, px + pw / 2 - ctx.measureText(cin).width / 2, py + ph + 29);
 
     /* título en tres alturas */
