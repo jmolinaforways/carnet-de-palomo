@@ -115,6 +115,22 @@
       }
     }
 
+    // Tocar un diseño de la portada lleva directo al formulario: quien
+    // toca ya decidió, y hacerle buscar el botón es tiempo perdido. Se
+    // distingue el toque del arrastre, o deslizar abriría el formulario.
+    (function () {
+      var x0 = 0, y0 = 0, arrastro = false;
+      cont.addEventListener('pointerdown', function (e) {
+        x0 = e.clientX; y0 = e.clientY; arrastro = false;
+      });
+      cont.addEventListener('pointermove', function (e) {
+        if (Math.abs(e.clientX - x0) > 8 || Math.abs(e.clientY - y0) > 8) { arrastro = true; }
+      });
+      cont.addEventListener('click', function () {
+        if (!arrastro) { go('step-form'); }
+      });
+    })();
+
     // Las flechas del escritorio avanzan una lámina entera.
     (function () {
       var atras = $('sliderAtras'), alante = $('sliderAlante');
@@ -450,6 +466,14 @@
   }
 
   function drawResult(j) {
+    window.Carnet.alLlegarLaBandera(function () {
+      // Las miniaturas se dibujaron sin ella; ahora que está, se rehacen.
+      pintarSlider();
+      if (document.getElementById('step-estilo').hasAttribute('data-active')) {
+        pintarSelector(false);
+      }
+    });
+
     return Promise.all([loadFonts(), window.Carnet.loadAssets()]).then(function () {
       var data = Object.assign({}, j, {
         qrUrl: j.verifyUrl,

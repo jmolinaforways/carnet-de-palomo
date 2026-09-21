@@ -268,21 +268,42 @@
      ------------------------------------------------------------------- */
 
   // Nada que cargar: el carnet se dibuja entero con código.
-  // El escudo nacional, si el sitio lo sirve. No se dibuja con trazos:
-  // a veinte pixeles saldria una mancha, y una mancha es exactamente lo
-  // que la Ley 210-19 llama alterar el simbolo. O es el escudo de
-  // verdad, o la bandera se queda en su forma civil, que tambien es
-  // oficial y no lleva escudo.
-  var ESCUDO = null;
+  // La Bandera Nacional no se dibuja con trazos: se usa el archivo
+  // oficial tal cual, con su Escudo dentro, a su propia proporcion y
+  // con sus colores. Redibujarla a mano seria alterarla, que es justo
+  // lo que prohibe la Ley 210-19.
+  //
+  // Mientras no haya llegado, su hueco se deja en blanco. Nunca se
+  // pinta una version incompleta del simbolo.
+  // Archivo: public/bandera.svg, tomado de Wikimedia Commons
+  // (File:Flag_of_the_Dominican_Republic.svg), dominio publico. Mide
+  // 900x600 con la cruz de 120 sobre cuarteles de 240: la mitad de la
+  // altura de un cuartel, que es la proporcion que manda la ley. Se
+  // dibuja a esa misma proporcion, solo escalado.
+  var BANDERA = null;
+  var enEspera = [];
 
+  // No bloquea el primer dibujo: el archivo pesa, y la portada no
+  // tiene por que esperarlo. Quien quiera repintar al llegar, que se
+  // apunte con alLlegarLaBandera().
   function loadAssets() {
-    if (ESCUDO !== null) { return Promise.resolve(); }
-    return new Promise(function (listo) {
-      var img = new Image();
-      img.onload = function () { ESCUDO = img; listo(); };
-      img.onerror = function () { ESCUDO = false; listo(); };
-      img.src = '/escudo.png';
-    });
+    if (BANDERA !== null) { return Promise.resolve(); }
+    BANDERA = false;
+    var img = new Image();
+    img.onload = function () {
+      BANDERA = img;
+      var pendientes = enEspera;
+      enEspera = [];
+      pendientes.forEach(function (f) { try { f(); } catch (e) {} });
+    };
+    img.onerror = function () { enEspera = []; };
+    img.src = '/bandera.svg';
+    return Promise.resolve();
+  }
+
+  function alLlegarLaBandera(cb) {
+    if (BANDERA) { return; }
+    enEspera.push(cb);
   }
 
   // El emblema del Ministerio: el palomo dentro de un sello.
@@ -310,27 +331,14 @@
   // ni recortada: es decoración, no el emblema del documento.
   // Ley 210-19 pide que no se altere; por eso aquí no se estiliza.
   function drawBandera(ctx, x, y, w) {
-    var h = w * 0.625;            // proporción oficial 5:8
-    var t = w / 9;                // la cruz mide un noveno del largo
-    ctx.save();
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(x, y, w, h);
-
-    var cx = x + w / 2 - t / 2, cy = y + h / 2 - t / 2;
-    ctx.fillStyle = '#002D62';                          // azul ultramar
-    ctx.fillRect(x, y, cx - x, cy - y);                 // superior izquierdo
-    ctx.fillRect(cx + t, cy + t, x + w - cx - t, y + h - cy - t);
-    ctx.fillStyle = '#CE1126';                          // rojo bermellón
-    ctx.fillRect(cx + t, y, x + w - cx - t, cy - y);    // superior derecho
-    ctx.fillRect(x, cy + t, cx - x, y + h - cy - t);
-
-    // El escudo va en el centro de la cruz, como en la bandera del
-    // Estado. Si no hay archivo, queda la bandera civil.
-    if (ESCUDO) {
-      var e = h * 0.52;
-      ctx.drawImage(ESCUDO, x + w / 2 - e / 2, y + h / 2 - e / 2, e, e);
+    if (!BANDERA) {
+      // Todavia no ha llegado. Se reserva el hueco y no se pinta nada:
+      // mejor un espacio vacio que media bandera.
+      return w * 0.6667;
     }
-
+    var h = w * BANDERA.naturalHeight / BANDERA.naturalWidth;
+    ctx.save();
+    ctx.drawImage(BANDERA, x, y, w, h);
     ctx.strokeStyle = 'rgba(0,0,0,.22)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
@@ -1975,6 +1983,7 @@
   global.Carnet = {
     render: renderCarnet,
     loadAssets: loadAssets,
+    alLlegarLaBandera: alLlegarLaBandera,
     drawPalomo: drawPalomo,
     medidas: function (id) {
       var e = estiloDe(id);
