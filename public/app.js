@@ -714,18 +714,6 @@
       if (pista) { pista.textContent = 'Este es el tuyo, ya con tu cara y tu nombre.'; }
     }
 
-    // La bandera es un archivo y tarda. Se pide aqui y, cuando llega,
-    // se repinta lo que la lleva.
-    //
-    // Antes la unica llamada a loadAssets() estaba dentro de
-    // drawResult, asi que la bandera solo existia en el carnet ya
-    // emitido: en la portada y en el selector salia el hueco vacio.
-    window.Carnet.loadAssets();
-    window.Carnet.alLlegarLaBandera(function () {
-      pintarSlider();
-      pintarSelector(false);
-    });
-
     loadFonts().then(function () {
       pintarSlider();
       // elegirFamilia y no pintarSelector: el diseno de salida es

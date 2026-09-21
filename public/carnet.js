@@ -77,7 +77,6 @@
       label: '#8fa6c8', red: '#e11d33',
       line: 'rgba(255,255,255,.16)',
       guilloche: '#33558c', guillocheAlfa: 0.5,
-      bandera: false,
       marcaAgua: 0.07,
       pie: 'rgba(4,10,22,.5)', pieTinta: 'rgba(238,243,251,.88)',
       suave: 'rgba(255,255,255,.28)', tenue: 'rgba(255,255,255,.14)'
@@ -154,7 +153,6 @@
       label: '#8ea2c4', red: '#e11d33',
       line: 'rgba(255,255,255,.16)',
       guilloche: '#2f4c80', guillocheAlfa: 0.55,
-      bandera: false,
       marcaAgua: 0.07,
       pie: 'rgba(4,10,22,.5)', pieTinta: 'rgba(238,243,251,.88)',
       suave: 'rgba(255,255,255,.28)', tenue: 'rgba(255,255,255,.14)'
@@ -185,7 +183,6 @@
       label: '#f0b3bb', red: '#ffffff',
       line: 'rgba(255,255,255,.18)',
       guilloche: '#e04a5c', guillocheAlfa: 0.5,
-      bandera: false,
       marcaAgua: 0.07,
       pie: 'rgba(4,10,22,.5)', pieTinta: 'rgba(238,243,251,.88)',
       suave: 'rgba(255,255,255,.28)', tenue: 'rgba(255,255,255,.14)'
@@ -279,46 +276,16 @@
      cosas que la ley nombra. Por eso el emblema del Ministerio es el
      palomo y nada más.
 
+     La Bandera llegó a estar en cinco diseños, en chiquito y con el
+     archivo oficial sin alterar. Se quitó: el proyecto contempla
+     promociones con negocios locales, y el 24.5 no distingue tamaños.
+
      Si alguien piensa devolver los símbolos al carnet: no lo haga.
      ------------------------------------------------------------------- */
 
   // Nada que cargar: el carnet se dibuja entero con código.
-  // La Bandera Nacional no se dibuja con trazos: se usa el archivo
-  // oficial tal cual, con su Escudo dentro, a su propia proporcion y
-  // con sus colores. Redibujarla a mano seria alterarla, que es justo
-  // lo que prohibe la Ley 210-19.
-  //
-  // Mientras no haya llegado, su hueco se deja en blanco. Nunca se
-  // pinta una version incompleta del simbolo.
-  // Archivo: public/bandera.svg, tomado de Wikimedia Commons
-  // (File:Flag_of_the_Dominican_Republic.svg), dominio publico. Mide
-  // 900x600 con la cruz de 120 sobre cuarteles de 240: la mitad de la
-  // altura de un cuartel, que es la proporcion que manda la ley. Se
-  // dibuja a esa misma proporcion, solo escalado.
-  var BANDERA = null;
-  var enEspera = [];
-
-  // No bloquea el primer dibujo: el archivo pesa, y la portada no
-  // tiene por que esperarlo. Quien quiera repintar al llegar, que se
-  // apunte con alLlegarLaBandera().
   function loadAssets() {
-    if (BANDERA !== null) { return Promise.resolve(); }
-    BANDERA = false;
-    var img = new Image();
-    img.onload = function () {
-      BANDERA = img;
-      var pendientes = enEspera;
-      enEspera = [];
-      pendientes.forEach(function (f) { try { f(); } catch (e) {} });
-    };
-    img.onerror = function () { enEspera = []; };
-    img.src = '/bandera.svg';
     return Promise.resolve();
-  }
-
-  function alLlegarLaBandera(cb) {
-    if (BANDERA) { return; }
-    enEspera.push(cb);
   }
 
   // El emblema del Ministerio: el palomo dentro de un sello.
@@ -345,28 +312,6 @@
     ctx.restore();
   }
 
-
-  /* ---------- la bandera, pequeña y sin alterar ---------- */
-
-  // Bandera civil de RD: sin escudo, con sus cuatro cuarteles en su sitio
-  // y sus colores exactos. Va chiquita y en un costado, nunca de centro
-  // ni recortada: es decoración, no el emblema del documento.
-  // Ley 210-19 pide que no se altere; por eso aquí no se estiliza.
-  function drawBandera(ctx, x, y, w) {
-    if (!BANDERA) {
-      // Todavia no ha llegado. Se reserva el hueco y no se pinta nada:
-      // mejor un espacio vacio que media bandera.
-      return w * 0.6667;
-    }
-    var h = w * BANDERA.naturalHeight / BANDERA.naturalWidth;
-    ctx.save();
-    ctx.drawImage(BANDERA, x, y, w, h);
-    ctx.strokeStyle = 'rgba(0,0,0,.22)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
-    ctx.restore();
-    return h;
-  }
 
   /* ---------- sello circular con texto en arco ---------- */
 
@@ -1598,8 +1543,6 @@
     ctx.fillStyle = C.label; ctx.font = font(700, 10);
     tracked(ctx, 'FIRMA DEL ' + sujeto(data), 306, 582, 1.2);
 
-    if (C.bandera !== false) { drawBandera(ctx, 636, 498, 88); }
-
     var qs = 112, qx = 804, qy = 480;
     ctx.fillStyle = '#fff';
     roundRect(ctx, qx - 7, qy - 7, qs + 14, qs + 14, 6); ctx.fill();
@@ -1743,8 +1686,6 @@
     ctx.fillStyle = C.label; ctx.font = font(700, 10);
     tracked(ctx, 'FIRMA DEL ' + suj, 294, 568, 1.2);
 
-    if (C.bandera !== false) { drawBandera(ctx, 630, 478, 86); }
-
     var qs = 108, qx = 756, qy = 466;
     ctx.fillStyle = '#fff';
     roundRect(ctx, qx - 7, qy - 7, qs + 14, qs + 14, 6); ctx.fill();
@@ -1848,8 +1789,6 @@
     ctx.fillStyle = C.red; ctx.font = font(700, 11);
     ctx.fillText(SITIO, qx + qs / 2 - ctx.measureText(SITIO).width / 2, qy + qs + 20);
 
-    if (C.bandera !== false) { drawBandera(ctx, 856, 356, 96); }
-
     /* la frase, enorme, entre dos filetes */
     ctx.strokeStyle = C.navy; ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.moveTo(44, 502); ctx.lineTo(968, 502); ctx.stroke();
@@ -1921,10 +1860,9 @@
     // Sello redondo arriba a la derecha.
     drawSello(ctx, w - 136, 190, 208, titulo, l3, C.navy);
 
-    /* --- banderita y emisor, en un costado y en chiquito --- */
+    /* --- el emisor, en un costado y en chiquito --- */
     var fy = 330;
-    var fh = C.bandera === false ? 0 : drawBandera(ctx, 52, fy, 108);
-    var tx = C.bandera === false ? 52 : 180;
+    var tx = 52;
 
     ctx.fillStyle = C.navy2;
     ctx.font = font(700, 17);
@@ -2161,7 +2099,6 @@
   global.Carnet = {
     render: renderCarnet,
     loadAssets: loadAssets,
-    alLlegarLaBandera: alLlegarLaBandera,
     drawPalomo: drawPalomo,
     medidas: function (id) {
       var e = estiloDe(id);

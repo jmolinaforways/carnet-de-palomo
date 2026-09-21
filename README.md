@@ -38,47 +38,34 @@ firmados dentro.
 
 ---
 
-## La bandera: cómo se usa y qué riesgo tiene
+## Sin símbolos patrios
 
-Durante un tiempo el carnet no llevó ningún símbolo patrio. Ya no es así: **cinco
-de los once diseños llevan la Bandera Nacional**, pequeña y en un costado (Hielo,
-Vintage, Sobrio, Solapín y ASODOPA).
+**El carnet no lleva la Bandera ni el Escudo de la República Dominicana. No los
+añadas.** El emblema es un palomo con corona dentro de un aro, dibujado con código
+(`marcaPalomos` en `public/carnet.js`); lo demás son azul y rojo, que son colores,
+no símbolos.
 
-**Si la tocas, respeta estas dos reglas.** Son las que mantienen el uso dentro de
-lo defendible:
+Hubo un rato en que cinco diseños sí llevaron la Bandera, pequeña y con el archivo
+oficial sin alterar. Se quitó, y conviene saber por qué antes de querer devolverla.
 
-1. **No se dibuja: se usa el archivo.** `public/bandera.svg` es el archivo oficial
-   ([Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg),
-   dominio público), 900×600 con la cruz de 120 sobre cuarteles de 240 —la mitad de
-   la altura de un cuartel, la proporción que manda la ley— y con su Escudo dentro.
-   Se pinta tal cual, solo escalado, a su propia proporción. Redibujar un símbolo
-   patrio a mano es alterarlo, que es justo lo prohibido. Si el archivo no ha
-   cargado todavía, su hueco queda **en blanco**: nunca se pinta media bandera.
-2. **No es el centro de nada.** Va al lado del nombre de la institución, en chico.
-
-El emblema propio del proyecto es otra cosa: un palomo con corona dentro de un aro
-(`marcaPalomos` en `public/carnet.js`). Ese sí es dibujado, y es el mismo en los
-once diseños.
-
-### El riesgo, dicho claro
-
-La [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf)
-no contempla ninguna versión de la bandera sin escudo como alternativa oficial: el
-artículo 7 confirma que el Escudo va en el centro, y el 24.1 fija los colores
-—rojo bermellón, azul ultramar y blanco en la cruz—.
-
-Pero además:
+El motivo está en la [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf):
 
 - **Art. 24.5** — prohíbe usar la Bandera «total o parcialmente en promoción o
-  propaganda electoral, política o **comercial**».
+  propaganda electoral, política o **comercial**». No distingue tamaños: una
+  banderita en un costado también es «parcialmente».
 - **Art. 28.3** — declara irreverencia usar el Escudo «en promociones comerciales
   con fines de lucro».
 - **Arts. 38 y 39** — irreverencia: 15 a 30 días de prisión y multa de 1 a 5
   salarios mínimos. Ultraje: 1 a 3 meses y de 5 a 20 salarios mínimos.
 
-Este proyecto contempla promociones con negocios locales. Eso activa los dos
-artículos. Quien mantiene el sitio lo sabe y decidió seguir adelante; queda escrito
-aquí para que nadie que llegue al código se lo encuentre de sorpresa.
+Este proyecto contempla promociones con negocios locales, y eso activa los dos
+artículos. Por eso no hay símbolos patrios.
+
+Un apunte por si alguien busca el atajo: **no existe una versión oficial de la
+Bandera sin Escudo**. El artículo 7 confirma que el Escudo va en el centro, y el
+24.1 fija los colores —rojo bermellón, azul ultramar y blanco en la cruz—. Dibujar
+una bandera propia tampoco vale: redibujar un símbolo patrio es alterarlo, que es
+justo lo que la ley prohíbe.
 
 ## Términos, privacidad y datos
 
