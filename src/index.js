@@ -446,11 +446,19 @@ footer a{color:#c3d2ec}
 .doc a{color:#7fb2ff}
 `;
 
-function envoltura(titulo, cuerpo) {
+function envoltura(titulo, cuerpo, indexar) {
   return `<!DOCTYPE html><html lang="es-DO"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(titulo)}</title><meta name="theme-color" content="#0b1b3a">
-<meta name="robots" content="noindex">
+<meta property="og:title" content="${esc(titulo)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Carnet de Palomo">
+<meta property="og:image" content="https://palomos.com.do/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://palomos.com.do/og.jpg">
+${indexar ? '' : '<meta name="robots" content="noindex">'}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -545,7 +553,8 @@ ${total}
 guardamos nombres ni fotos de nadie. Para ver los datos completos de un carnet,
 escanea su código QR, que los lleva firmados dentro.</p>
 
-<a class="cta" href="/">Sacar mi propio carnet</a>`
+<a class="cta" href="/">Sacar mi propio carnet</a>`,
+    true
   );
 }
 
@@ -633,7 +642,8 @@ lo que hagas con él es cosa tuya.</p>
   <p>Escribe a ${CONTACTO} en Instagram.</p>
 </div>
 
-<a class="cta" href="/">Volver al inicio</a>`
+<a class="cta" href="/">Volver al inicio</a>`,
+    true
   );
 }
 
@@ -704,7 +714,8 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
   sitio.</p>
 </div>
 
-<a class="cta" href="/">Volver al inicio</a>`
+<a class="cta" href="/">Volver al inicio</a>`,
+    true
   );
 }
 

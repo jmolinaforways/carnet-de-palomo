@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Cada carnet emitido genera una URL propia: son infinitas y no aportan
+# nada a una búsqueda. Que no se rastreen.
+Disallow: /v/
+Disallow: /api/
+
+Sitemap: https://palomos.com.do/sitemap.xml
