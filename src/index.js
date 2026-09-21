@@ -1,3 +1,8 @@
+import {
+  CARNETS, carnetDe, carnetPorSlug, g, generoDe,
+  ORDEN_CARNETS, POR_DEFECTO
+} from './carnets.js';
+
 /* =========================================================================
    Carnet de Palomo — Cloudflare Worker.
 
@@ -21,170 +26,6 @@
    Cada una cambia quién emite el carnet y qué dice; el dibujo es el mismo.
    En el token viaja solo la inicial, para que el QR no crezca.
    ---------------------------------------------------------------- */
-
-const TIPOS = {
-  palomo: {
-    id: 'palomo',
-    inicial: 'p',
-    nombre: 'Palomo',
-    titulo: 'CARNET DE PALOMO',
-    titulos: {
-        oficial: 'CARNET DE PALOMO',
-        hielo: 'CARNET DE PALOMO',
-        institucional: 'CARNET DE PALOMO',
-        crema: 'CERTIFICADO DE PALOMO',
-        carbon: 'CARNET DE PALOMO',
-        candela: 'CREDENCIAL DE PALOMO',
-        solapin: 'CARNET DE PALOMO',
-        asodopa: 'CERTIFICADO DE PALOMO',
-        nocturno: 'CARNET DE PALOMO',
-        tricolor: 'CERTIFICADO DE PALOMO',
-        esmeralda: 'CREDENCIAL DE PALOMO'
-    },
-    nivelEtiqueta: 'Nivel de tigueraje',
-    hashtag: 'palomos',
-    vence: 'DE POR VIDA',
-    invitacion: 'Invita a tus panas palomos al club.',
-
-    // Una institución por estilo, para que cada diseño tenga su voz.
-    emisores: {
-        oficial: { nombre: 'Ministerio de Palomos', siglas: 'MINPAL' },
-        institucional: { nombre: 'Dirección General del Palomaje', siglas: 'DGP' },
-        crema: { nombre: 'Instituto Nacional del Palomaje', siglas: 'INAPAL' },
-        hielo: { nombre: 'Comisión Nacional de Palomos', siglas: 'CONAPAL' },
-        carbon: { nombre: 'Consejo Superior de Palomos', siglas: 'CONSUPAL' },
-        candela: { nombre: 'Registro Nacional de Palomos', siglas: 'RENAPAL' },
-        solapin: { nombre: 'Federación Dominicana de Palomos', siglas: 'FEDOPAL' },
-        asodopa: { nombre: 'Asociación Dominicana de Palomos', siglas: 'ASODOPA' },
-        nocturno: { nombre: 'Cámara Dominicana de Palomos', siglas: 'CADOPAL' },
-        tricolor: { nombre: 'Asociación Nacional de Palomos', siglas: 'ANPC' },
-        esmeralda: { nombre: 'Junta Central de Palomos', siglas: 'JCP' }
-    },
-
-    frases: {
-        oficial: 'La paz también es una forma de éxito.',
-        hielo: 'Aquí no hay líos, aquí hay carnet.',
-        institucional: 'El que se queda en su casa, siempre gana.',
-        crema: 'Aquí no andamos en gente.',
-        carbon: 'El que no debe, duerme tranquilo.',
-        candela: 'Mi casa, mi paz, mi gente.',
-        solapin: 'No es un sueño, es un palomo certificado.',
-        asodopa: 'Mejor tranquilo en mi casa que en líos en la calle.',
-        nocturno: 'Sin líos, sin cuentos, sin maña.',
-        tricolor: "Pa' los palomos de verdad.",
-        esmeralda: 'Tranquilo en su casa, todo frío.'
-    },
-
-    condiciones: [
-      'PALOMO CERTIFICADO',
-      'OFICIALMENTE PALOMO',
-      'PALOMO VERIFICADO',
-      'PALOMO DE PRIMERA',
-      'PALOMO VITALICIO',
-      'TRANQUILO DE SU CASA',
-      'PALOMO SIN UNA MAÑA'
-    ],
-    oficios: [
-      'TRABAJAR Y EVITAR PROBLEMAS',
-      'DE LA CASA AL TRABAJO',
-      'CASA, COLMADO Y CASA',
-      'DISFRUTAR MI FAMILIA',
-      'SERENO DE SU CASA',
-      'NI FU NI FA',
-      'EN SU CASA TEMPRANO'
-    ],
-    antecedentes: [
-      'NINGUNO, GRACIAS A DIOS',
-      'NINGUNO',
-      'LIMPIO COMO EL AGUA',
-      'NI UNA MULTA',
-      'NINGUNO, PREGUNTE'
-    ]
-  },
-
-  pariguayo: {
-    id: 'pariguayo',
-    inicial: 'g',
-    nombre: 'Pariguayo',
-    titulo: 'CARNET DE PARIGUAYO',
-    titulos: {
-        oficial: 'CARNET DE PARIGUAYO',
-        hielo: 'CARNET DE PARIGUAYO',
-        institucional: 'CARNET DE PARIGUAYO',
-        crema: 'CERTIFICADO DE PARIGUAYO',
-        carbon: 'CARNET DE PARIGUAYO',
-        candela: 'CREDENCIAL DE PARIGUAYO',
-        solapin: 'CARNET DE PARIGUAYO',
-        asodopa: 'CERTIFICADO DE PARIGUAYO',
-        nocturno: 'CARNET DE PARIGUAYO',
-        tricolor: 'CERTIFICADO DE PARIGUAYO',
-        esmeralda: 'CREDENCIAL DE PARIGUAYO'
-    },
-    nivelEtiqueta: 'Nivel de flow',
-    hashtag: 'pariguayos',
-    vence: 'DE POR VIDA',
-    invitacion: 'Invita a tus panas pariguayos al club.',
-
-    emisores: {
-        oficial: { nombre: 'Ministerio de Pariguayos', siglas: 'MINPAR' },
-        institucional: { nombre: 'Dirección General del Pariguayaje', siglas: 'DGPAR' },
-        crema: { nombre: 'Instituto Nacional del Pariguayaje', siglas: 'INAPARI' },
-        hielo: { nombre: 'Comisión Nacional de Pariguayos', siglas: 'CONAPARI' },
-        carbon: { nombre: 'Consejo Superior de Pariguayos', siglas: 'CONSUPARI' },
-        candela: { nombre: 'Registro Nacional de Pariguayos', siglas: 'RENAPARI' },
-        solapin: { nombre: 'Federación Dominicana de Pariguayos', siglas: 'FEDOPARI' },
-        asodopa: { nombre: 'Asociación Dominicana de Pariguayos', siglas: 'ASODOPARI' },
-        nocturno: { nombre: 'Cámara Dominicana de Pariguayos', siglas: 'CADOPARI' },
-        tricolor: { nombre: 'Asociación Nacional de Pariguayos', siglas: 'ANPAR' },
-        esmeralda: { nombre: 'Junta Central de Pariguayos', siglas: 'JCPAR' }
-    },
-
-    frases: {
-        oficial: 'El que no baila, observa.',
-        hielo: 'Aquí no se baila, aquí se observa.',
-        institucional: 'Yo no bailo, yo cuido los bultos.',
-        crema: 'Yo vine fue a mirar.',
-        carbon: 'El que graba no baila.',
-        candela: 'Sosteniendo la pared desde siempre.',
-        solapin: 'No es un sueño, es un pariguayo certificado.',
-        asodopa: 'Llegué temprano y me quedé en la esquina.',
-        nocturno: 'Buscando el hielo toda la noche.',
-        tricolor: "Pa' los pariguayos de verdad.",
-        esmeralda: 'Parado ahí, como siempre.'
-    },
-
-    condiciones: [
-      'PARIGUAYO CERTIFICADO',
-      'OFICIALMENTE PARIGUAYO',
-      'PARIGUAYO VERIFICADO',
-      'MIRÓN OFICIAL',
-      'PARIGUAYO VITALICIO',
-      'EL QUE NO BAILA',
-      'PARIGUAYO DE PRIMERA'
-    ],
-    oficios: [
-      'SOSTENIENDO LA PARED',
-      'CUIDANDO LOS BULTOS',
-      'MIRANDO LA FIESTA',
-      'PARADO EN LA ESQUINA',
-      'BUSCANDO EL HIELO',
-      'GUARDANDO EL PUESTO',
-      'GRABANDO A LOS DEMÁS'
-    ],
-    antecedentes: [
-      'NINGUNO, NI BAILANDO',
-      'NINGUNO, GRACIAS A DIOS',
-      'NUNCA ME HE TIRADO',
-      'CERO PASOS DADOS',
-      'NINGUNO, PREGUNTE'
-    ]
-  }
-};
-
-function tipoDe(v) {
-  if (v === 'pariguayo' || v === 'g') return TIPOS.pariguayo;
-  return TIPOS.palomo;
-}
 
 // Los cinco estilos. El servidor solo necesita saber cuáles existen para
 // entregar el emisor y la frase que le tocan a cada uno.
@@ -337,33 +178,46 @@ async function readToken(secret, token) {
 // sale del nombre, así que es estable: el mismo nombre siempre tiene la
 // misma condición y el mismo nivel de palomería, aunque saque el carnet
 // diez veces.
-async function derive(secret, nombre, seq, tipo, estilo) {
+async function derive(secret, nombre, seq, tipo, estilo, genero) {
   const mac = await sign(secret, 'palomo:v2:' + nombre.toLocaleLowerCase('es'));
   const chk = await sign(secret, 'palomo:chk:' + seq);
-  const prefijo = tipo.id === 'pariguayo' ? 'PAR' : 'PAL';
+  const prefijo = tipo.prefijo;
   const emisor = tipo.emisores[estilo] || tipo.emisores.oficial;
+
+  // Cada texto se resuelve segun el genero. Los que no cambian estan
+  // escritos una sola vez en el registro y g() los devuelve tal cual.
+  const t = (v) => g(v, genero);
 
   return {
     tipo: tipo.id,
+    genero,
     estilo,
+
+    // Lo que antes estaba cableado dentro de carnet.js y ahora sale del
+    // registro: asi un carnet nuevo no obliga a tocar el dibujo.
+    sujeto: t(tipo.sujeto),
+    lema: t(tipo.lema),
+    cintilla: t(tipo.cintilla),
+    citas: tipo.citas.map(t),
+    sello: tipo.sello.map(t),
     serial: `${prefijo}-${String(seq).padStart(6, '0')}-${chk[0] % 10}`,
 
     // El chiste está invertido: un palomo tiene CERO tigueraje. Una barra
     // casi vacía dice más que un 97 por ciento.
     nivel: (mac[5] % 30) / 10,
-    nivelEtiqueta: tipo.nivelEtiqueta,
+    nivelEtiqueta: t(tipo.nivelEtiqueta),
 
-    categoria: tipo.condiciones[mac[6] % tipo.condiciones.length],
-    oficio: tipo.oficios[mac[8] % tipo.oficios.length],
-    antecedentes: tipo.antecedentes[mac[9] % tipo.antecedentes.length],
-    vence: tipo.vence,
+    categoria: t(tipo.condiciones[mac[6] % tipo.condiciones.length]),
+    oficio: t(tipo.oficios[mac[8] % tipo.oficios.length]),
+    antecedentes: t(tipo.antecedentes[mac[9] % tipo.antecedentes.length]),
+    vence: t(tipo.vence),
 
     emisor: emisor.nombre,
     siglas: emisor.siglas,
-    titulo: (tipo.titulos && tipo.titulos[estilo]) || tipo.titulo,
-    frase: tipo.frases[estilo] || tipo.frases.oficial,
+    titulo: t((tipo.titulos && tipo.titulos[estilo]) || tipo.titulo),
+    frase: t(tipo.frases[estilo] || tipo.frases.oficial),
     hashtag: tipo.hashtag,
-    invitacion: tipo.invitacion
+    invitacion: t(tipo.invitacion)
   };
 }
 
@@ -586,7 +440,8 @@ async function emitir(request, env) {
   const secret = secretoDe(env, new URL(request.url));
   if (!secret) return json({ ok: false, error: SIN_LLAVE }, 503);
 
-  const tipo = tipoDe(body && body.tipo);
+  const tipo = carnetDe(body && body.tipo);
+  const genero = generoDe(body && body.genero);
   const estilo = estiloDe(body && body.estilo);
   const emitido = hoyRD();
   // La rama del experimento, si el navegador la manda. Es una letra:
@@ -596,9 +451,11 @@ async function emitir(request, env) {
   // persona, no solo como emision.
   const primera = rama && (body && body.expPrimera) === true;
   const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo, rama, primera);
-  const datos = await derive(secret, nombre, seq, tipo, estilo);
+  const datos = await derive(secret, nombre, seq, tipo, estilo, genero);
   const token = await makeToken(secret, {
-    n: nombre, e: emitido, q: seq, l: lugar, t: tipo.inicial,
+    n: nombre, e: emitido, q: seq, l: lugar, t: tipo.codigo,
+    // 'x' es el valor por defecto: no viaja, para no engordar el QR.
+    x: genero === 'x' ? undefined : genero,
     c: concepto || undefined
   });
 
@@ -631,8 +488,9 @@ async function verificar(request, env, token) {
   }
 
   const nombre = limpiarNombre(payload.n);
-  const tipo = tipoDe(payload.t);
-  const datos = await derive(secret, nombre, payload.q, tipo, 'oficial');
+  const tipo = carnetDe(payload.t);
+  const genero = generoDe(payload.x);
+  const datos = await derive(secret, nombre, payload.q, tipo, 'oficial', genero);
   const lugar = limpiarLugar(payload.l) || SIN_LUGAR;
   const concepto = limpiarConcepto(payload.c);
 
