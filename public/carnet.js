@@ -307,6 +307,13 @@
   }
 
   // El emblema del Ministerio: el palomo dentro de un sello.
+  // Geometria compartida por el logo y por el sello: la corona a la
+  // misma altura y el palomo al mismo tamano relativo. Si esto cambia,
+  // cambia en los dos sitios a la vez, que es justo el punto.
+  function marcaPalomos(ctx, cx, cy, size, color) {
+    drawCorona(ctx, cx, cy - size * 0.22, size * 0.21, color);
+    drawPalomo(ctx, cx, cy + size * 0.05, size * 0.50, color);
+  }
   function drawEmblema(ctx, cx, cy, size, color) {
     var r = size / 2;
     ctx.save();
@@ -319,7 +326,7 @@
     ctx.beginPath();
     ctx.arc(cx, cy, r * 0.86, 0, Math.PI * 2);
     ctx.stroke();
-    drawPalomo(ctx, cx, cy, size * 0.62, color);
+    marcaPalomos(ctx, cx, cy, size * 0.74, color);
     ctx.restore();
   }
 
@@ -442,9 +449,8 @@
     drawEstrella(ctx, cx - r * 0.60, cy + r * 0.02, size * 0.045, color);
     drawEstrella(ctx, cx + r * 0.60, cy + r * 0.02, size * 0.045, color);
 
-    drawCorona(ctx, cx, cy - r * 0.40, size * 0.20, color);
     drawLaurel(ctx, cx, cy - r * 0.02, r * 0.56, color);
-    drawPalomo(ctx, cx, cy + r * 0.04, size * 0.40, color);
+    marcaPalomos(ctx, cx, cy - size * 0.01, size * 0.56, color);
 
     ctx.strokeStyle = color;
     ctx.lineWidth = Math.max(1.6, size * 0.016);
@@ -1517,8 +1523,7 @@
     tracked(ctx, 'CERTIFICADO', tx + 8, 228, 5);
 
 
-    drawCorona(ctx, 736, 112, 44, C.navy);
-    drawPalomo(ctx, 736, 172, 116, C.navy);
+    drawEmblema(ctx, 734, 160, 132, C.navy);
 
     /* sello de parodia */
     ctx.save();
