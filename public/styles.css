@@ -705,9 +705,21 @@ img, canvas, video, svg{max-width:100%}
   color:#fff;font:800 14px/1 'Archivo',system-ui,sans-serif;
   letter-spacing:.04em;overflow:hidden;
 }
+/* El PNG de origen ya trae aro degradado y un anillo blanco grueso.
+   A 42 px ese blanco se comia la cara, asi que se amplia para recortar
+   los dos y el aro lo pone el ::after, que va por encima. */
 .sigueme-foto img{
   position:absolute;inset:0;
   width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.34);
+}
+.sigueme-foto::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  padding:2px;
+  background:linear-gradient(135deg,#f9ce34,#ee2a7b 45%,#6228d7);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;
 }
 .sigueme-txt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .sigueme-txt strong{
