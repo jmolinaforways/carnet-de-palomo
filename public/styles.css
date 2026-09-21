@@ -529,8 +529,10 @@ img, canvas, video, svg{max-width:100%}
 
 /* ---------- flechas del carrusel ---------- */
 
-/* En el móvil se desliza con el dedo y las flechas estorban; en el
-   escritorio no hay dedo, así que sin ellas el carrusel no se ve. */
+/* Salen en todas partes. En el movil tambien: se puede deslizar, pero
+   nada dice que haya mas disenos detras, y el selector no trae puntos
+   como el de la portada. Ahi son algo mas chicas, que la pantalla es
+   la que es. */
 .pista{position:relative}
 #slider{margin-top:22px;margin-bottom:10px}
 #disenos{margin-top:16px;margin-bottom:6px}
@@ -538,7 +540,7 @@ img, canvas, video, svg{max-width:100%}
   position:absolute;top:50%;transform:translateY(-50%);
   z-index:3;
   width:42px;height:42px;padding:0 0 4px;
-  display:none;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;
   border:1px solid rgba(255,255,255,.22);border-radius:50%;
   background:rgba(9,19,38,.9);color:#e4ecfa;
   font:400 27px/1 system-ui,sans-serif;cursor:pointer;
@@ -550,8 +552,16 @@ img, canvas, video, svg{max-width:100%}
 .flecha:disabled:hover{background:rgba(9,19,38,.9);border-color:rgba(255,255,255,.22);color:#e4ecfa}
 .flecha.izq{left:-4px}
 .flecha.der{right:-4px}
-@media (hover:hover) and (pointer:fine){
-  .flecha{display:flex}
+/* Sin raton bajan a flanquear el nombre del diseno: encima del carnet
+   taparian justo la foto y el QR, que es lo que se esta mirando. */
+@media (hover:none){
+  .flecha{
+    width:36px;height:36px;font-size:23px;
+    top:auto;bottom:-44px;transform:none;
+  }
+  .flecha.izq{left:26px}
+  .flecha.der{right:26px}
+  .carrusel-pie{min-height:36px;line-height:36px;font-size:15px}
 }
 .lamina{
   flex:0 0 100%;
