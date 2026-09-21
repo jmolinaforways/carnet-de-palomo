@@ -27,8 +27,9 @@ para firmar el token; no se guarda.
 
 No hay base de datos de carnets. El carnet entero viaja firmado dentro del
 propio QR, así que verificar no requiere consultar nada. Lo único con estado en
-todo el proyecto es un Durable Object que guarda **un número**: cuántos carnets
-se han emitido. No sabe de quién es cada uno.
+todo el proyecto es un Durable Object que guarda **tres recuentos**: cuántos
+carnets se han emitido, cuántos de cada diseño, y los de una prueba A/B. Son
+números sueltos; ninguno sabe de quién es cada carnet.
 
 Por eso la verificación por número escrito (`/verificar`) confirma que el carnet
 fue emitido y que su dígito verificador cuadra, pero no muestra el nombre: no lo
@@ -37,19 +38,47 @@ firmados dentro.
 
 ---
 
-## Sin símbolos patrios
+## La bandera: cómo se usa y qué riesgo tiene
 
-**El carnet no lleva la bandera ni el escudo de la República Dominicana. No los
-añadas.** El emblema es un palomo dibujado con código (`paintPalomo` en
-`public/carnet.js`); lo demás son solo azul y rojo, que son colores, no símbolos.
+Durante un tiempo el carnet no llevó ningún símbolo patrio. Ya no es así: **cinco
+de los once diseños llevan la Bandera Nacional**, pequeña y en un costado (Hielo,
+Vintage, Sobrio, Solapín y ASODOPA).
 
-El motivo está en la [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf):
-el artículo 26 reserva el Escudo en **identificaciones** a una lista cerrada de
-funcionarios públicos; el 24.5 prohíbe la bandera como distintivo de una
-organización privada; y el 28.3 declara irreverencia usar el escudo en promociones
-comerciales con fines de lucro, que es justo hacia donde va este proyecto. La pena
-por irreverencia es de 15 a 30 días de prisión y multa de 1 a 5 salarios mínimos
-del sector público (art. 38).
+**Si la tocas, respeta estas dos reglas.** Son las que mantienen el uso dentro de
+lo defendible:
+
+1. **No se dibuja: se usa el archivo.** `public/bandera.svg` es el archivo oficial
+   ([Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg),
+   dominio público), 900×600 con la cruz de 120 sobre cuarteles de 240 —la mitad de
+   la altura de un cuartel, la proporción que manda la ley— y con su Escudo dentro.
+   Se pinta tal cual, solo escalado, a su propia proporción. Redibujar un símbolo
+   patrio a mano es alterarlo, que es justo lo prohibido. Si el archivo no ha
+   cargado todavía, su hueco queda **en blanco**: nunca se pinta media bandera.
+2. **No es el centro de nada.** Va al lado del nombre de la institución, en chico.
+
+El emblema propio del proyecto es otra cosa: un palomo con corona dentro de un aro
+(`marcaPalomos` en `public/carnet.js`). Ese sí es dibujado, y es el mismo en los
+once diseños.
+
+### El riesgo, dicho claro
+
+La [Ley núm. 210-19](https://mirex.gob.do/pdf/dcep/ley_no.210-19_de_los_simbolos_patrios_dominicanos.pdf)
+no contempla ninguna versión de la bandera sin escudo como alternativa oficial: el
+artículo 7 confirma que el Escudo va en el centro, y el 24.1 fija los colores
+—rojo bermellón, azul ultramar y blanco en la cruz—.
+
+Pero además:
+
+- **Art. 24.5** — prohíbe usar la Bandera «total o parcialmente en promoción o
+  propaganda electoral, política o **comercial**».
+- **Art. 28.3** — declara irreverencia usar el Escudo «en promociones comerciales
+  con fines de lucro».
+- **Arts. 38 y 39** — irreverencia: 15 a 30 días de prisión y multa de 1 a 5
+  salarios mínimos. Ultraje: 1 a 3 meses y de 5 a 20 salarios mínimos.
+
+Este proyecto contempla promociones con negocios locales. Eso activa los dos
+artículos. Quien mantiene el sitio lo sabe y decidió seguir adelante; queda escrito
+aquí para que nadie que llegue al código se lo encuentre de sorpresa.
 
 ## Términos, privacidad y datos
 
@@ -61,9 +90,12 @@ Lo que declaran es lo que el código hace, y conviene que siga siendo así:
 
 - La foto **nunca** sale del navegador. No hay endpoint que la reciba.
 - El nombre y la ciudad viajan al servidor solo para firmar el token. No se guardan.
-- Lo único con estado es el contador de secuenciales: un número, no una lista.
-- El nombre y la ciudad **sí** van dentro del QR, firmados y legibles por quien lo
-  escanee. Eso está dicho en los términos, en la privacidad y en la propia casilla.
+- Lo único con estado son tres recuentos agregados: números, no listas.
+- El navegador sí guarda tres cosas en `localStorage` (la rama de la prueba A/B y
+  dos marcas para no contar dos veces). No salen del dispositivo y están dichas en
+  la política de privacidad.
+- El nombre, la ciudad y el concepto **sí** van dentro del QR, firmados y legibles
+  por quien lo escanee. Eso está dicho en los términos, en la privacidad y en la propia casilla.
 
 Si algún día se empieza a almacenar nombres o fotos, hay que reescribir las dos
 páginas y asumir las obligaciones de responsable de tratamiento de la Ley 172-13:

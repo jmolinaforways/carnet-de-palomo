@@ -22,7 +22,8 @@
   ],
 
   // El contador de secuenciales. Es lo único con estado en todo el
-  // proyecto, y solo guarda un número: cuántos carnets se han emitido.
+  // proyecto: cuántos carnets se han emitido, cuántos de cada diseño y los
+  // dos recuentos de la prueba A/B. Números sueltos, nunca una lista.
   "durable_objects": {
     "bindings": [
       { "name": "SECUENCIA", "class_name": "Secuencia" }

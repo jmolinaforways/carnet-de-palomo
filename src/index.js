@@ -426,7 +426,8 @@ async function siguienteSecuencial(env, diseno, rama, primera) {
   return 900000000 + (Date.now() % 99999999);
 }
 
-// Cuántos carnets se han emitido. Es un número, no una lista: el
+// Cuántos carnets se han emitido, cuántos de cada diseño y los dos
+// recuentos de la prueba A/B. Son números sueltos, no listas: el
 // contador no sabe de quién es cada carnet.
 async function emitidosHasta(env) {
   try {
@@ -918,13 +919,16 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
   <p>El nombre y la ciudad que escribes viajan al servidor solo el instante necesario
   para firmar el código de tu carnet, y no se escriben en ningún sitio. No existe una
   base de datos de carnets ni de personas.</p>
-  <p>Lo único que el servidor conserva es un contador: cuántos carnets se han emitido
-  en total. Es un número, no una lista, y no está asociado a nadie.</p>
+  <p>Lo único que el servidor conserva son tres recuentos: cuántos carnets se han
+  emitido en total, cuántos de cada diseño, y los de una prueba que comparamos para
+  saber si conviene ofrecer varios diseños o uno solo. Los tres son números sueltos.
+  Ninguno guarda quién, ni cuándo, ni desde dónde: no hay forma de ir de un número a
+  una persona, porque no existe la lista.</p>
 
   <h2>Pero el QR sí lleva tus datos</h2>
-  <p>Para poder verificar un carnet sin guardar nada, el nombre, la ciudad, la fecha y
-  el número van <em>dentro</em> del código QR, protegidos con una firma que impide
-  alterarlos. No están cifrados: quien escanee tu carnet los verá. Si compartes tu
+  <p>Para poder verificar un carnet sin guardar nada, el nombre, la ciudad, tu
+  concepto, la fecha y el número van <em>dentro</em> del código QR, protegidos con una
+  firma que impide alterarlos. No están cifrados: quien escanee tu carnet los verá. Si compartes tu
   carnet, compartes esos datos. Por eso puedes poner un apodo.</p>
 
   <h2>Datos técnicos de la conexión</h2>
@@ -939,10 +943,20 @@ tu nombre ni tu carnet en ninguna base de datos.</p>
   y solo eso. No pone cookies, no guarda identificadores en tu navegador y no te sigue
   de un sitio a otro. Cuenta visitas, páginas vistas, país y desde dónde llega la gente,
   sin armar un perfil de nadie.</p>
-  <p>Por eso no te salta ningún cartel pidiéndote permiso: no hay nada que consentir.
+  <p>Por eso no te salta ningún cartel pidiéndote permiso: no hay publicidad ni
+  rastreo que consentir.
   No usamos el pixel de Meta, ni Google Analytics, ni ninguna herramienta publicitaria.
   Si algún día eso cambiara, te lo pediríamos antes de activarlo y podrías negarte sin
   perder nada.</p>
+  <h2>Lo que sí queda en tu navegador</h2>
+  <p>Guardamos tres cosas en el almacenamiento local de tu navegador, que es un
+  espacio que pertenece a este sitio y que nunca sale de tu dispositivo: una letra
+  —<code>A</code> o <code>B</code>— para que siempre veas la misma versión de la
+  página mientras probamos si conviene ofrecer varios diseños o uno solo, y dos
+  marcas de «por aquí ya pasé», para no contarte dos veces en esa prueba.</p>
+  <p>No son cookies, no viajan a ningún servidor, no sirven para identificarte y no
+  te siguen a otros sitios. Si borras los datos del sitio en tu navegador,
+  desaparecen y empiezas de cero.</p>
 
   <h2>Tus derechos</h2>
   <p>La <strong>Ley núm. 172-13</strong> sobre protección de datos personales te
