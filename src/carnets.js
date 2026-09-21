@@ -406,7 +406,360 @@ export const CARNETS = {
       'SIEMPRE LLEGO A MI CASA',
       'NINGUNO, PREGUNTE'
     ]
-  }};
+  },
+
+  princeso: {
+    id: 'princeso',
+
+    codigo: 'r',
+    prefijo: 'PRI',
+
+    slug: 'carnet-de-princeso',
+    orden: 4,
+    buscar: [
+      'princeso', 'princesa', 'principe', 'delicado', 'delicada',
+      'fino', 'fina', 'perfume', 'cuidado', 'realeza'
+    ],
+
+    nombre: { m: 'Princeso', f: 'Princesa' },
+    sujeto: { m: 'PRINCESO', f: 'PRINCESA' },
+    plural: { m: 'PRINCESOS', f: 'PRINCESAS' },
+    hashtag: 'princesos',
+    emblema: 'castillo',
+    nivelEtiqueta: 'Nivel de delicadeza',
+    vence: 'MIENTRAS BRILLE',
+    invitacion: 'Invita a tus panas princesos al club.',
+    titulo: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+
+    lema: 'PERFUME · CUIDADO · BUENOS MODALES',
+    cintilla: { m: 'Un Princeso Certificado', f: 'Una Princesa Certificada' },
+    citas: [
+      'Yo no cargo nada pesado.',
+      'Si no hay aire acondicionado, yo no voy.'
+    ],
+    sello: [
+      'SIN SUDAR',
+      { m: 'PERFUMADO', f: 'PERFUMADA' },
+      'UÑAS AL DÍA',
+      'BUENOS MODALES'
+    ],
+
+    seo: {
+      titulo: 'Emite tu Carnet de Princeso RD | Gratis y en 10 segundos',
+      descripcion: 'Delicado, perfumado y sin cargar nada pesado. Emite tu Carnet de Princeso o Princesa con tu foto, gratis y sin dar datos personales. #teamprincesos',
+      og: '/og.jpg'
+    },
+
+    portada: {
+      kicker: 'Ministerio de Princesos · RD',
+      h1: 'Carnet de Princeso',
+      sub: 'Delicado, perfumado y sin cargar nada pesado.'
+    },
+
+    titulos: {
+      oficial: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+      institucional: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+      crema: { m: 'CERTIFICADO DE PRINCESO', f: 'CERTIFICADO DE PRINCESA' },
+      hielo: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+      carbon: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+      candela: { m: 'CREDENCIAL DE PRINCESO', f: 'CREDENCIAL DE PRINCESA' },
+      solapin: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+      asodopa: { m: 'CERTIFICADO DE PRINCESO', f: 'CERTIFICADO DE PRINCESA' },
+      nocturno: { m: 'CARNET DE PRINCESO', f: 'CARNET DE PRINCESA' },
+      tricolor: { m: 'CERTIFICADO DE PRINCESO', f: 'CERTIFICADO DE PRINCESA' },
+      esmeralda: { m: 'CREDENCIAL DE PRINCESO', f: 'CREDENCIAL DE PRINCESA' }
+    },
+
+    emisores: {
+      oficial: { nombre: 'Ministerio de Princesos', siglas: 'MINPRIN' },
+      institucional: { nombre: 'Dirección Nacional de Princesos', siglas: 'DNPRIN' },
+      crema: { nombre: 'Instituto Nacional de la Delicadeza', siglas: 'INADEL' },
+      hielo: { nombre: 'Comisión Nacional de Princesos', siglas: 'CONAPRIN' },
+      carbon: { nombre: 'Consejo Superior de Princesos', siglas: 'CONSUPRIN' },
+      candela: { nombre: 'Registro Nacional de Princesos', siglas: 'RENAPRIN' },
+      solapin: { nombre: 'Federación Dominicana de Princesos', siglas: 'FEDOPRIN' },
+      asodopa: { nombre: 'Asociación Dominicana de Princesos', siglas: 'ASODOPRIN' },
+      nocturno: { nombre: 'Cámara Dominicana de Princesos', siglas: 'CADOPRIN' },
+      tricolor: { nombre: 'Asociación Nacional de Princesos', siglas: 'ANPRIN' },
+      esmeralda: { nombre: 'Junta Central de Princesos', siglas: 'JCPRIN' }
+    },
+
+    frases: {
+      oficial: { m: 'Ser delicado también es una forma de clase.', f: 'Ser delicada también es una forma de clase.' },
+      institucional: { m: 'El que se cuida, se nota.', f: 'La que se cuida, se nota.' },
+      crema: 'Aquí no se suda.',
+      hielo: 'Perfume, calma y buenos modales.',
+      carbon: 'Yo no cargo nada pesado.',
+      candela: 'Mi piel, mi pelo, mi paz.',
+      solapin: { m: 'No es un sueño, es un princeso certificado.', f: 'No es un sueño, es una princesa certificada.' },
+      asodopa: { m: 'Mejor bien vestido que apurado.', f: 'Mejor bien vestida que apurada.' },
+      nocturno: 'Sin sudar, sin gritar, sin despeinarme.',
+      tricolor: { m: "Pa' los princesos de verdad.", f: "Pa' las princesas de verdad." },
+      esmeralda: { m: 'Tranquilo y perfumado, como debe ser.', f: 'Tranquila y perfumada, como debe ser.' }
+    },
+
+    condiciones: [
+      { m: 'PRINCESO CERTIFICADO', f: 'PRINCESA CERTIFICADA' },
+      { m: 'OFICIALMENTE PRINCESO', f: 'OFICIALMENTE PRINCESA' },
+      { m: 'PRINCESO VERIFICADO', f: 'PRINCESA VERIFICADA' },
+      { m: 'DELICADO DE NACIMIENTO', f: 'DELICADA DE NACIMIENTO' },
+      { m: 'PRINCESO VITALICIO', f: 'PRINCESA VITALICIA' },
+      'NO CARGA NADA PESADO',
+      'SANGRE AZUL'
+    ],
+    oficios: [
+      'CUIDARME LA PIEL',
+      'QUE NO SE ME DAÑE EL PELO',
+      'ELEGIR BIEN LA ROPA',
+      'OLER BIEN SIEMPRE',
+      'NO CARGAR NADA PESADO',
+      'BUSCAR EL AIRE ACONDICIONADO',
+      'MANTENER LA CALMA'
+    ],
+    antecedentes: [
+      { m: 'NINGUNO, SOY DELICADO', f: 'NINGUNA, SOY DELICADA' },
+      { m: 'NUNCA ME HE ENSUCIADO', f: 'NUNCA ME HE ENSUCIADO' },
+      'CERO PELEAS, DAÑAN EL PELO',
+      'JAMÁS HE CARGADO UN SACO',
+      'NINGUNO, PREGUNTE'
+    ]
+  },
+
+  wawawa: {
+    id: 'wawawa',
+
+    codigo: 'w',
+    prefijo: 'WAW',
+
+    slug: 'carnet-de-wawawa',
+    orden: 5,
+    buscar: [
+      'wawawa', 'wawawá', 'guauguau', 'barrio', 'dembow', 'motor',
+      'moto', 'calibrar', 'bloque', 'bulla'
+    ],
+
+    nombre: 'Wawawá',
+    sujeto: 'WAWAWÁ',
+    plural: 'WAWAWÁS',
+    hashtag: 'wawawas',
+    emblema: 'moto',
+    nivelEtiqueta: 'Nivel de dembow',
+    vence: 'MIENTRAS SUENE',
+    invitacion: 'Invita a tus panas del bloque al club.',
+    titulo: 'CARNET DE WAWAWÁ',
+
+    lema: 'DEMBOW · MOTOR · BARRIO',
+    cintilla: { m: 'Un Wawawá Certificado', f: 'Una Wawawá Certificada' },
+    citas: [
+      'El barrio entero me conoce.',
+      'Yo me sé todos, del primero al último.'
+    ],
+    sello: [
+      'SE LOS SABE TODOS',
+      'CALIBRA LA MOTO',
+      'DEL BARRIO',
+      'SIN PARAR'
+    ],
+
+    seo: {
+      titulo: 'Emite tu Carnet de Wawawá RD | Gratis y en 10 segundos',
+      descripcion: 'Dembow, motor calibrado y el bloque completo. Emite tu Carnet de Wawawá con tu foto, gratis y sin dar datos personales. #teamwawawas',
+      og: '/og.jpg'
+    },
+
+    portada: {
+      kicker: 'Ministerio de Wawawás · RD',
+      h1: 'Carnet de Wawawá',
+      sub: 'Dembow, motor calibrado y el bloque completo.'
+    },
+
+    titulos: {
+      oficial: 'CARNET DE WAWAWÁ',
+      institucional: 'CARNET DE WAWAWÁ',
+      crema: 'CERTIFICADO DE WAWAWÁ',
+      hielo: 'CARNET DE WAWAWÁ',
+      carbon: 'CARNET DE WAWAWÁ',
+      candela: 'CREDENCIAL DE WAWAWÁ',
+      solapin: 'CARNET DE WAWAWÁ',
+      asodopa: 'CERTIFICADO DE WAWAWÁ',
+      nocturno: 'CARNET DE WAWAWÁ',
+      tricolor: 'CERTIFICADO DE WAWAWÁ',
+      esmeralda: 'CREDENCIAL DE WAWAWÁ'
+    },
+
+    emisores: {
+      oficial: { nombre: 'Ministerio de Wawawás', siglas: 'MINWA' },
+      institucional: { nombre: 'Dirección Nacional de Wawawás', siglas: 'DNWA' },
+      crema: { nombre: 'Instituto Nacional del Dembow', siglas: 'INADEM' },
+      hielo: { nombre: 'Comisión Nacional de Wawawás', siglas: 'CONAWA' },
+      carbon: { nombre: 'Consejo Superior de Wawawás', siglas: 'CONSUWA' },
+      candela: { nombre: 'Registro Nacional de Wawawás', siglas: 'RENAWA' },
+      solapin: { nombre: 'Federación Dominicana de Wawawás', siglas: 'FEDOWA' },
+      asodopa: { nombre: 'Asociación Dominicana de Wawawás', siglas: 'ASODOWA' },
+      nocturno: { nombre: 'Cámara Dominicana de Wawawás', siglas: 'CADOWA' },
+      tricolor: { nombre: 'Asociación Nacional de Wawawás', siglas: 'ANWA' },
+      esmeralda: { nombre: 'Junta Central de Wawawás', siglas: 'JCWA' }
+    },
+
+    frases: {
+      oficial: 'El barrio también tiene su corona.',
+      institucional: 'Donde suena el dembow, ahí estoy.',
+      crema: 'Yo me sé todos, del primero al último.',
+      hielo: 'Motor limpio, música alta y nada de líos.',
+      carbon: { m: 'El bloque me conoce desde chiquito.', f: 'El bloque me conoce desde chiquita.' },
+      candela: 'Mi barrio, mi gente, mi música.',
+      solapin: { m: 'No es un sueño, es un wawawá certificado.', f: 'No es un sueño, es una wawawá certificada.' },
+      asodopa: 'Aquí se calibra, no se pelea.',
+      nocturno: 'La bulla es alegría, no es lío.',
+      tricolor: "Pa' los wawawás de verdad.",
+      esmeralda: { m: 'Tranquilo en el bloque, con mi música.', f: 'Tranquila en el bloque, con mi música.' }
+    },
+
+    condiciones: [
+      { m: 'WAWAWÁ CERTIFICADO', f: 'WAWAWÁ CERTIFICADA' },
+      'OFICIALMENTE WAWAWÁ',
+      { m: 'WAWAWÁ VERIFICADO', f: 'WAWAWÁ VERIFICADA' },
+      'DEL BARRIO Y A MUCHA HONRA',
+      { m: 'WAWAWÁ VITALICIO', f: 'WAWAWÁ VITALICIA' },
+      'SE SABE TODOS LOS DEMBOW',
+      'EL ALMA DEL BLOQUE'
+    ],
+    oficios: [
+      'CALIBRAR LA MOTO',
+      'PONER EL DEMBOW',
+      'CONOCER TODO EL BARRIO',
+      'LLEGAR PRIMERO A LA FIESTA',
+      'SABERSE LA LETRA COMPLETA',
+      'MANTENER EL BLOQUE ALEGRE',
+      'BUSCAR LA BOCINA'
+    ],
+    antecedentes: [
+      'NINGUNO, SOLO BULLA',
+      'CERO LÍOS, PURA ALEGRÍA',
+      { m: 'LIMPIO, SOLO RUIDO', f: 'LIMPIA, SOLO RUIDO' },
+      'NINGUNO, PREGUNTE EN EL BLOQUE',
+      'NI UNA MULTA, CASI'
+    ]
+  },
+
+  popi: {
+    id: 'popi',
+
+    codigo: 'o',
+    prefijo: 'POP',
+
+    slug: 'carnet-de-popi',
+    orden: 6,
+    buscar: [
+      'popi', 'jevito', 'jevita', 'rico', 'rica', 'privar', 'privadera',
+      'clase alta', 'reloj', 'gym', 'brunch'
+    ],
+
+    nombre: 'Popi',
+    sujeto: 'POPI',
+    plural: 'POPIS',
+    hashtag: 'popis',
+    emblema: 'reloj',
+    nivelEtiqueta: 'Nivel de privadera',
+    vence: 'MIENTRAS PAPI PAGUE',
+    invitacion: 'Invita a tus panas popis al club.',
+    titulo: 'CARNET DE POPI',
+
+    lema: 'GYM · BRUNCH · BUENA VIDA',
+    cintilla: { m: 'Un Popi Certificado', f: 'Una Popi Certificada' },
+    citas: [
+      'Eso queda muy lejos, yo no bajo para allá.',
+      'Mi papá conoce a alguien.'
+    ],
+    sello: [
+      'RELOJ AL DÍA',
+      'GYM A LAS SEIS',
+      'INGLÉS FLUIDO',
+      'NUNCA HACE FILA'
+    ],
+
+    seo: {
+      titulo: 'Emite tu Carnet de Popi RD | Gratis y en 10 segundos',
+      descripcion: 'Reloj al día, gym a las seis y papi resuelve. Emite tu Carnet de Popi con tu foto, gratis y sin dar datos personales. #teampopis',
+      og: '/og.jpg'
+    },
+
+    portada: {
+      kicker: 'Ministerio de Popis · RD',
+      h1: 'Carnet de Popi',
+      sub: 'Reloj al día, gym a las seis y papi resuelve.'
+    },
+
+    titulos: {
+      oficial: 'CARNET DE POPI',
+      institucional: 'CARNET DE POPI',
+      crema: 'CERTIFICADO DE POPI',
+      hielo: 'CARNET DE POPI',
+      carbon: 'CARNET DE POPI',
+      candela: 'CREDENCIAL DE POPI',
+      solapin: 'CARNET DE POPI',
+      asodopa: 'CERTIFICADO DE POPI',
+      nocturno: 'CARNET DE POPI',
+      tricolor: 'CERTIFICADO DE POPI',
+      esmeralda: 'CREDENCIAL DE POPI'
+    },
+
+    emisores: {
+      oficial: { nombre: 'Ministerio de Popis', siglas: 'MINPOP' },
+      institucional: { nombre: 'Dirección Nacional de Popis', siglas: 'DNPOP' },
+      crema: { nombre: 'Instituto Nacional de la Privadera', siglas: 'INAPRIV' },
+      hielo: { nombre: 'Comisión Nacional de Popis', siglas: 'CONAPOP' },
+      carbon: { nombre: 'Consejo Superior de Popis', siglas: 'CONSUPOP' },
+      candela: { nombre: 'Registro Nacional de Popis', siglas: 'RENAPOP' },
+      solapin: { nombre: 'Federación Dominicana de Popis', siglas: 'FEDOPOP' },
+      asodopa: { nombre: 'Asociación Dominicana de Popis', siglas: 'ASODOPOP' },
+      nocturno: { nombre: 'Cámara Dominicana de Popis', siglas: 'CADOPOP' },
+      tricolor: { nombre: 'Asociación Nacional de Popis', siglas: 'ANPOP' },
+      esmeralda: { nombre: 'Junta Central de Popis', siglas: 'JCPOP' }
+    },
+
+    frases: {
+      oficial: 'Privar también es un trabajo.',
+      institucional: 'Yo no bajo para allá.',
+      crema: 'Eso no es caro, es exclusivo.',
+      hielo: 'Gym, brunch y buena vida.',
+      carbon: 'Mi papá conoce a alguien.',
+      candela: 'Mi carro, mi reloj, mi paz.',
+      solapin: { m: 'No es un sueño, es un popi certificado.', f: 'No es un sueño, es una popi certificada.' },
+      asodopa: 'Mejor un buen reloj que mucha bulla.',
+      nocturno: 'Sin filas, sin apuros, sin preguntar precios.',
+      tricolor: "Pa' los popis de verdad.",
+      esmeralda: { m: 'Tranquilo, que papi resuelve.', f: 'Tranquila, que papi resuelve.' }
+    },
+
+    condiciones: [
+      { m: 'POPI CERTIFICADO', f: 'POPI CERTIFICADA' },
+      'OFICIALMENTE POPI',
+      { m: 'POPI VERIFICADO', f: 'POPI VERIFICADA' },
+      { m: 'HIJO DE PAPI', f: 'HIJA DE PAPI' },
+      { m: 'POPI VITALICIO', f: 'POPI VITALICIA' },
+      'NO PREGUNTA PRECIOS',
+      'SANGRE AZUL'
+    ],
+    oficios: [
+      'ESTUDIAR ALGO EN EL EXTERIOR',
+      'IR AL GYM A LAS SEIS',
+      'HABLAR EN DOS IDIOMAS',
+      'NO PREGUNTAR PRECIOS',
+      'BRUNCH LOS DOMINGOS',
+      'ADMINISTRAR LO DE PAPI',
+      'POSTEAR EL VIAJE'
+    ],
+    antecedentes: [
+      'NINGUNO, NI UNA MULTA',
+      'CERO, TODO EN ORDEN',
+      'NINGUNO, PREGUNTE A MI ABOGADO',
+      { m: 'LIMPIO, COMO MI CARRO', f: 'LIMPIA, COMO MI CARRO' },
+      'NINGUNO, PAPI LO RESOLVIÓ'
+    ]
+  }
+
+};
 
 // En el orden en que se enseñan.
 export const ORDEN_CARNETS = Object.values(CARNETS)

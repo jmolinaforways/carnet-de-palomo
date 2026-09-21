@@ -691,12 +691,172 @@
     ctx.restore();
   }
 
+  // Un castillo de cuento. Para el princeso y la princesa: es lo que
+  // dice «realeza» sin dibujar a nadie, y vale igual para los dos.
+  // Una figura habria que dibujarla dos veces y saldria peor.
+  function drawCastillo(ctx, cx, cy, s, fill) {
+    var k = s / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    ctx.fillStyle = fill;
+
+    // las tres torres, con sus tejados en punta
+    var torres = [
+      { x: -40, ancho: 26, alto: 34 },
+      { x: -13, ancho: 26, alto: 56 },
+      { x: 14, ancho: 26, alto: 34 }
+    ];
+    torres.forEach(function (t) {
+      var techo = -t.alto - 4;
+      ctx.beginPath();
+      ctx.moveTo(t.x - 5, techo);
+      ctx.lineTo(t.x + t.ancho / 2, techo - 26);
+      ctx.lineTo(t.x + t.ancho + 5, techo);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillRect(t.x, techo, t.ancho, t.alto + 4);
+    });
+
+    // el cuerpo, con almenas
+    ctx.fillRect(-46, -6, 92, 46);
+    for (var i = 0; i < 5; i++) {
+      ctx.fillRect(-46 + i * 20, -16, 12, 12);
+    }
+
+    // la puerta, en hueco
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.moveTo(-10, 40);
+    ctx.lineTo(-10, 14);
+    ctx.arc(0, 14, 10, Math.PI, 0);
+    ctx.lineTo(10, 40);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  // Un motor calibrando: la rueda de delante levantada. Es la estampa
+  // del wawawa y de lejos se reconoce por la inclinacion.
+  //
+  // Va gorda y compacta a proposito. Al primer intento los trazos eran
+  // finos y se perdian a treinta y siete pixeles, y el manubrio subia
+  // tanto que la corona de la marca le caia encima.
+  function drawMoto(ctx, cx, cy, s, fill) {
+    var k = s / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    ctx.strokeStyle = fill;
+    ctx.fillStyle = fill;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // rueda de atras, apoyada
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.arc(-30, 22, 22, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // rueda de delante, en el aire
+    ctx.beginPath();
+    ctx.arc(30, -10, 20, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // el cuerpo, subiendo de atras adelante
+    ctx.lineWidth = 15;
+    ctx.beginPath();
+    ctx.moveTo(-30, 22);
+    ctx.lineTo(-2, 4);
+    ctx.lineTo(22, -8);
+    ctx.stroke();
+
+    // el asiento
+    ctx.lineWidth = 17;
+    ctx.beginPath();
+    ctx.moveTo(-38, 2);
+    ctx.lineTo(-10, -7);
+    ctx.stroke();
+
+    // el manubrio, corto para dejarle sitio a la corona
+    ctx.lineWidth = 11;
+    ctx.beginPath();
+    ctx.moveTo(15, -11);
+    ctx.lineTo(21, -27);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(11, -30);
+    ctx.lineTo(32, -25);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Un reloj de los caros. El popi se reconoce por el reloj, asi que
+  // va con su bisel dentado, sus agujas y su pulsera de eslabones. Sin
+  // marca ninguna: es el gesto, no el logo de nadie.
+  function drawReloj(ctx, cx, cy, s, fill) {
+    var k = s / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = fill;
+    ctx.lineCap = 'round';
+
+    // la pulsera, arriba y abajo
+    ctx.beginPath();
+    ctx.moveTo(-20, -34); ctx.lineTo(20, -34);
+    ctx.lineTo(16, -54); ctx.lineTo(-16, -54);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-20, 34); ctx.lineTo(20, 34);
+    ctx.lineTo(16, 54); ctx.lineTo(-16, 54);
+    ctx.closePath(); ctx.fill();
+
+    // el bisel dentado
+    ctx.beginPath();
+    ctx.arc(0, 0, 40, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    for (var i = 0; i < 12; i++) {
+      var a = (Math.PI * 2 / 12) * i + Math.PI / 12;
+      ctx.beginPath();
+      ctx.arc(Math.cos(a) * 40, Math.sin(a) * 40, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // la esfera
+    ctx.beginPath();
+    ctx.arc(0, 0, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // las agujas, marcando las diez y diez
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(-14, -14);
+    ctx.moveTo(0, 0); ctx.lineTo(15, -12);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   // Cuál se dibuja. Vive aquí, como la paleta, y lo fija renderCarnet.
   var EMBLEMA = 'palomo';
 
   function dibujarEmblema(ctx, cx, cy, s, fill) {
-    if (EMBLEMA === 'copa')  { return drawCopa(ctx, cx, cy, s, fill); }
-    if (EMBLEMA === 'bulto') { return drawBulto(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'copa')     { return drawCopa(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'bulto')    { return drawBulto(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'castillo') { return drawCastillo(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'moto')     { return drawMoto(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'reloj')    { return drawReloj(ctx, cx, cy, s, fill); }
     return drawPalomo(ctx, cx, cy, s, fill);
   }
 
