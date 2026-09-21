@@ -76,103 +76,6 @@
     return url;
   }
 
-  // Cuatro diseños por lámina. Cada uno se encaja entero en su hueco,
-  // que es la única forma de enseñar juntos un carnet apaisado, un
-  // solapín vertical y un cuadrado sin deformar ninguno.
-  var POR_LAMINA = 4;
-
-  function pintarSlider() {
-    var cont = $('slider');
-    var puntos = $('puntos');
-    if (!cont || !window.Carnet) { return; }
-    cont.innerHTML = '';
-    if (puntos) { puntos.innerHTML = ''; }
-
-    var todos = window.Carnet.catalogo(state.tipo);
-    var laminas = Math.ceil(todos.length / POR_LAMINA);
-
-    for (var i = 0; i < laminas; i++) {
-      var lam = document.createElement('div');
-      lam.className = 'lamina';
-      todos.slice(i * POR_LAMINA, (i + 1) * POR_LAMINA).forEach(function (c) {
-        var fig = document.createElement('figure');
-        var img = new Image();
-        img.src = miniatura(c.tipo, c.estilo);
-        img.alt = c.nombre + ', ' + c.familia + ' de ' + c.tipo;
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        fig.appendChild(img);
-        lam.appendChild(fig);
-      });
-      cont.appendChild(lam);
-
-      if (puntos) {
-        var p = document.createElement('button');
-        p.type = 'button';
-        p.className = 'punto' + (i ? '' : ' on');
-        p.setAttribute('aria-label', 'Diseños ' + (i + 1) + ' de ' + laminas);
-        (function (n) {
-          p.addEventListener('click', function () {
-            cont.scrollTo({ left: cont.clientWidth * n, behavior: 'smooth' });
-          });
-        })(i);
-        puntos.appendChild(p);
-      }
-    }
-
-    // Tocar un diseño de la portada lleva directo al formulario: quien
-    // toca ya decidió, y hacerle buscar el botón es tiempo perdido. Se
-    // distingue el toque del arrastre, o deslizar abriría el formulario.
-    (function () {
-      var x0 = 0, y0 = 0, arrastro = false;
-      cont.addEventListener('pointerdown', function (e) {
-        x0 = e.clientX; y0 = e.clientY; arrastro = false;
-      });
-      cont.addEventListener('pointermove', function (e) {
-        if (Math.abs(e.clientX - x0) > 8 || Math.abs(e.clientY - y0) > 8) { arrastro = true; }
-      });
-      cont.addEventListener('click', function () {
-        if (!arrastro) { go('step-form'); }
-      });
-    })();
-
-    // Las flechas del escritorio avanzan una lámina entera.
-    (function () {
-      var atras = $('sliderAtras'), alante = $('sliderAlante');
-      if (!atras || !alante) { return; }
-
-      function estado() {
-        atras.disabled = cont.scrollLeft < 8;
-        alante.disabled = cont.scrollLeft > cont.scrollWidth - cont.clientWidth - 8;
-      }
-      function mover(d) {
-        cont.scrollBy({ left: cont.clientWidth * d, behavior: 'smooth' });
-      }
-      atras.onclick = function () { mover(-1); };
-      alante.onclick = function () { mover(1); };
-      cont.addEventListener('scroll', estado, { passive: true });
-      estado();
-    })();
-
-    // Cuantos hay de verdad, no un numero escrito a mano que se queda
-    // viejo cada vez que se anade un diseno o un carnet.
-    if ($('cuentaDisenos')) {
-      $('cuentaDisenos').textContent =
-        todos.length + ' diseños entre carnets y credenciales.';
-    }
-
-    if (puntos) {
-      cont.addEventListener('scroll', function () {
-        var n = Math.round(cont.scrollLeft / Math.max(1, cont.clientWidth));
-        for (var k = 0; k < puntos.children.length; k++) {
-          puntos.children[k].classList.toggle('on', k === n);
-        }
-      }, { passive: true });
-    }
-  }
-
-  /* ---------------- el experimento ---------------- */
-
   // Dos ramas: A enseña los diez diseños, B enseña uno solo y sin
   // elección. Lo que se compara es la elección, no un diseño concreto:
   // por eso en B el que sale es igual de aleatorio que en A.
@@ -434,7 +337,6 @@
     } catch (e) { /* si el navegador no deja, da igual */ }
 
     pintarCarnets();
-    pintarSlider();
     pintarSelector();
   }
 
@@ -831,7 +733,6 @@
 
     loadFonts().then(function () {
       pintarCarnets();
-      pintarSlider();
       // elegirFamilia y no pintarSelector: el diseno de salida es
       // aleatorio y su pestana de formato tiene que venir marcada.
       elegirFamilia(state.familia);

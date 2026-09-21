@@ -515,26 +515,12 @@ img, canvas, video, svg{max-width:100%}
   font-size:12.5px;line-height:1.55;color:var(--muted);
 }
 
-/* ---------- carrusel de la portada ---------- */
-.slider{
-  display:flex;
-  margin:0 -18px;
-  padding:0;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-.slider::-webkit-scrollbar{display:none}
-
 /* ---------- flechas del carrusel ---------- */
 
 /* Salen en todas partes. En el movil tambien: se puede deslizar, pero
-   nada dice que haya mas disenos detras, y el selector no trae puntos
-   como el de la portada. Ahi son algo mas chicas, que la pantalla es
-   la que es. */
+   nada dice que haya mas disenos detras. Ahi son algo mas chicas, que
+   la pantalla es la que es. */
 .pista{position:relative}
-#slider{margin-top:22px;margin-bottom:10px}
 #disenos{margin-top:16px;margin-bottom:6px}
 .flecha{
   position:absolute;top:50%;transform:translateY(-50%);
@@ -557,49 +543,13 @@ img, canvas, video, svg{max-width:100%}
 @media (hover:none){
   .flecha{width:36px;height:36px;font-size:23px}
 
-  /* Solo en el carrusel de disenos bajan a flanquear el nombre. En el
-     de la portada, debajo estan los puntos y se pisarian. */
+  /* Bajan a flanquear el nombre del diseno: encima del carnet taparian
+     justo la foto y el QR, que es lo que se esta mirando. */
   .pista-selector .flecha{top:auto;bottom:-44px;transform:none}
   .pista-selector .flecha.izq{left:26px}
   .pista-selector .flecha.der{right:26px}
   .carrusel-pie{min-height:36px;line-height:36px;font-size:15px}
 }
-.lamina{
-  flex:0 0 100%;
-  box-sizing:border-box;
-  scroll-snap-align:center;
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:6px 18px 10px;
-}
-.lamina figure{
-  margin:0;
-  display:flex;align-items:center;justify-content:center;
-  height:clamp(152px,31vw,208px);
-}
-.lamina img{
-  cursor:pointer;
-  max-width:100%;max-height:100%;
-  width:auto;height:auto;
-  display:block;
-  border-radius:9px;
-  box-shadow:0 14px 30px -12px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.1);
-}
-.puntos{
-  display:flex;justify-content:center;align-items:center;gap:7px;
-  margin:2px 0 4px;
-}
-.punto{
-  width:7px;height:7px;padding:0;border:0;border-radius:50%;
-  background:rgba(255,255,255,.24);cursor:pointer;
-  transition:background .18s,width .18s;
-}
-.punto.on{background:var(--red);width:20px;border-radius:4px}
-.slider-pista{
-  margin:0 0 4px;
-  font-size:12.5px;color:var(--muted);
-}
-
 /* ---------- elegir categoría ---------- */
 .tipos{display:flex;gap:9px;margin:18px 0 10px}
 .tipos-sm{margin:0 0 4px}
