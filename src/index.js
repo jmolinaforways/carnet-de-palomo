@@ -922,10 +922,27 @@ export default {
     }
 
 
+    // La copia de staging se cierra entera a los buscadores.
+    if (env.ENTORNO === 'staging' && path === '/robots.txt') {
+      return new Response(['User-agent: *', 'Disallow: /', ''].join(String.fromCharCode(10)), {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Robots-Tag': 'noindex, nofollow'
+        }
+      });
+    }
+
     const res = await env.ASSETS.fetch(request);
     const headers = new Headers(res.headers);
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    // La copia de staging no se indexa. Si Google la encontrara, le
+    // competiría al sitio de verdad por sus propias palabras.
+    if (env.ENTORNO === 'staging') {
+      headers.set('X-Robots-Tag', 'noindex, nofollow');
+    }
+
     return new Response(res.body, { status: res.status, headers });
   }
 };

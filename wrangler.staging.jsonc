@@ -1,0 +1,58 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // Una copia entera del sitio para revisar antes de publicar.
+  //
+  // Es un Worker distinto, no una vista previa del de producción. Eso
+  // le da tres cosas que importan:
+  //
+  //   - Su propio Durable Object, así que su contador empieza en cero y
+  //     las pruebas no gastan números de los de verdad.
+  //   - Su propia llave de firma, así que un carnet emitido aquí no
+  //     verifica en palomos.com.do. No se puede colar.
+  //   - Su propia dirección, sin dominio propio ni rutas.
+  //
+  // Para subir aquí:  npx wrangler deploy -c wrangler.staging.jsonc
+  // Eso NO toca palomos.com.do.
+  "name": "carnet-de-palomo-staging",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+
+    // En produccion los assets se sirven desde el borde sin invocar al
+    // Worker, que es lo rapido. Aqui hace falta que pase por el Worker
+    // para poder marcar la copia como noindex.
+    "run_worker_first": true
+  },
+
+  "workers_dev": true,
+
+  // Sin routes ni custom_domain a propósito: staging no vive en el
+  // dominio del meme.
+
+  "vars": {
+    // El Worker lo usa para mandar X-Robots-Tag: noindex. Una copia del
+    // sitio indexada por Google le competiría al original por sus
+    // propias palabras, que es lo último que queremos.
+    "ENTORNO": "staging"
+  },
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "SECUENCIA", "class_name": "Secuencia" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Secuencia"]
+    }
+  ],
+
+  "observability": {
+    "enabled": true
+  }
+}

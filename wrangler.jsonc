@@ -16,6 +16,11 @@
   // apagar para tener una sola dirección.
   "workers_dev": true,
 
+  // Las URL de vista previa: cada 'wrangler versions upload' se puede
+  // abrir en su propia direccion sin tocar produccion. Es lo que se
+  // usa para revisar antes de publicar.
+  "preview_urls": true,
+
   "routes": [
     { "pattern": "palomos.com.do", "custom_domain": true },
     { "pattern": "www.palomos.com.do", "custom_domain": true }
