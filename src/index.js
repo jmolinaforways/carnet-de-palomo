@@ -241,8 +241,11 @@ export class Secuencia {
     const rama = url.searchParams.get('x');
     if (rama === 'A' || rama === 'B') {
       const exp = (await this.state.storage.get('experimento')) || {};
-      const k = rama + ':emitido';
-      exp[k] = (exp[k] || 0) + 1;
+      exp[rama + ':emitido'] = (exp[rama + ':emitido'] || 0) + 1;
+      if (url.searchParams.get('u') === '1') {
+        const u = rama + ':emitido-unico';
+        exp[u] = (exp[u] || 0) + 1;
+      }
       await this.state.storage.put('experimento', exp);
     }
 
@@ -399,13 +402,14 @@ function contador(env) {
   return env.SECUENCIA.get(env.SECUENCIA.idFromName(CONTADOR));
 }
 
-async function siguienteSecuencial(env, diseno, rama) {
+async function siguienteSecuencial(env, diseno, rama, primera) {
   // Si el contador falla, el sitio no se cae: damos un número basado en
   // el reloj. No es correlativo, pero sigue siendo único.
   try {
     const partes = [];
     if (diseno) { partes.push('d=' + encodeURIComponent(diseno)); }
     if (rama === 'A' || rama === 'B') { partes.push('x=' + rama); }
+    if (primera === true) { partes.push('u=1'); }
     const q = partes.length ? '?' + partes.join('&') : '';
     const res = await contador(env).fetch('https://secuencia/next' + q);
     const { n } = await res.json();
@@ -573,7 +577,10 @@ async function emitir(request, env) {
   // La rama del experimento, si el navegador la manda. Es una letra:
   // cualquier otra cosa se ignora.
   const rama = (body && body.exp) === 'A' || (body && body.exp) === 'B' ? body.exp : null;
-  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo, rama);
+  // Si este navegador no habia emitido nunca, cuenta tambien como
+  // persona, no solo como emision.
+  const primera = rama && (body && body.expPrimera) === true;
+  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo, rama, primera);
   const datos = await derive(secret, nombre, seq, tipo, estilo);
   const token = await makeToken(secret, {
     n: nombre, e: emitido, q: seq, l: lugar, t: tipo.inicial,
@@ -991,11 +998,12 @@ export default {
       try { cuerpo = await request.json(); } catch { cuerpo = null; }
       const rama = cuerpo && cuerpo.exp;
       const evento = cuerpo && cuerpo.paso;
-      if ((rama !== 'A' && rama !== 'B') || evento !== 'elegir') {
+      if ((rama !== 'A' && rama !== 'B') ||
+          (evento !== 'elegir' && evento !== 'elegir-unico')) {
         return json({ ok: false }, 400);
       }
       try {
-        await contador(env).fetch('https://secuencia/exp?k=' + rama + '%3Aelegir');
+        await contador(env).fetch('https://secuencia/exp?k=' + rama + '%3A' + evento);
       } catch { /* si el registro no responde, no pasa nada */ }
       return json({ ok: true });
     }

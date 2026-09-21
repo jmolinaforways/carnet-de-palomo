@@ -177,6 +177,28 @@
     return nueva;
   }
 
+  // Marca que este navegador ya paso por aqui. Devuelve true solo la
+  // primera vez. Si el navegador no deja escribir -modo privado-,
+  // devuelve false siempre: mejor no contar que contar de mas.
+  function primeraVez(que) {
+    var clave = 'palomos.hito.' + que;
+    try {
+      if (localStorage.getItem(clave)) { return false; }
+      localStorage.setItem(clave, '1');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function yaPaso(que) {
+    try { return !!localStorage.getItem('palomos.hito.' + que); } catch (e) { return true; }
+  }
+
+  function marcar(que) {
+    try { localStorage.setItem('palomos.hito.' + que, '1'); } catch (e) { /* da igual */ }
+  }
+
   function anotarPaso(paso) {
     var cuerpo = JSON.stringify({ exp: state.exp, paso: paso });
     try {
@@ -478,6 +500,7 @@
         lugar: cleanName($('inLugar').value),
         concepto: ($('inConcepto') ? $('inConcepto').value : ''),
         exp: state.exp,
+        expPrimera: !yaPaso('emitido'),
         tipo: state.tipo,
         estilo: state.estilo
       })
@@ -487,6 +510,9 @@
         return j;
       });
     }).then(function (j) {
+      // Solo al salir bien: si la emision falla, el navegador sigue
+      // contando como que no ha emitido nunca.
+      marcar('emitido');
       state.carnet = j;
       return drawResult(j);
     }).then(function () {
@@ -746,6 +772,8 @@
       go('step-estilo');
       pintarSelector();
       anotarPaso('elegir');
+      // Y una vez por navegador, que es lo que de verdad se compara.
+      if (primeraVez('elegir')) { anotarPaso('elegir-unico'); }
     });
     $('btnDescargar').addEventListener('click', descargar);
     $('btnWhatsapp').addEventListener('click', function () { compartir('whatsapp'); });

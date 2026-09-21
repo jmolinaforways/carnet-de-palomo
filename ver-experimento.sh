@@ -5,15 +5,27 @@ import sys, json
 d = json.load(sys.stdin)
 e = d.get('experimento', {})
 print('Total emitidos:', d['total'])
-print()
-print('%-28s %8s %9s %9s' % ('', 'llegan', 'emiten', 'conversion'))
-for rama, nombre in (('A', 'A - los diez disenos'), ('B', 'B - uno solo, sin elegir')):
-    lleg = e.get(rama + ':elegir', 0)
-    emi  = e.get(rama + ':emitido', 0)
-    pct  = ('%.1f%%' % (100.0 * emi / lleg)) if lleg else '--'
-    print('%-28s %8d %9d %9s' % (nombre, lleg, emi, pct))
-a, b = e.get('A:elegir', 0), e.get('B:elegir', 0)
-if min(a, b) < 100:
+
+def bloque(titulo, suf_l, suf_e, nota):
     print()
-    print('Faltan datos: hacen falta ~100 por rama para que signifique algo.')
+    print(titulo)
+    print('  %-26s %8s %8s %11s' % ('', 'llegan', 'emiten', 'conversion'))
+    tot_l = 0
+    for r, n in (('A', 'A - los diez disenos'), ('B', 'B - uno solo, sin elegir')):
+        l = e.get(r + suf_l, 0); m = e.get(r + suf_e, 0)
+        tot_l += l
+        pct = ('%.1f%%' % (100.0 * m / l)) if l else '--'
+        print('  %-26s %8d %8d %11s' % (n, l, m, pct))
+    if nota and tot_l:
+        a = e.get('A' + suf_l, 0)
+        print('  reparto de llegadas: %.0f%% / %.0f%%' % (100.0*a/tot_l, 100.0*(tot_l-a)/tot_l))
+    return tot_l
+
+u = bloque('POR NAVEGADOR  <- este es el bueno', ':elegir-unico', ':emitido-unico', True)
+bloque('POR PULSACION  (cuenta reintentos, no personas)', ':elegir', ':emitido', True)
+
+print()
+if u < 200:
+    print('Faltan datos: ~100 navegadores por rama para que signifique algo.')
+    print('Los contadores por navegador arrancaron de cero el 21/09.')
 "
