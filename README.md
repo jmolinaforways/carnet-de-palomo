@@ -67,6 +67,21 @@ Bandera sin Escudo**. El artículo 7 confirma que el Escudo va en el centro, y e
 una bandera propia tampoco vale: redibujar un símbolo patrio es alterarlo, que es
 justo lo que la ley prohíbe.
 
+## Lo que no dibujamos nosotros
+
+Casi todo el carnet se dibuja con código. Una sola pieza viene de fuera:
+
+- **La silueta de la Estatua de la Libertad** (emblema del Carnet de Dominican
+  York) es [`Liberty_symbol.svg`](https://commons.wikimedia.org/wiki/File:Liberty_symbol.svg)
+  de Mikael Häggström, que la puso en dominio público en 2008. Va incrustada en
+  `public/carnet.js` como un `Path2D` de 127 puntos, normalizada y recentrada;
+  no se descarga nada.
+
+  Está ahí porque dibujarla a mano no salía: tres intentos y seguía pareciendo
+  una pieza de ajedrez. A ese tamaño una figura humana necesita la silueta de
+  verdad. La atribución no es legalmente obligatoria —es dominio público— pero
+  se pone igual.
+
 ## Términos, privacidad y datos
 
 El sitio publica [términos](https://palomos.com.do/terminos) y

@@ -293,6 +293,12 @@
   // misma altura y el palomo al mismo tamano relativo. Si esto cambia,
   // cambia en los dos sitios a la vez, que es justo el punto.
   function marcaPalomos(ctx, cx, cy, size, color) {
+    // La Estatua ya trae su corona y es vertical: ponerle la nuestra
+    // encima daba dos coronas, y a lo alto le sobra sitio a los lados.
+    if (EMBLEMA === 'libertad') {
+      dibujarEmblema(ctx, cx, cy, size * 0.86, color);
+      return;
+    }
     drawCorona(ctx, cx, cy - size * 0.22, size * 0.21, color);
     dibujarEmblema(ctx, cx, cy + size * 0.05, size * 0.50, color);
   }
@@ -869,69 +875,59 @@
     ctx.restore();
   }
 
-  // La Estatua de la Libertad. A este tamaño lo que la hace reconocible
-  // son dos cosas y nada mas: la corona de picos y el brazo en alto con
-  // la antorcha. El resto es un cuerpo que se ensancha hacia abajo.
+  // La silueta viene de Liberty_symbol.svg de Wikimedia Commons, que
+  // Mikael Haggstrom puso en dominio publico en 2008. Es un poligono de
+  // 127 puntos, un solo trazo y un solo color: eso es justo lo que hace
+  // falta para poder tenirlo con la tinta de cada diseno.
+  //
+  // Va incrustado, no cargado: son dos kilos de texto y evita una
+  // peticion mas. Las coordenadas estan normalizadas a cien de ALTO
+  // -la estatua es vertical- y centradas en el origen.
+  //
+  // Dibujarla a mano no salia. Tres intentos y seguia pareciendo una
+  // pieza de ajedrez: a este tamano una figura humana necesita la
+  // silueta de verdad, no una aproximacion.
+  var TRAZO_LIBERTAD = null;
+
   function drawLibertad(ctx, cx, cy, s, fill) {
+    if (!TRAZO_LIBERTAD) {
+      TRAZO_LIBERTAD = new Path2D(
+      'M -3.88 12.78 L -1.39 10.29 L -7.4 -0.84 L 0.51 8.83 L 4.62 7.95 L ' +
+      '6.96 -4.95 L 7.4 8.24 L 10.48 9.85 L 20.29 1.94 L 12.38 11.47 L ' +
+      '14.14 14.4 L 25.57 12.64 L 15.02 16.89 L 15.02 19.08 L 15.02 19.67 L ' +
+      '26.59 22.45 L 14.58 21.87 L 14.58 23.19 L 14.87 24.07 L 15.16 24.95 ' +
+      'L 14.43 25.09 L 13.7 25.24 L 13.41 25.97 L 13.55 27.29 L 13.85 28.75 ' +
+      'L 15.02 32.42 L 14.73 32.86 L 13.7 33.59 L 14.87 39.16 L 16.48 40.18 ' +
+      'L 17.8 41.79 L 19.27 43.11 L 20.73 44.87 L 21.9 46.63 L 22.64 49.71 ' +
+      'L -23.96 50 L -23.22 47.8 L -21.76 45.31 L -22.78 44.58 L -22.34 ' +
+      '41.79 L -23.52 41.36 L -23.81 40.33 L -24.98 38.42 L -24.69 35.49 L ' +
+      '-23.81 33.59 L -23.81 32.12 L -22.78 31.1 L -24.25 30.51 L -25.42 ' +
+      '29.34 L -26.59 26.7 L -26.59 24.36 L -24.69 20.7 L -22.2 18.35 L ' +
+      '-20.59 15.86 L -20.29 15.86 L -20.44 11.47 L -20 8.83 L -20.73 6.63 ' +
+      'L -21.17 2.97 L -21.17 -1.72 L -19.56 -12.71 L -20.73 -15.2 L -20.73 ' +
+      '-16.52 L -21.61 -18.57 L -21.76 -20.18 L -21.03 -22.09 L -21.9 ' +
+      '-23.99 L -21.61 -24.87 L -23.37 -26.78 L -24.4 -29.12 L -24.4 -31.17 ' +
+      'L -23.66 -32.93 L -24.1 -33.66 L -23.37 -34.25 L -22.05 -36.15 L ' +
+      '-20.15 -37.62 L -18.39 -38.06 L -19.12 -39.52 L -19.85 -44.65 L ' +
+      '-18.1 -47 L -18.39 -44.36 L -16.48 -49.34 L -16.12 -47.88 L -15.46 ' +
+      '-47.44 L -14.73 -50 L -14.43 -47 L -14.29 -47.66 L -13.7 -49.05 L ' +
+      '-12.75 -45.46 L -12.53 -47.58 L -11.72 -44.43 L -11.06 -46.12 L ' +
+      '-11.5 -41.72 L -10.48 -44.36 L -10.04 -40.55 L -11.36 -37.03 L -9.74 ' +
+      '-34.98 L -8.42 -31.61 L -8.28 -29.12 L -8.86 -26.78 L -10.33 -25.02 ' +
+      'L -12.82 -23.7 L -12.09 -20.77 L -12.23 -16.37 L -12.97 -12.27 L ' +
+      '-12.82 -4.8 L -11.94 -0.26 L -11.36 5.46 L -11.79 9.56 L -10.48 ' +
+      '12.34 L -9.74 13.15 L -9.3 14.1 L -8.28 14.98 L -8.43 18.28 L -8.13 ' +
+      '21.14 L -7.84 23.04 L -5.64 25.09 L -4.32 24.95 L -5.35 22.45 L ' +
+      '-5.35 20.11 L -8.28 19.52 L -8.42 17.62 L -5.49 17.47 L -4.76 15.27 ' +
+      'L -9.3 13.66 L -10.41 12.34 L -3.88 12.78 z'
+      );
+    }
     var k = s / 100;
     ctx.save();
     ctx.translate(cx, cy);
     ctx.scale(k, k);
     ctx.fillStyle = fill;
-    ctx.strokeStyle = fill;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    // pedestal
-    ctx.fillRect(-30, 40, 60, 10);
-    ctx.fillRect(-22, 30, 44, 12);
-
-    // el manto, ensanchando hacia abajo
-    ctx.beginPath();
-    ctx.moveTo(-7, -14);
-    ctx.lineTo(9, -14);
-    ctx.lineTo(20, 32);
-    ctx.lineTo(-20, 32);
-    ctx.closePath();
-    ctx.fill();
-
-    // la tabla, en el brazo de abajo
-    ctx.save();
-    ctx.rotate(0.22);
-    ctx.fillRect(-27, -8, 15, 21);
-    ctx.restore();
-
-    // el brazo en alto
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.moveTo(6, -12);
-    ctx.lineTo(19, -44);
-    ctx.stroke();
-
-    // la antorcha
-    ctx.fillRect(12, -54, 15, 7);
-    ctx.beginPath();
-    ctx.moveTo(19, -56);
-    ctx.quadraticCurveTo(13, -66, 19, -76);
-    ctx.quadraticCurveTo(25, -66, 19, -56);
-    ctx.closePath();
-    ctx.fill();
-
-    // la cabeza
-    ctx.beginPath();
-    ctx.arc(0, -22, 8, 0, Math.PI * 2);
-    ctx.fill();
-
-    // la corona de picos
-    ctx.lineWidth = 4;
-    for (var i = 0; i < 7; i++) {
-      var a = -Math.PI + (Math.PI / 6) * i;
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(a) * 8, -22 + Math.sin(a) * 8);
-      ctx.lineTo(Math.cos(a) * 19, -22 + Math.sin(a) * 19);
-      ctx.stroke();
-    }
-
+    ctx.fill(TRAZO_LIBERTAD);
     ctx.restore();
   }
 
