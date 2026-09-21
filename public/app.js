@@ -525,7 +525,14 @@
       })
     }).then(function (r) {
       return r.json().then(function (j) {
-        if (!r.ok || !j.ok) { throw new Error(j.error || 'Falló la emisión'); }
+        if (!r.ok || !j.ok) {
+          var e = new Error(j.error || 'Falló la emisión');
+          // Cuando el servidor corta por ir muy rápido, el mensaje ya
+          // viene escrito para la persona. Envolverlo en «no se pudo…
+          // intenta de nuevo» lo dejaría diciendo dos cosas contrarias.
+          e.yaEstaDicho = r.status === 429;
+          throw e;
+        }
         return j;
       });
     }).then(function (j) {
@@ -537,7 +544,9 @@
     }).then(function () {
       go('step-result');
     }).catch(function (err) {
-      showError('estiloError', 'No se pudo emitir el carnet: ' + err.message + '. Intenta de nuevo.');
+      showError('estiloError', err.yaEstaDicho
+        ? err.message
+        : 'No se pudo emitir el carnet: ' + err.message + '. Intenta de nuevo.');
     }).finally(function () {
       btn.disabled = false;
       btn.textContent = 'Emitir mi carnet';

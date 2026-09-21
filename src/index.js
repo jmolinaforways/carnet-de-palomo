@@ -38,9 +38,53 @@ const SIN_LUGAR = 'NO DECLARADO';
 
 /* ---------------- Durable Object: el contador ---------------- */
 
+// Cuantas emisiones por minuto y por direccion. Generoso a proposito:
+// una persona emite una, se arrepiente del diseno, vuelve y emite otra.
+// Cuatro o cinco en un minuto es gente normal. Y en RD mucha gente
+// comparte direccion -el movil de Claro, el wifi de una oficina- asi
+// que apretar esto de mas no para a nadie malo y si deja fuera a gente
+// de verdad. Doce no roza a nadie y al script que quiera inflar el
+// contador lo baja de miles por minuto a doce.
+const POR_MINUTO = 12;
+
+// Los pasos son solo la medicion del embudo: falsearlos no rompe nada,
+// solo ensucia los numeros, asi que van mas flojos.
+const PASOS_POR_MINUTO = 60;
+
+const VENTANA = 60 * 1000;
+
 export class Secuencia {
   constructor(state) {
     this.state = state;
+
+    // Lo que lleva cada direccion en el minuto en curso. Vive en
+    // memoria a proposito: escribir esto a disco en cada emision
+    // costaria mas que el contador entero, y si el objeto se reinicia
+    // lo peor que pasa es que un minuto empieza de cero.
+    this.visitas = new Map();
+    this.proximaLimpieza = 0;
+  }
+
+  // true si esta direccion ya paso de la cuenta.
+  pasada(clave, tope) {
+    const ahora = Date.now();
+
+    // Sin esto el mapa crece con cada direccion que ha pasado por aqui.
+    // Se barre una vez por ventana, no en cada peticion.
+    if (ahora > this.proximaLimpieza) {
+      for (const [k, v] of this.visitas) {
+        if (v.hasta <= ahora) this.visitas.delete(k);
+      }
+      this.proximaLimpieza = ahora + VENTANA;
+    }
+
+    const v = this.visitas.get(clave);
+    if (!v || v.hasta <= ahora) {
+      this.visitas.set(clave, { n: 1, hasta: ahora + VENTANA });
+      return false;
+    }
+    v.n++;
+    return v.n > tope;
   }
 
   // Cada Durable Object atiende una petición a la vez, así que el
@@ -66,6 +110,10 @@ export class Secuencia {
     // Llegadas al paso de elegir. No gasta numero del contador: solo
     // anota que alguien de esta rama llego hasta ahi.
     if (url.pathname === '/exp') {
+      const ip = url.searchParams.get('ip');
+      if (ip && this.pasada('p:' + ip, PASOS_POR_MINUTO)) {
+        return new Response(JSON.stringify({ limite: true }), { status: 429, headers: cab });
+      }
       const clave = url.searchParams.get('k');
       if (clave) {
         const exp = (await this.state.storage.get('experimento')) || {};
@@ -73,6 +121,12 @@ export class Secuencia {
         await this.state.storage.put('experimento', exp);
       }
       return new Response(JSON.stringify({ ok: true }), { headers: cab });
+    }
+
+    // Aqui, antes de gastar un numero: un rechazo no debe consumirlo.
+    const quien = url.searchParams.get('ip');
+    if (quien && this.pasada(quien, POR_MINUTO)) {
+      return new Response(JSON.stringify({ limite: true }), { status: 429, headers: cab });
     }
 
     const siguiente = actual + 1;
@@ -265,7 +319,22 @@ function contador(env) {
   return env.SECUENCIA.get(env.SECUENCIA.idFromName(CONTADOR));
 }
 
-async function siguienteSecuencial(env, diseno, rama, primera) {
+// La direccion de quien pide, segun Cloudflare. Si no viene, todos
+// caen en el mismo cubo: prefiero eso a no limitar nada.
+function quienPide(request) {
+  return request.headers.get('CF-Connecting-IP') || 'sin-ip';
+}
+
+function demasiado() {
+  return json(
+    { ok: false, error: 'Vas muy rápido. Espera un minuto y vuelve a intentarlo.' },
+    429,
+    { 'Retry-After': '60' }
+  );
+}
+
+// Devuelve el numero, o null si a esta direccion le toca esperar.
+async function siguienteSecuencial(env, diseno, rama, primera, ip) {
   // Si el contador falla, el sitio no se cae: damos un número basado en
   // el reloj. No es correlativo, pero sigue siendo único.
   try {
@@ -273,13 +342,20 @@ async function siguienteSecuencial(env, diseno, rama, primera) {
     if (diseno) { partes.push('d=' + encodeURIComponent(diseno)); }
     if (rama === 'A' || rama === 'B') { partes.push('x=' + rama); }
     if (primera === true) { partes.push('u=1'); }
+    if (ip) { partes.push('ip=' + encodeURIComponent(ip)); }
     const q = partes.length ? '?' + partes.join('&') : '';
     const res = await contador(env).fetch('https://secuencia/next' + q);
+    // 429 es una respuesta, no una averia: hay que distinguirla del
+    // respaldo de abajo o el limite no serviria de nada.
+    if (res.status === 429) return null;
     const { n } = await res.json();
     if (Number.isInteger(n) && n > 0) return n;
   } catch {
     /* seguimos al respaldo */
   }
+  // Si el contador se cae, el sitio no. Este numero no es correlativo
+  // pero es unico, y sobre todo: no toca el contador de verdad, asi que
+  // una avalancha que tumbe el objeto tampoco puede inflarlo.
   return 900000000 + (Date.now() % 99999999);
 }
 
@@ -385,12 +461,13 @@ const esFecha = (s) => typeof s === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(s);
 
 /* ---------------- helpers HTTP ---------------- */
 
-const json = (obj, status = 200) =>
+const json = (obj, status = 200, extra = null) =>
   new Response(JSON.stringify(obj), {
     status,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store'
+      'Cache-Control': 'no-store',
+      ...(extra || {})
     }
   });
 
@@ -453,7 +530,8 @@ async function emitir(request, env) {
   // Si este navegador no habia emitido nunca, cuenta tambien como
   // persona, no solo como emision.
   const primera = rama && (body && body.expPrimera) === true;
-  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo, rama, primera);
+  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo, rama, primera, quienPide(request));
+  if (seq === null) return demasiado();
   const datos = await derive(secret, nombre, seq, tipo, estilo, genero);
   const token = await makeToken(secret, {
     n: nombre, e: emitido, q: seq, l: lugar, t: tipo.codigo,
@@ -1137,7 +1215,14 @@ async function manejar(request, env, nonce) {
         return json({ ok: false }, 400);
       }
       try {
-        await contador(env).fetch('https://secuencia/exp?k=' + rama + '%3A' + evento);
+        const r = await contador(env).fetch(
+          'https://secuencia/exp?k=' + rama + '%3A' + evento +
+          '&ip=' + encodeURIComponent(quienPide(request))
+        );
+        // El contador ya se negó a apuntarlo. Decirlo, en vez de
+        // responder que sí: si algún día estos números se ven raros,
+        // que se vea también dónde se cortaron.
+        if (r.status === 429) return demasiado();
       } catch { /* si el registro no responde, no pasa nada */ }
       return json({ ok: true });
     }
