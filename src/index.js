@@ -28,6 +28,13 @@ const TIPOS = {
     inicial: 'p',
     nombre: 'Palomo',
     titulo: 'CARNET DE PALOMO',
+    titulos: {
+      oficial:  'CARNET DE PALOMO',
+      titular:  'CARNET DE PALOMO',
+      asodopa:  'CERTIFICADO DE PALOMO',
+      nocturno: 'CARNET DE PALOMO',
+      tricolor: 'CERTIFICADO DE PALOMO'
+    },
     nivelEtiqueta: 'Nivel de tigueraje',
     hashtag: 'palomos',
     vence: 'DE POR VIDA',
@@ -82,6 +89,13 @@ const TIPOS = {
     inicial: 'g',
     nombre: 'Pariguayo',
     titulo: 'CARNET DE PARIGUAYO',
+    titulos: {
+      oficial:  'CARNET DE PARIGUAYO',
+      titular:  'CARNET DE PARIGUAYO',
+      asodopa:  'CERTIFICADO DE PARIGUAYO',
+      nocturno: 'CARNET DE PARIGUAYO',
+      tricolor: 'CERTIFICADO DE PARIGUAYO'
+    },
     nivelEtiqueta: 'Nivel de flow',
     hashtag: 'pariguayos',
     vence: 'DE POR VIDA',
@@ -286,7 +300,7 @@ async function derive(secret, nombre, seq, tipo, estilo) {
 
     emisor: emisor.nombre,
     siglas: emisor.siglas,
-    titulo: tipo.titulo,
+    titulo: (tipo.titulos && tipo.titulos[estilo]) || tipo.titulo,
     frase: tipo.frases[estilo] || tipo.frases.oficial,
     hashtag: tipo.hashtag,
     invitacion: tipo.invitacion

@@ -71,7 +71,8 @@
       line: 'rgba(19,41,75,.16)',
       guilloche: '#c3d2e2', guillocheAlfa: 0.4,
       marcaAgua: 0.05,
-      formato: 'credencial',
+      formato: 'solapin',
+      grad: ['#1b3f80', '#0d2247'],
       pie: 'rgba(255,255,255,.88)', pieTinta: 'rgba(19,41,75,.85)',
       suave: 'rgba(19,41,75,.25)', tenue: 'rgba(19,41,75,.12)'
     },
@@ -467,6 +468,9 @@
   var MUESTRA = {
     palomo: {
       titulo: 'CARNET DE PALOMO', hashtag: 'palomos',
+      titulos: { oficial:'CARNET DE PALOMO', titular:'CARNET DE PALOMO',
+                 asodopa:'CERTIFICADO DE PALOMO', nocturno:'CARNET DE PALOMO',
+                 tricolor:'CERTIFICADO DE PALOMO' },
       nivelEtiqueta: 'Nivel de tigueraje', vence: 'DE POR VIDA',
       categoria: 'PALOMO CERTIFICADO', oficio: 'TRABAJAR Y EVITAR PROBLEMAS',
       antecedentes: 'NINGUNO, GRACIAS A DIOS',
@@ -487,6 +491,9 @@
     },
     pariguayo: {
       titulo: 'CARNET DE PARIGUAYO', hashtag: 'pariguayos',
+      titulos: { oficial:'CARNET DE PARIGUAYO', titular:'CARNET DE PARIGUAYO',
+                 asodopa:'CERTIFICADO DE PARIGUAYO', nocturno:'CARNET DE PARIGUAYO',
+                 tricolor:'CERTIFICADO DE PARIGUAYO' },
       nivelEtiqueta: 'Nivel de flow', vence: 'DE POR VIDA',
       categoria: 'PARIGUAYO CERTIFICADO', oficio: 'CUIDANDO LOS BULTOS',
       antecedentes: 'NINGUNO, NI BAILANDO',
@@ -526,7 +533,7 @@
       emitido: dd + '/' + mm + '/' + hoy.getFullYear(),
       vence: m.vence,
       emisor: em[0], siglas: em[1],
-      titulo: m.titulo,
+      titulo: (m.titulos && m.titulos[estilo]) || m.titulo,
       frase: m.frases[estilo] || m.frases.oficial,
       hashtag: m.hashtag,
       qrUrl: 'https://palomos.com.do',
@@ -918,11 +925,11 @@
     var primera = partes.join(' ');
 
     ctx.fillStyle = C.bandaTinta || '#fff';
-    ctx.font = font(800, 38);
-    ctx.fillText(primera, 44, 150);
-    var tam = fitText(ctx, ultima, 420, 800, 74, 40);
+    ctx.font = font(800, 40);
+    ctx.fillText(primera, 44, 148);
+    var tam = fitText(ctx, ultima, 560, 800, 92, 44);
     ctx.font = font(800, tam);
-    ctx.fillText(ultima, 44, 216);
+    ctx.fillText(ultima, 44, 226);
 
     ctx.font = font(700, 20);
     ctx.globalAlpha = 0.9;
@@ -1076,16 +1083,16 @@
     var primera = partes.join(' ');
 
     ctx.fillStyle = tinta;
-    ctx.font = font(800, 44);
-    ctx.fillText(primera, 60, 120);
-    var tam = fitText(ctx, ultima, 640, 800, 96, 50);
+    ctx.font = font(800, 50);
+    ctx.fillText(primera, 60, 122);
+    var tam = fitText(ctx, ultima, 820, 800, 124, 54);
     ctx.font = font(800, tam);
-    ctx.fillText(ultima, 60, 206);
+    ctx.fillText(ultima, 60, 226);
 
     ctx.font = font(700, 18);
     ctx.globalAlpha = 0.85;
-    tracked(ctx, 'CERTIFICADO · ' + (data.siglas || ''), 62, 242, 4);
-    ctx.fillText(data.emisor || '', 62, 274);
+    tracked(ctx, 'CERTIFICADO · ' + (data.siglas || ''), 62, 260, 4);
+    ctx.fillText(data.emisor || '', 62, 292);
     ctx.globalAlpha = 1;
 
     drawEmblema(ctx, w - 110, 130, 128, tinta);
