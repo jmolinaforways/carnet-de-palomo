@@ -60,43 +60,100 @@
 
   // Los diseños se dibujan aquí, con datos de muestra: la portada no le
   // pide ni un carnet al servidor, que gastaría números del contador.
-  function miniatura(tipo, estilo, ancho) {
+  // A escala reducida: son miniaturas, y a tamano completo serian veinte
+  // lienzos de casi un millon de pixeles cada uno nada mas abrir la pagina.
+  function miniatura(tipo, estilo, escala) {
     var cv = document.createElement('canvas');
-    window.Carnet.render(cv, window.Carnet.datosMuestra(tipo, estilo, fotoDemo()), 1, estilo);
-    var url = cv.toDataURL('image/jpeg', 0.82);
+    window.Carnet.render(cv, window.Carnet.datosMuestra(tipo, estilo, fotoDemo()), escala || 0.42, estilo);
+    var url = cv.toDataURL('image/jpeg', 0.8);
     cv.width = cv.height = 0;   // el lienzo ya no hace falta
     return url;
   }
 
+  // Cuatro diseños por lámina. Cada uno se encaja entero en su hueco,
+  // que es la única forma de enseñar juntos un carnet apaisado, un
+  // solapín vertical y un cuadrado sin deformar ninguno.
+  var POR_LAMINA = 4;
+
   function pintarSlider() {
     var cont = $('slider');
+    var puntos = $('puntos');
     if (!cont || !window.Carnet) { return; }
     cont.innerHTML = '';
-    window.Carnet.catalogo().forEach(function (c) {
-      var img = new Image();
-      img.src = miniatura(c.tipo, c.estilo);
-      img.alt = 'Carnet de ' + c.tipo + ', diseño ' + c.nombre;
-      img.loading = 'lazy';
-      cont.appendChild(img);
-    });
+    if (puntos) { puntos.innerHTML = ''; }
+
+    var todos = window.Carnet.catalogo();
+    var laminas = Math.ceil(todos.length / POR_LAMINA);
+
+    for (var i = 0; i < laminas; i++) {
+      var lam = document.createElement('div');
+      lam.className = 'lamina';
+      todos.slice(i * POR_LAMINA, (i + 1) * POR_LAMINA).forEach(function (c) {
+        var fig = document.createElement('figure');
+        var img = new Image();
+        img.src = miniatura(c.tipo, c.estilo);
+        img.alt = c.nombre + ', ' + c.familia + ' de ' + c.tipo;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        fig.appendChild(img);
+        lam.appendChild(fig);
+      });
+      cont.appendChild(lam);
+
+      if (puntos) {
+        var p = document.createElement('button');
+        p.type = 'button';
+        p.className = 'punto' + (i ? '' : ' on');
+        p.setAttribute('aria-label', 'Diseños ' + (i + 1) + ' de ' + laminas);
+        (function (n) {
+          p.addEventListener('click', function () {
+            cont.scrollTo({ left: cont.clientWidth * n, behavior: 'smooth' });
+          });
+        })(i);
+        puntos.appendChild(p);
+      }
+    }
+
+    if (puntos) {
+      cont.addEventListener('scroll', function () {
+        var n = Math.round(cont.scrollLeft / Math.max(1, cont.clientWidth));
+        for (var k = 0; k < puntos.children.length; k++) {
+          puntos.children[k].classList.toggle('on', k === n);
+        }
+      }, { passive: true });
+    }
   }
+
+  var FAMILIAS = [
+    ['carnet',     'Carnet · apaisado'],
+    ['credencial', 'Credencial · cuadrada']
+  ];
 
   function pintarSelector() {
     var cont = $('disenos');
     if (!cont || !window.Carnet) { return; }
     cont.innerHTML = '';
-    window.Carnet.estilos().forEach(function (e) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'diseno' + (e.id === state.estilo ? ' elegido' : '');
-      b.innerHTML = '<img src="' + miniatura(state.tipo, e.id) + '" alt="">' +
-                    '<span>' + e.nombre + '</span>';
-      b.addEventListener('click', function () {
-        state.estilo = e.id;
-        pintarSelector();
-        $('btnSeguir').disabled = false;
+    var todos = window.Carnet.estilos();
+
+    FAMILIAS.forEach(function (f) {
+      var titulo = document.createElement('p');
+      titulo.className = 'familia';
+      titulo.textContent = f[1];
+      cont.appendChild(titulo);
+
+      todos.filter(function (e) { return e.familia === f[0]; }).forEach(function (e) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'diseno' + (e.id === state.estilo ? ' elegido' : '');
+        b.innerHTML = '<span class="caja"><img src="' + miniatura(state.tipo, e.id) +
+                      '" alt=""></span><span>' + e.nombre + '</span>';
+        b.addEventListener('click', function () {
+          state.estilo = e.id;
+          pintarSelector();
+          $('btnSeguir').disabled = false;
+        });
+        cont.appendChild(b);
       });
-      cont.appendChild(b);
     });
   }
 
@@ -448,7 +505,8 @@
     $('btnSeguir').addEventListener('click', function () { go('step-form'); });
 
     document.querySelectorAll('[data-back]').forEach(function (b) {
-      b.addEventListener('click', function () { go('step-intro'); });
+      var destino = b.getAttribute('data-back') || 'step-intro';
+      b.addEventListener('click', function () { go(destino); });
     });
 
     $('inNombre').addEventListener('input', validate);

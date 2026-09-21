@@ -29,11 +29,16 @@ const TIPOS = {
     nombre: 'Palomo',
     titulo: 'CARNET DE PALOMO',
     titulos: {
-      oficial:  'CARNET DE PALOMO',
-      titular:  'CARNET DE PALOMO',
-      asodopa:  'CERTIFICADO DE PALOMO',
-      nocturno: 'CARNET DE PALOMO',
-      tricolor: 'CERTIFICADO DE PALOMO'
+        oficial: 'CARNET DE PALOMO',
+        institucional: 'CARNET DE PALOMO',
+        crema: 'CERTIFICADO DE PALOMO',
+        carbon: 'CARNET DE PALOMO',
+        candela: 'CREDENCIAL DE PALOMO',
+        solapin: 'CARNET DE PALOMO',
+        asodopa: 'CERTIFICADO DE PALOMO',
+        nocturno: 'CARNET DE PALOMO',
+        tricolor: 'CERTIFICADO DE PALOMO',
+        esmeralda: 'CREDENCIAL DE PALOMO'
     },
     nivelEtiqueta: 'Nivel de tigueraje',
     hashtag: 'palomos',
@@ -42,19 +47,29 @@ const TIPOS = {
 
     // Una institución por estilo, para que cada diseño tenga su voz.
     emisores: {
-      oficial:  { nombre: 'Ministerio de Palomos', siglas: 'MINPAL' },
-      titular:  { nombre: 'Dirección General del Palomaje', siglas: 'DGP' },
-      asodopa:  { nombre: 'Asociación Dominicana de Palomos', siglas: 'ASODOPA' },
-      nocturno: { nombre: 'Federación Dominicana de Palomos', siglas: 'FEDOPAL' },
-      tricolor: { nombre: 'Asociación Nacional de Palomos', siglas: 'ANPC' }
+        oficial: { nombre: 'Ministerio de Palomos', siglas: 'MINPAL' },
+        institucional: { nombre: 'Dirección General del Palomaje', siglas: 'DGP' },
+        crema: { nombre: 'Instituto Nacional del Palomaje', siglas: 'INAPAL' },
+        carbon: { nombre: 'Consejo Superior de Palomos', siglas: 'CONSUPAL' },
+        candela: { nombre: 'Registro Nacional de Palomos', siglas: 'RENAPAL' },
+        solapin: { nombre: 'Federación Dominicana de Palomos', siglas: 'FEDOPAL' },
+        asodopa: { nombre: 'Asociación Dominicana de Palomos', siglas: 'ASODOPA' },
+        nocturno: { nombre: 'Cámara Dominicana de Palomos', siglas: 'CADOPAL' },
+        tricolor: { nombre: 'Asociación Nacional de Palomos', siglas: 'ANPC' },
+        esmeralda: { nombre: 'Junta Central de Palomos', siglas: 'JCP' }
     },
 
     frases: {
-      oficial:  'La paz también es una forma de éxito.',
-      titular:  'El que se queda en su casa, siempre gana.',
-      asodopa:  'Mejor tranquilo en mi casa que en líos en la calle.',
-      nocturno: 'No es un sueño, es un palomo certificado.',
-      tricolor: "Pa' los palomos de verdad."
+        oficial: 'La paz también es una forma de éxito.',
+        institucional: 'El que se queda en su casa, siempre gana.',
+        crema: 'Aquí no andamos en gente.',
+        carbon: 'El que no debe, duerme tranquilo.',
+        candela: 'Mi casa, mi paz, mi gente.',
+        solapin: 'No es un sueño, es un palomo certificado.',
+        asodopa: 'Mejor tranquilo en mi casa que en líos en la calle.',
+        nocturno: 'Sin líos, sin cuentos, sin maña.',
+        tricolor: "Pa' los palomos de verdad.",
+        esmeralda: 'Tranquilo en su casa, todo frío.'
     },
 
     condiciones: [
@@ -90,11 +105,16 @@ const TIPOS = {
     nombre: 'Pariguayo',
     titulo: 'CARNET DE PARIGUAYO',
     titulos: {
-      oficial:  'CARNET DE PARIGUAYO',
-      titular:  'CARNET DE PARIGUAYO',
-      asodopa:  'CERTIFICADO DE PARIGUAYO',
-      nocturno: 'CARNET DE PARIGUAYO',
-      tricolor: 'CERTIFICADO DE PARIGUAYO'
+        oficial: 'CARNET DE PARIGUAYO',
+        institucional: 'CARNET DE PARIGUAYO',
+        crema: 'CERTIFICADO DE PARIGUAYO',
+        carbon: 'CARNET DE PARIGUAYO',
+        candela: 'CREDENCIAL DE PARIGUAYO',
+        solapin: 'CARNET DE PARIGUAYO',
+        asodopa: 'CERTIFICADO DE PARIGUAYO',
+        nocturno: 'CARNET DE PARIGUAYO',
+        tricolor: 'CERTIFICADO DE PARIGUAYO',
+        esmeralda: 'CREDENCIAL DE PARIGUAYO'
     },
     nivelEtiqueta: 'Nivel de flow',
     hashtag: 'pariguayos',
@@ -102,19 +122,29 @@ const TIPOS = {
     invitacion: 'Invita a tus panas pariguayos al club.',
 
     emisores: {
-      oficial:  { nombre: 'Ministerio de Pariguayos', siglas: 'MINPAR' },
-      titular:  { nombre: 'Dirección General del Pariguayaje', siglas: 'DGPAR' },
-      asodopa:  { nombre: 'Asociación Dominicana de Pariguayos', siglas: 'ASODOPARI' },
-      nocturno: { nombre: 'Federación Dominicana de Pariguayos', siglas: 'FEDOPARI' },
-      tricolor: { nombre: 'Asociación Nacional de Pariguayos', siglas: 'ANPAR' }
+        oficial: { nombre: 'Ministerio de Pariguayos', siglas: 'MINPAR' },
+        institucional: { nombre: 'Dirección General del Pariguayaje', siglas: 'DGPAR' },
+        crema: { nombre: 'Instituto Nacional del Pariguayaje', siglas: 'INAPARI' },
+        carbon: { nombre: 'Consejo Superior de Pariguayos', siglas: 'CONSUPARI' },
+        candela: { nombre: 'Registro Nacional de Pariguayos', siglas: 'RENAPARI' },
+        solapin: { nombre: 'Federación Dominicana de Pariguayos', siglas: 'FEDOPARI' },
+        asodopa: { nombre: 'Asociación Dominicana de Pariguayos', siglas: 'ASODOPARI' },
+        nocturno: { nombre: 'Cámara Dominicana de Pariguayos', siglas: 'CADOPARI' },
+        tricolor: { nombre: 'Asociación Nacional de Pariguayos', siglas: 'ANPAR' },
+        esmeralda: { nombre: 'Junta Central de Pariguayos', siglas: 'JCPAR' }
     },
 
     frases: {
-      oficial:  'El que no baila, observa.',
-      titular:  'Yo no bailo, yo cuido los bultos.',
-      asodopa:  'Llegué temprano y me quedé en la esquina.',
-      nocturno: 'No es un sueño, es un pariguayo certificado.',
-      tricolor: "Pa' los pariguayos de verdad."
+        oficial: 'El que no baila, observa.',
+        institucional: 'Yo no bailo, yo cuido los bultos.',
+        crema: 'Yo vine fue a mirar.',
+        carbon: 'El que graba no baila.',
+        candela: 'Sosteniendo la pared desde siempre.',
+        solapin: 'No es un sueño, es un pariguayo certificado.',
+        asodopa: 'Llegué temprano y me quedé en la esquina.',
+        nocturno: 'Buscando el hielo toda la noche.',
+        tricolor: "Pa' los pariguayos de verdad.",
+        esmeralda: 'Parado ahí, como siempre.'
     },
 
     condiciones: [
@@ -152,7 +182,7 @@ function tipoDe(v) {
 
 // Los cinco estilos. El servidor solo necesita saber cuáles existen para
 // entregar el emisor y la frase que le tocan a cada uno.
-const ESTILOS = ['oficial', 'titular', 'asodopa', 'nocturno', 'tricolor'];
+const ESTILOS = ["oficial","institucional","crema","carbon","candela","solapin","asodopa","nocturno","tricolor","esmeralda"];
 const estiloDe = (v) => (ESTILOS.includes(v) ? v : 'oficial');
 
 // Lo que sale en el carnet cuando no escriben de dónde son. El lugar viaja

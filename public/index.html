@@ -72,7 +72,8 @@
       <p class="sub">Tranquilo en su casa, todo fr&iacute;o. No tamo en l&iacute;os.</p>
 
       <div class="slider" id="slider" aria-label="Diseños disponibles"></div>
-      <p class="slider-pista">Desliza para ver los diseños &rarr;</p>
+      <div class="puntos" id="puntos" aria-hidden="true"></div>
+      <p class="slider-pista">20 dise&ntilde;os. Desliza para verlos &rarr;</p>
 
       <button class="btn btn-primary btn-xl" id="btnStart">Genera el tuyo</button>
       <p class="claim">Gratis, r&aacute;pido y sin dar datos personales.</p>
@@ -132,7 +133,7 @@
       <div class="disenos" id="disenos"></div>
 
       <div class="row-actions">
-        <button class="btn btn-quiet" data-back>Atr&aacute;s</button>
+        <button class="btn btn-quiet" data-back="step-intro">Atr&aacute;s</button>
         <button class="btn btn-primary" id="btnSeguir" disabled>Continuar</button>
       </div>
     </div>
@@ -207,7 +208,7 @@
       </label>
 
       <div class="row-actions">
-        <button class="btn btn-quiet" data-back>Atr&aacute;s</button>
+        <button class="btn btn-quiet" data-back="step-estilo">Cambiar dise&ntilde;o</button>
         <button class="btn btn-primary" id="btnGenerar" disabled>Emitir carnet</button>
       </div>
       <p class="error" id="formError" hidden></p>
