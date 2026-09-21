@@ -3,30 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Emite tu Carnet de Palomo RD | Gratis y en 10 segundos</title>
-<meta name="description" content="La calle está caliente, pero yo ya tengo mi carnet. Emite el tuyo gratis, en 10 segundos y sin dar datos personales. #teampalomos">
-<meta name="author" content="Javier Molina (@javimolinax)">
-<meta name="theme-color" content="#0b1b3a">
-
-<meta property="og:title" content="Emite tu Carnet de Palomo RD">
-<meta property="og:description" content="La calle está caliente, pero yo ya tengo mi carnet. Emite el tuyo gratis, en 10 segundos y sin dar datos personales. #teampalomos">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://palomos.com.do/">
-<meta property="og:site_name" content="Carnet de Palomo">
-<meta property="og:locale" content="es_DO">
-<meta property="og:image" content="https://palomos.com.do/og.jpg">
-<meta property="og:image:secure_url" content="https://palomos.com.do/og.jpg">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Carnet de Palomo del Ministerio de Palomos">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Emite tu Carnet de Palomo RD">
-<meta name="twitter:description" content="La calle está caliente, pero yo ya tengo mi carnet. Emite el tuyo gratis.">
-<meta name="twitter:image" content="https://palomos.com.do/og.jpg">
-
-<link rel="canonical" href="https://palomos.com.do/">
+<!--CABEZA-->
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,29 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Carnet de Palomo",
-  "url": "https://palomos.com.do/",
-  "applicationCategory": "EntertainmentApplication",
-  "operatingSystem": "Web",
-  "inLanguage": "es-DO",
-  "isFamilyFriendly": true,
-  "description": "La calle está caliente, pero yo ya tengo mi carnet. Emite el tuyo gratis, en 10 segundos y sin dar datos personales. #teampalomos",
-  "image": "https://palomos.com.do/og.jpg",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "DOP" },
-  "author": {
-    "@type": "Person",
-    "name": "Javier Molina",
-    "sameAs": [
-      "https://www.instagram.com/javimolinax/",
-      "https://www.tiktok.com/@javimolinaxt"
-    ]
-  }
-}
-</script>
+<!--FICHA-->
 </head>
 <body>
 
@@ -67,9 +22,18 @@
   <!-- ================= PASO 0: PORTADA ================= -->
   <section class="step" id="step-intro" data-active>
     <div class="hero">
-      <p class="kicker">Ministerio de Palomos &middot; RD</p>
-      <h1>Carnet de Palomo</h1>
-      <p class="sub">Tranquilo en su casa, todo fr&iacute;o. No tamo en l&iacute;os.</p>
+      <!--PORTADA-->
+
+      <section class="elige" aria-label="Elige tu carnet">
+        <h2 class="elige-tit">&iquest;Qu&eacute; carnet quieres?</h2>
+        <label class="busca" id="buscaCaja">
+          <span class="busca-lupa" aria-hidden="true">&#128269;</span>
+          <input type="search" id="buscaCarnet" autocomplete="off"
+                 placeholder="Busca tu carnet&hellip;" aria-label="Busca tu carnet">
+        </label>
+        <div class="carnets" id="listaCarnets"></div>
+        <p class="sin-resultados" id="sinCarnets" hidden>No hay ning&uacute;n carnet con ese nombre. Todav&iacute;a.</p>
+      </section>
 
       <div class="pista">
         <button class="flecha izq" id="sliderAtras" type="button" aria-label="Dise&ntilde;os anteriores">&lsaquo;</button>
@@ -77,7 +41,7 @@
         <button class="flecha der" id="sliderAlante" type="button" aria-label="Dise&ntilde;os siguientes">&rsaquo;</button>
       </div>
       <div class="puntos" id="puntos" aria-hidden="true"></div>
-      <p class="slider-pista">20 dise&ntilde;os entre carnets y credenciales.</p>
+      <p class="slider-pista" id="cuentaDisenos">&nbsp;</p>
 
       <button class="btn btn-primary btn-xl" id="btnStart">Genera el tuyo</button>
       <p class="claim">Gratis, r&aacute;pido y sin dar datos personales.</p>
@@ -128,17 +92,12 @@
       <h2>Elige tus batallas</h2>
       <p class="hint">Ya con tu cara y tu nombre puestos. Desliza y quédate con el que m&aacute;s te represente.</p>
 
-      <div class="tipos" role="tablist" aria-label="Categor&iacute;a">
-        <button class="tipo activo" id="tipoPalomo" type="button" role="tab">Palomo</button>
-        <button class="tipo" id="tipoPariguayo" type="button" role="tab">Pariguayo</button>
-      </div>
-
       <div class="tipos tipos-sm" role="tablist" aria-label="Formato">
         <button class="tipo activo" id="famCarnet" type="button" role="tab">Carnet</button>
         <button class="tipo" id="famCredencial" type="button" role="tab">Credencial</button>
       </div>
 
-      <div class="pista">
+      <div class="pista pista-selector">
         <button class="flecha izq" id="disenoAtras" type="button" aria-label="Dise&ntilde;o anterior">&lsaquo;</button>
         <div class="carrusel" id="disenos" aria-label="Dise&ntilde;os"></div>
         <button class="flecha der" id="disenoAlante" type="button" aria-label="Dise&ntilde;o siguiente">&rsaquo;</button>
@@ -166,6 +125,17 @@
                spellcheck="false" placeholder="Ej. Juan Carlos P&eacute;rez">
       </label>
       <p class="hint" id="hintNombre">Como quieres que salga en el carnet. Puede ser inventado.</p>
+
+      <fieldset class="genero">
+        <legend>&iquest;C&oacute;mo lo escribimos?</legend>
+        <div class="genero-ops" role="radiogroup">
+          <button type="button" class="gen activo" data-genero="m">&Eacute;l</button>
+          <button type="button" class="gen" data-genero="f">Ella</button>
+          <button type="button" class="gen" data-genero="x">Prefiero no decir</button>
+        </div>
+        <p class="hint">Cambia c&oacute;mo habla el carnet: <em>palomo certificado</em> o
+        <em>paloma certificada</em>.</p>
+      </fieldset>
 
       <label class="field mt-sm">
         <span>Tu concepto <em>(opcional)</em></span>
@@ -365,6 +335,7 @@
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
         data-cf-beacon='{"token": "5252e7034c504b9ebe41f551a96ef465"}'></script>
 <script src="/vendor/qrcode.js"></script>
+<!--REGISTRO-->
 <script src="/carnet.js"></script>
 <script src="/app.js"></script>
 </body>

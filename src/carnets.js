@@ -37,6 +37,10 @@ export function g(valor, genero) {
   return genero === 'f' && valor.f ? valor.f : valor.m;
 }
 
+// «Certificado» describe a la persona, no al documento, asi que
+// concuerda. Es igual para todos los carnets: vive aqui una sola vez.
+export const CERTIFICADO = { m: 'CERTIFICADO', f: 'CERTIFICADA' };
+
 export const CARNETS = {
   palomo: {
     id: 'palomo',
@@ -74,7 +78,16 @@ export const CARNETS = {
 
     seo: {
       titulo: 'Emite tu Carnet de Palomo RD | Gratis y en 10 segundos',
-      descripcion: 'La calle está caliente, pero yo ya tengo mi carnet. Emite tu Carnet de Palomo con tu foto, gratis y sin dar datos personales. #teampalomos'
+      descripcion: 'La calle está caliente, pero yo ya tengo mi carnet. Emite tu Carnet de Palomo con tu foto, gratis y sin dar datos personales. #teampalomos',
+      og: '/og.jpg'
+    },
+
+    // Lo que se ve al entrar. Va aquí y no en el HTML porque el Worker
+    // lo pinta por carnet: un buscador tiene que leer el H1 que toca.
+    portada: {
+      kicker: 'Ministerio de Palomos · RD',
+      h1: 'Carnet de Palomo',
+      sub: 'Tranquilo en su casa, todo frío. No tamo en líos.'
     },
 
     titulos: {
@@ -183,7 +196,16 @@ export const CARNETS = {
 
     seo: {
       titulo: 'Emite tu Carnet de Pariguayo RD | Gratis y en 10 segundos',
-      descripcion: 'Yo no bailo, yo cuido los bultos. Emite tu Carnet de Pariguayo con tu foto, gratis y sin dar datos personales. #teampariguayos'
+      descripcion: 'Yo no bailo, yo cuido los bultos. Emite tu Carnet de Pariguayo con tu foto, gratis y sin dar datos personales. #teampariguayos',
+      // Sin imagen propia todavía: cae en la de palomo. Cada carnet
+      // nuevo debería traer la suya.
+      og: '/og.jpg'
+    },
+
+    portada: {
+      kicker: 'Ministerio de Pariguayos · RD',
+      h1: 'Carnet de Pariguayo',
+      sub: 'Yo no bailo, yo cuido los bultos. Vine fue a mirar.'
     },
 
     titulos: {

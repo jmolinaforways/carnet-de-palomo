@@ -20,7 +20,11 @@
     familia: 'carnet',
     exp: 'A',
     prevStep: 'step-form',
-    tipo: 'palomo',
+    // Lo pone el Worker segun la URL: en / es el de por defecto, y en
+    // /carnet-de-lo-que-sea es ese. Asi entrar por un enlace compartido
+    // ya trae el carnet puesto.
+    tipo: (window.PALOMOS && window.PALOMOS.activo) || 'palomo',
+    genero: 'm',
     estilo: 'oficial'
   };
 
@@ -66,7 +70,7 @@
   // lienzos de casi un millon de pixeles cada uno nada mas abrir la pagina.
   function miniatura(tipo, estilo, escala) {
     var cv = document.createElement('canvas');
-    window.Carnet.render(cv, window.Carnet.datosMuestra(tipo, estilo, fotoDemo()), escala || 0.42, estilo);
+    window.Carnet.render(cv, window.Carnet.datosMuestra(tipo, estilo, fotoDemo(), state.genero), escala || 0.42, estilo);
     var url = cv.toDataURL('image/jpeg', 0.8);
     cv.width = cv.height = 0;   // el lienzo ya no hace falta
     return url;
@@ -149,6 +153,13 @@
       cont.addEventListener('scroll', estado, { passive: true });
       estado();
     })();
+
+    // Cuantos hay de verdad, no un numero escrito a mano que se queda
+    // viejo cada vez que se anade un diseno o un carnet.
+    if ($('cuentaDisenos')) {
+      $('cuentaDisenos').textContent =
+        todos.length + ' diseños entre carnets y credenciales.';
+    }
 
     if (puntos) {
       cont.addEventListener('scroll', function () {
@@ -246,7 +257,7 @@
   // Se dibuja en su teléfono, así que verlas todas no gasta ningún número
   // del contador: eso solo pasa al emitir.
   function miniaturaPropia(estilo) {
-    var d = window.Carnet.datosMuestra(state.tipo, estilo, state.photo || fotoDemo());
+    var d = window.Carnet.datosMuestra(state.tipo, estilo, state.photo || fotoDemo(), state.genero);
     var nombre = cleanName($('inNombre').value);
     if (nombre) { d.nombre = nombre.toLocaleUpperCase('es'); }
     var lugar = cleanName($('inLugar').value);
@@ -347,11 +358,86 @@
     pintarSelector();
   }
 
-  function elegirTipo(t) {
-    state.tipo = t;
-    $('tipoPalomo').classList.toggle('activo', t === 'palomo');
-    $('tipoPariguayo').classList.toggle('activo', t === 'pariguayo');
+  /* ---------------- elegir el carnet ---------------- */
+
+  function carnetsDisponibles() {
+    var r = window.Carnet.carnets();
+    return window.Carnet.tipos().map(function (id) { return r[id]; }).filter(Boolean);
+  }
+
+  // La busqueda mira el nombre y las palabras que cada carnet declara,
+  // que es donde viven las variantes: «pariguallo», «parriguayo».
+  function coincide(c, q) {
+    if (!q) { return true; }
+    var campos = [window.Carnet.texto(c.nombre, 'm'), window.Carnet.texto(c.nombre, 'f')]
+      .concat(c.buscar || []);
+    return campos.some(function (t) { return sinTildes(t).indexOf(q) >= 0; });
+  }
+
+  function sinTildes(t) {
+    return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function pintarCarnets() {
+    var cont = $('listaCarnets');
+    if (!cont || !window.Carnet) { return; }
+
+    var q = sinTildes($('buscaCarnet') ? $('buscaCarnet').value.trim() : '');
+    var lista = carnetsDisponibles().filter(function (c) { return coincide(c, q); });
+
+    cont.innerHTML = '';
+    lista.forEach(function (c) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'carnet-op' + (c.id === state.tipo ? ' elegido' : '');
+      b.textContent = window.Carnet.texto(c.nombre, 'm');
+      b.setAttribute('aria-pressed', c.id === state.tipo ? 'true' : 'false');
+      b.addEventListener('click', function () { elegirCarnet(c.id); });
+      cont.appendChild(b);
+    });
+
+    if ($('sinCarnets')) { $('sinCarnets').hidden = lista.length > 0; }
+
+    // La caja de busqueda solo estorba mientras haya pocos.
+    if ($('buscaCaja')) { $('buscaCaja').hidden = carnetsDisponibles().length < 7; }
+  }
+
+  function elegirCarnet(id) {
+    var c = window.Carnet.carnets()[id];
+    if (!c) { return; }
+    state.tipo = id;
+
+    // La portada cambia entera: es otro carnet.
+    var p = c.portada || {};
+    var k = document.querySelector('#step-intro .kicker');
+    var h = document.querySelector('#step-intro h1');
+    var u = document.querySelector('#step-intro .sub');
+    if (k && p.kicker) { k.textContent = p.kicker; }
+    if (h && p.h1) { h.textContent = p.h1; }
+    if (u && p.sub) { u.textContent = p.sub; }
+    if (p.h1) { document.title = (c.seo && c.seo.titulo) || p.h1; }
+
+    // Y la direccion, para que se pueda compartir tal cual.
+    try {
+      var destino = c.porDefecto ? '/' : '/' + c.slug;
+      if (location.pathname !== destino) {
+        history.replaceState(null, '', destino + location.search);
+      }
+    } catch (e) { /* si el navegador no deja, da igual */ }
+
+    pintarCarnets();
+    pintarSlider();
     pintarSelector();
+  }
+
+  function elegirGenero(g) {
+    state.genero = g;
+    var ops = document.querySelectorAll('.gen');
+    for (var i = 0; i < ops.length; i++) {
+      var suyo = ops[i].getAttribute('data-genero') === g;
+      ops[i].classList.toggle('activo', suyo);
+      ops[i].setAttribute('aria-pressed', suyo ? 'true' : 'false');
+    }
   }
 
   /* ---------------- foto ---------------- */
@@ -514,6 +600,7 @@
         exp: state.exp,
         expPrimera: !yaPaso('emitido'),
         tipo: state.tipo,
+        genero: state.genero,
         estilo: state.estilo
       })
     }).then(function (r) {
@@ -558,7 +645,11 @@
 
       window.Carnet.render($('carnetCanvas'), data, EXPORT_SCALE, j.estilo || state.estilo);
 
-      $('secuencial').textContent = 'Eres el ' + (j.tipo || 'palomo') + ' número ' +
+      // El articulo y el sujeto concuerdan: «Eres la pariguaya numero
+      // 60», no «el pariguayo».
+      var art = j.genero === 'f' ? 'la ' : 'el ';
+      var quien = (j.sujeto || j.tipo || 'palomo').toLocaleLowerCase('es');
+      $('secuencial').textContent = 'Eres ' + art + quien + ' número ' +
         Number(j.secuencial).toLocaleString('es-DO');
 
       $('verifyLink').href = j.verifyUrl;
@@ -725,6 +816,8 @@
       if (pista) { pista.textContent = 'Este es el tuyo, ya con tu cara y tu nombre.'; }
     }
 
+    pintarCarnets();
+
     loadFonts().then(function () {
       pintarSlider();
       // elegirFamilia y no pintarSelector: el diseno de salida es
@@ -733,8 +826,14 @@
     });
 
     $('btnStart').addEventListener('click', function () { go('step-form'); });
-    $('tipoPalomo').addEventListener('click', function () { elegirTipo('palomo'); });
-    $('tipoPariguayo').addEventListener('click', function () { elegirTipo('pariguayo'); });
+    if ($('buscaCarnet')) {
+      $('buscaCarnet').addEventListener('input', pintarCarnets);
+    }
+    document.querySelectorAll('.gen').forEach(function (b) {
+      b.addEventListener('click', function () {
+        elegirGenero(b.getAttribute('data-genero'));
+      });
+    });
     $('famCarnet').addEventListener('click', function () { elegirFamilia('carnet'); });
     $('famCredencial').addEventListener('click', function () { elegirFamilia('credencial'); });
     $('disenoAtras').addEventListener('click', function () { moverSeleccion(-1); });

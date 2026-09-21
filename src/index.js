@@ -1,5 +1,5 @@
 import {
-  CARNETS, carnetDe, carnetPorSlug, g, generoDe,
+  CARNETS, CERTIFICADO, carnetDe, carnetPorSlug, g, generoDe,
   ORDEN_CARNETS, POR_DEFECTO
 } from './carnets.js';
 
@@ -196,6 +196,7 @@ async function derive(secret, nombre, seq, tipo, estilo, genero) {
     // Lo que antes estaba cableado dentro de carnet.js y ahora sale del
     // registro: asi un carnet nuevo no obliga a tocar el dibujo.
     sujeto: t(tipo.sujeto),
+    certificado: t(CERTIFICADO),
     lema: t(tipo.lema),
     cintilla: t(tipo.cintilla),
     citas: tipo.citas.map(t),
@@ -861,9 +862,163 @@ async function rutaVerificar(request, env) {
 
 /* ---------------- router ---------------- */
 
+
+/* ---------------- una URL por carnet ---------------- */
+
+const SITIO_URL = 'https://palomos.com.do';
+
+function cabezaDe(carnet, canonica) {
+  const s = carnet.seo;
+  const img = SITIO_URL + (s.og || '/og.jpg');
+  // El de la portada, en caja normal: en redes se lee mejor que el
+  // del carnet, que va todo en mayusculas.
+  const corta = carnet.portada.h1;
+  return [
+    `<title>${esc(s.titulo)}</title>`,
+    `<meta name="description" content="${esc(s.descripcion)}">`,
+    '<meta name="author" content="Javier Molina (@javimolinax)">',
+    '<meta name="theme-color" content="#0b1b3a">',
+    '',
+    `<meta property="og:title" content="${esc(corta)}">`,
+    `<meta property="og:description" content="${esc(s.descripcion)}">`,
+    '<meta property="og:type" content="website">',
+    `<meta property="og:url" content="${esc(canonica)}">`,
+    '<meta property="og:site_name" content="Carnet de Palomo">',
+    '<meta property="og:locale" content="es_DO">',
+    `<meta property="og:image" content="${img}">`,
+    `<meta property="og:image:secure_url" content="${img}">`,
+    '<meta property="og:image:type" content="image/jpeg">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    `<meta property="og:image:alt" content="${esc(corta)}">`,
+    '',
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:title" content="${esc(corta)}">`,
+    `<meta name="twitter:description" content="${esc(s.descripcion)}">`,
+    `<meta name="twitter:image" content="${img}">`,
+    '',
+    `<link rel="canonical" href="${esc(canonica)}">`
+  ].join('\n');
+}
+
+function fichaDe(carnet, canonica) {
+  const ficha = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: g(carnet.titulo, 'm'),
+    url: canonica,
+    applicationCategory: 'EntertainmentApplication',
+    operatingSystem: 'Web',
+    inLanguage: 'es-DO',
+    isFamilyFriendly: true,
+    description: carnet.seo.descripcion,
+    image: SITIO_URL + (carnet.seo.og || '/og.jpg'),
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'DOP' },
+    author: {
+      '@type': 'Person',
+      name: 'Javier Molina',
+      sameAs: [
+        'https://www.instagram.com/javimolinax/',
+        'https://www.tiktok.com/@javimolinaxt'
+      ]
+    }
+  };
+  return '<script type="application/ld+json">\n' +
+    JSON.stringify(ficha, null, 2).replace(/</g, '\\u003c') +
+    '\n</script>';
+}
+
+function portadaDe(carnet) {
+  const p = carnet.portada;
+  return [
+    `<p class="kicker">${esc(p.kicker)}</p>`,
+    `<h1>${esc(p.h1)}</h1>`,
+    `<p class="sub">${esc(p.sub)}</p>`
+  ].join('\n      ');
+}
+
+// El registro entero viaja a la página. Antes el cliente tenía su
+// propia copia del catálogo y había que mantener las dos a la vez.
+function registroDe(carnet) {
+  const datos = { carnets: CARNETS, orden: ORDEN_CARNETS, activo: carnet.id };
+  return '<script>window.PALOMOS=' +
+    JSON.stringify(datos).replace(/</g, '\\u003c') +
+    ';</script>';
+}
+
+async function paginaDeCarnet(request, env, carnet, canonica) {
+  const base = new URL(request.url);
+  base.pathname = '/index.html';
+  base.search = '';
+
+  const res = await env.ASSETS.fetch(new Request(base.toString(), { method: 'GET' }));
+  if (!res.ok) return res;
+
+  let html = await res.text();
+  html = html
+    .replace('<!--CABEZA-->', cabezaDe(carnet, canonica))
+    .replace('<!--FICHA-->', fichaDe(carnet, canonica))
+    .replace('<!--PORTADA-->', portadaDe(carnet))
+    .replace('<!--REGISTRO-->', registroDe(carnet));
+
+  const headers = {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'public, max-age=0, must-revalidate',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin'
+  };
+  if (env.ENTORNO === 'staging') headers['X-Robots-Tag'] = 'noindex, nofollow';
+
+  return new Response(html, { headers });
+}
+
+function sitemapDe(env) {
+  const hoy = new Date().toISOString().slice(0, 10);
+  const urls = [SITIO_URL + '/'];
+  for (const id of ORDEN_CARNETS) {
+    if (id === POR_DEFECTO) continue;   // ese vive en la raíz
+    urls.push(SITIO_URL + '/' + CARNETS[id].slug);
+  }
+  urls.push(SITIO_URL + '/verificar', SITIO_URL + '/terminos', SITIO_URL + '/privacidad');
+
+  const cuerpo = urls.map((u) =>
+    `  <url><loc>${u}</loc><lastmod>${hoy}</lastmod></url>`).join('\n');
+
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    cuerpo + '\n</urlset>\n';
+}
+
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+
+    // La raíz y una dirección por carnet.
+    if (path === '/' || path === '/index.html') {
+      return paginaDeCarnet(request, env, CARNETS[POR_DEFECTO], SITIO_URL + '/');
+    }
+
+    if (path.startsWith('/carnet-de-')) {
+      const slug = path.slice(1).replace(/\/$/, '');
+      const carnet = carnetPorSlug(slug);
+      if (!carnet) return new Response('No existe ese carnet.', { status: 404 });
+
+      // El de por defecto vive en la raíz: su propio slug redirige, para
+      // no tener la misma página en dos direcciones peleándose en Google.
+      if (carnet.id === POR_DEFECTO) {
+        return Response.redirect(SITIO_URL + '/', 301);
+      }
+      return paginaDeCarnet(request, env, carnet, SITIO_URL + '/' + carnet.slug);
+    }
+
+    if (path === '/sitemap.xml') {
+      return new Response(sitemapDe(env), {
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    }
 
     if (path === '/api/emitir') {
       if (request.method !== 'POST') return json({ ok: false, error: 'Usa POST' }, 405);

@@ -497,27 +497,30 @@
 
   // Las citas manuscritas del costado. Van aquí y no en el servidor
   // porque son adorno del diseño, no dato del carnet.
-  var CITAS = {
-    palomos: ['El que se queda en su casa, siempre gana.',
-              'Mejor tranquilo en mi casa que en líos en la calle.'],
-    pariguayos: ['El que no baila, observa.',
-                 'Yo vine fue a mirar, no a bailar.']
-  };
+  // Vienen dentro de los datos, ya resueltos por género. Los respaldos
+  // son por si llega un carnet emitido antes de que esto existiera.
+  function citasDe(d) { return (d.citas && d.citas.length) ? d.citas : []; }
+  function lemaDe(d)  { return d.lema || ''; }
 
-  var LEMAS = {
-    palomos: 'PAZ · TRANQUILIDAD · VIDA SIN LÍOS',
-    pariguayos: 'MIRAR · CUIDAR · NO BAILAR'
-  };
+  // La frase que se imprime: la de la persona si escribio su concepto,
+  // si no la que trae el diseno. Ocupa el mismo sitio en los dos casos.
+  //
+  // Se llamaba lema(), a un caracter de distancia de lemaDe(), que es
+  // otra cosa: el lema de la institucion.
+  function fraseImpresa(d) {
+    return (d.concepto && d.concepto.trim()) || d.frase || '';
+  }
+  function sujeto(d)  { return d.sujeto || 'PALOMO'; }
+  function selloDe(d) { return (d.sello && d.sello.length) ? d.sello : []; }
 
-
-  // Si la persona escribió su concepto, ese es el que se imprime; si no,
-  // la frase que trae el diseño. Ocupa el mismo sitio en los dos casos,
-  // así que la maqueta no se mueve.
-  function lema(d) { return (d.concepto && d.concepto.trim()) || d.frase || ''; }
-
-  function citasDe(d) { return CITAS[d.hashtag] || CITAS.palomos; }
-  function lemaDe(d)  { return LEMAS[d.hashtag] || LEMAS.palomos; }
-  function sujeto(d)  { return d.hashtag === 'pariguayos' ? 'PARIGUAYO' : 'PALOMO'; }
+  // Concuerda con la persona. Cableado en ocho sitios, decia siempre
+  // CERTIFICADO aunque el carnet fuera de una mujer.
+  function certDe(d) { return d.certificado || 'CERTIFICADO'; }
+  function cintillaDe(d) {
+    if (d.cintilla) { return d.cintilla; }
+    var x = sujeto(d);
+    return 'Un ' + x.charAt(0) + x.slice(1).toLowerCase() + ' Certificado';
+  }
 
   /* ---------- el palomo (emblema propio, no es símbolo patrio) ---------- */
 
@@ -751,128 +754,76 @@
     }
     return [
       pad('PD<DOM' + p.apellidos.replace(/ /g, '<') + '<<' + p.nombres.replace(/ /g, '<'), 44),
-      pad(deaccent(data.serial).toUpperCase().replace(/-/g, '') + '<DOM<PALOMO<CERTIFICADO', 44)
+      pad(deaccent(data.serial).toUpperCase().replace(/-/g, '') +
+          '<DOM<' + deaccent(sujeto(data)) + '<' + deaccent(certDe(data)), 44)
     ];
   }
 
 
   /* ---------- datos de muestra, solo para la portada ---------- */
 
-  var MUESTRA = {
-    palomo: {
-      titulo: 'CARNET DE PALOMO', hashtag: 'palomos',
-      nivelEtiqueta: 'Nivel de tigueraje', vence: 'DE POR VIDA',
-      categoria: 'PALOMO CERTIFICADO', oficio: 'TRABAJAR Y EVITAR PROBLEMAS',
-      antecedentes: 'NINGUNO, GRACIAS A DIOS',
-      titulos: {
-        oficial: 'CARNET DE PALOMO',
-        hielo: 'CARNET DE PALOMO',
-        institucional: 'CARNET DE PALOMO',
-        crema: 'CERTIFICADO DE PALOMO',
-        carbon: 'CARNET DE PALOMO',
-        candela: 'CREDENCIAL DE PALOMO',
-        solapin: 'CARNET DE PALOMO',
-        asodopa: 'CERTIFICADO DE PALOMO',
-        nocturno: 'CARNET DE PALOMO',
-        tricolor: 'CERTIFICADO DE PALOMO',
-        esmeralda: 'CREDENCIAL DE PALOMO'
-      },
-      emisores: {
-        oficial: ['Ministerio de Palomos', 'MINPAL'],
-        institucional: ['Dirección General del Palomaje', 'DGP'],
-        crema: ['Instituto Nacional del Palomaje', 'INAPAL'],
-        hielo: ['Comisión Nacional de Palomos', 'CONAPAL'],
-        carbon: ['Consejo Superior de Palomos', 'CONSUPAL'],
-        candela: ['Registro Nacional de Palomos', 'RENAPAL'],
-        solapin: ['Federación Dominicana de Palomos', 'FEDOPAL'],
-        asodopa: ['Asociación Dominicana de Palomos', 'ASODOPA'],
-        nocturno: ['Cámara Dominicana de Palomos', 'CADOPAL'],
-        tricolor: ['Asociación Nacional de Palomos', 'ANPC'],
-        esmeralda: ['Junta Central de Palomos', 'JCP']
-      },
-      frases: {
-        oficial: 'La paz también es una forma de éxito.',
-        hielo: 'Aquí no hay líos, aquí hay carnet.',
-        institucional: 'El que se queda en su casa, siempre gana.',
-        crema: 'Aquí no andamos en gente.',
-        carbon: 'El que no debe, duerme tranquilo.',
-        candela: 'Mi casa, mi paz, mi gente.',
-        solapin: 'No es un sueño, es un palomo certificado.',
-        asodopa: 'Mejor tranquilo en mi casa que en líos en la calle.',
-        nocturno: 'Sin líos, sin cuentos, sin maña.',
-        tricolor: "Pa' los palomos de verdad.",
-        esmeralda: 'Tranquilo en su casa, todo frío.'
-      }
-    },
-    pariguayo: {
-      titulo: 'CARNET DE PARIGUAYO', hashtag: 'pariguayos',
-      nivelEtiqueta: 'Nivel de flow', vence: 'DE POR VIDA',
-      categoria: 'PARIGUAYO CERTIFICADO', oficio: 'CUIDANDO LOS BULTOS',
-      antecedentes: 'NINGUNO, NI BAILANDO',
-      titulos: {
-        oficial: 'CARNET DE PARIGUAYO',
-        hielo: 'CARNET DE PARIGUAYO',
-        institucional: 'CARNET DE PARIGUAYO',
-        crema: 'CERTIFICADO DE PARIGUAYO',
-        carbon: 'CARNET DE PARIGUAYO',
-        candela: 'CREDENCIAL DE PARIGUAYO',
-        solapin: 'CARNET DE PARIGUAYO',
-        asodopa: 'CERTIFICADO DE PARIGUAYO',
-        nocturno: 'CARNET DE PARIGUAYO',
-        tricolor: 'CERTIFICADO DE PARIGUAYO',
-        esmeralda: 'CREDENCIAL DE PARIGUAYO'
-      },
-      emisores: {
-        oficial: ['Ministerio de Pariguayos', 'MINPAR'],
-        institucional: ['Dirección General del Pariguayaje', 'DGPAR'],
-        crema: ['Instituto Nacional del Pariguayaje', 'INAPARI'],
-        hielo: ['Comisión Nacional de Pariguayos', 'CONAPARI'],
-        carbon: ['Consejo Superior de Pariguayos', 'CONSUPARI'],
-        candela: ['Registro Nacional de Pariguayos', 'RENAPARI'],
-        solapin: ['Federación Dominicana de Pariguayos', 'FEDOPARI'],
-        asodopa: ['Asociación Dominicana de Pariguayos', 'ASODOPARI'],
-        nocturno: ['Cámara Dominicana de Pariguayos', 'CADOPARI'],
-        tricolor: ['Asociación Nacional de Pariguayos', 'ANPAR'],
-        esmeralda: ['Junta Central de Pariguayos', 'JCPAR']
-      },
-      frases: {
-        oficial: 'El que no baila, observa.',
-        hielo: 'Aquí no se baila, aquí se observa.',
-        institucional: 'Yo no bailo, yo cuido los bultos.',
-        crema: 'Yo vine fue a mirar.',
-        carbon: 'El que graba no baila.',
-        candela: 'Sosteniendo la pared desde siempre.',
-        solapin: 'No es un sueño, es un pariguayo certificado.',
-        asodopa: 'Llegué temprano y me quedé en la esquina.',
-        nocturno: 'Buscando el hielo toda la noche.',
-        tricolor: "Pa' los pariguayos de verdad.",
-        esmeralda: 'Parado ahí, como siempre.'
-      }
-    }
-  };
+  /* ---------- datos de muestra ---------- */
 
-  function datosMuestra(tipo, estilo, foto) {
-    var m = MUESTRA[tipo] || MUESTRA.palomo;
-    var em = m.emisores[estilo] || m.emisores.oficial;
+  // El registro que el Worker inyectó en la página. Es el mismo objeto
+  // que usa el servidor: ya no hay dos catálogos que sincronizar.
+  function registro() {
+    return (global.PALOMOS && global.PALOMOS.carnets) || {};
+  }
+
+  function carnetDe(id) {
+    var r = registro();
+    return r[id] || r[Object.keys(r)[0]] || null;
+  }
+
+  function tiposDisponibles() {
+    return (global.PALOMOS && global.PALOMOS.orden) || Object.keys(registro());
+  }
+
+  // Resuelve un texto según el género: cadena suelta o { m, f }.
+  function gx(v, genero) {
+    if (typeof v === 'string') { return v; }
+    if (!v) { return ''; }
+    return (genero === 'f' && v.f) ? v.f : v.m;
+  }
+
+  // Los mismos datos que devuelve el servidor, pero de mentira, para
+  // las vistas previas. No pide nada a la API: así mirar los diseños no
+  // gasta números del contador.
+  function datosMuestra(tipo, estilo, foto, genero) {
+    var c = carnetDe(tipo);
+    if (!c) { return null; }
+
+    var gen = genero || 'm';
+    var t = function (v) { return gx(v, gen); };
+    var em = c.emisores[estilo] || c.emisores.oficial;
+
     var hoy = new Date();
     var dd = String(hoy.getDate()).padStart(2, '0');
     var mm = String(hoy.getMonth() + 1).padStart(2, '0');
 
+    var nombre = gen === 'f' ? 'MARIA ' + t(c.sujeto) : 'JUAN ' + t(c.sujeto);
+
     return {
-      nombre: tipo === 'pariguayo' ? 'JUAN PARIGUAYO' : 'JUAN PALOMO',
-      serial: (tipo === 'pariguayo' ? 'PAR' : 'PAL') + '-000001-7',
+      nombre: nombre,
+      serial: c.prefijo + '-000001-7',
       nivel: 0,
-      nivelEtiqueta: m.nivelEtiqueta,
-      categoria: m.categoria,
-      oficio: m.oficio,
-      antecedentes: m.antecedentes,
+      nivelEtiqueta: t(c.nivelEtiqueta),
+      categoria: t(c.condiciones[0]),
+      oficio: t(c.oficios[0]),
+      antecedentes: t(c.antecedentes[0]),
       lugar: 'SANTO DOMINGO',
       emitido: dd + '/' + mm + '/' + hoy.getFullYear(),
-      vence: m.vence,
-      emisor: em[0], siglas: em[1],
-      titulo: (m.titulos && m.titulos[estilo]) || m.titulo,
-      frase: m.frases[estilo] || m.frases.oficial,
-      hashtag: m.hashtag,
+      vence: t(c.vence),
+      emisor: em.nombre, siglas: em.siglas,
+      titulo: t((c.titulos && c.titulos[estilo]) || c.titulo),
+      frase: t(c.frases[estilo] || c.frases.oficial),
+      hashtag: c.hashtag,
+      sujeto: t(c.sujeto),
+      certificado: gen === 'f' ? 'CERTIFICADA' : 'CERTIFICADO',
+      lema: t(c.lema),
+      cintilla: t(c.cintilla),
+      citas: (c.citas || []).map(t),
+      sello: (c.sello || []).map(t),
       concepto: '',
       qrUrl: 'https://palomos.com.do',
       photo: foto
@@ -882,7 +833,7 @@
   // Las diez combinaciones, en el orden en que se enseñan.
   function catalogo() {
     var lista = [];
-    ['palomo', 'pariguayo'].forEach(function (t) {
+    tiposDisponibles().forEach(function (t) {
       ORDEN.forEach(function (e) {
         lista.push({ tipo: t, estilo: e, nombre: ESTILOS[e].nombre, familia: ESTILOS[e].familia });
       });
@@ -1002,7 +953,7 @@
         tracked(ctx, titulo, W - 32 - tw, 46, 1.6);
         ctx.fillStyle = C.red;
         ctx.font = font(700, 11);
-        var t2 = 'CERTIFICADO';
+        var t2 = certDe(data);
         var tw2 = trackedWidth(ctx, t2, 2.6);
         tracked(ctx, t2, W - 32 - tw2, 66, 2.6);
       })();
@@ -1161,7 +1112,7 @@
     (function () {
       ctx.fillStyle = C.navy;
       ctx.font = 'italic ' + font(700, 17);
-      var f = lema(data);
+      var f = fraseImpresa(data);
       ctx.font = 'italic ' + font(700, fitText(ctx, f, 600, 700, 17, 11));
       ctx.fillText(f, 32, MY + 104);
 
@@ -1384,9 +1335,7 @@
       ctx.fillStyle = C.navy; ctx.font = font(800, 10);
       var t = 'SELLO OFICIAL';
       tracked(ctx, t, 698 - trackedWidth(ctx, t, 1.4) / 2, 510, 1.4);
-      var items = data.hashtag === 'pariguayos'
-        ? ['SIN BAILAR', 'CON EL VASO', 'EN LA ESQUINA', 'MIRANDO']
-        : ['SIN ENREDOS', 'SIN PROBLEMAS', 'EN MI CASA', 'TRANQUILO'];
+      var items = selloDe(data);
       ctx.font = font(700, 11);
       items.forEach(function (it, i) {
         ctx.fillStyle = C.red;  ctx.fillText('✓', 614, 530 + i * 15);
@@ -1397,7 +1346,7 @@
     (function () {
       ctx.save(); ctx.translate(890, 536); ctx.rotate(-0.15);
       ctx.globalAlpha = 0.6;
-      drawSello(ctx, 0, 0, 88, data.siglas || '', 'CERTIFICADO', C.navy);
+      drawSello(ctx, 0, 0, 88, data.siglas || '', certDe(data), C.navy);
       ctx.restore();
     })();
 
@@ -1468,7 +1417,7 @@
     ctx.fillStyle = C.navy;
     roundRect(ctx, px, py + ph + 6, pw, 34, 5); ctx.fill();
     ctx.fillStyle = '#fff';
-    var cin = 'Un ' + sujeto(data).charAt(0) + sujeto(data).slice(1).toLowerCase() + ' Certificado';
+    var cin = cintillaDe(data);
     // «Un Pariguayo Certificado» no cabe donde cabia «Un Palomo
     // Certificado»: se encoge hasta entrar en la cintilla.
     var zc = fitText(ctx, cin, pw - 20, 700, 16, 11, 'Georgia, serif');
@@ -1487,7 +1436,7 @@
     ctx.fillText(suj, tx, 196);
 
     ctx.font = font(700, 19);
-    tracked(ctx, 'CERTIFICADO', tx + 8, 228, 5);
+    tracked(ctx, certDe(data), tx + 8, 228, 5);
 
 
     drawEmblema(ctx, 734, 160, 132, C.navy);
@@ -1526,7 +1475,7 @@
       ctx.font = 'italic ' + font(600, 19, 'Georgia, serif');
       ctx.fillStyle = C.navy;
       var y = 330;
-      envolver(ctx, '«' + lema(data) + '»', 216).forEach(function (ln) {
+      envolver(ctx, '«' + fraseImpresa(data) + '»', 216).forEach(function (ln) {
         ctx.fillText(ln, 986 - ctx.measureText(ln).width, y);
         y += 26;
       });
@@ -1623,7 +1572,7 @@
     ctx.fillText(suj, tx, 188);
 
     ctx.font = font(700, 17);
-    var cert = 'CERTIFICADO';
+    var cert = certDe(data);
     tracked(ctx, cert, tx + 16, 216, 5.5);
     ctx.strokeStyle = C.navy; ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1669,7 +1618,7 @@
       ctx.font = 'italic ' + font(600, 18, 'Georgia, serif');
       ctx.fillStyle = C.navy;
       var y = 300;
-      envolver(ctx, '«' + lema(data) + '»', 200).forEach(function (ln) {
+      envolver(ctx, '«' + fraseImpresa(data) + '»', 200).forEach(function (ln) {
         ctx.fillText(ln, 982 - ctx.measureText(ln).width, y);
         y += 25;
       });
@@ -1741,9 +1690,10 @@
     ctx.fillRect(hx, 102, 700, 3);
 
     ctx.fillStyle = C.navy;
-    var zt = fitText(ctx, data.titulo + ' CERTIFICADO', 660, 800, 33, 19);
+    var tituloLargo = data.titulo + ' ' + certDe(data);
+    var zt = fitText(ctx, tituloLargo, 660, 800, 33, 19);
     ctx.font = font(800, zt);
-    ctx.fillText(data.titulo + ' CERTIFICADO', hx, 156);
+    ctx.fillText(tituloLargo, hx, 156);
 
     var px = 44, py = 196, pw = 196, ph = 242;
     ctx.save();
@@ -1795,7 +1745,7 @@
     ctx.beginPath(); ctx.moveTo(44, 578); ctx.lineTo(968, 578); ctx.stroke();
 
     ctx.fillStyle = C.navy;
-    var fr = lema(data).toUpperCase();
+    var fr = fraseImpresa(data).toUpperCase();
     var zf = fitText(ctx, fr, 880, 800, 46, 20);
     ctx.font = font(800, zf);
     ctx.fillText(fr, w / 2 - ctx.measureText(fr).width / 2, 552);
@@ -1847,7 +1797,7 @@
     var palabras = titulo.split(' ');
     var l1 = palabras[0];
     var l2 = palabras.slice(1).join(' ');
-    var l3 = /CERTIFICADO/.test(titulo) ? 'OFICIAL' : 'CERTIFICADO';
+    var l3 = /CERTIFICAD/.test(titulo) ? 'OFICIAL' : certDe(data);
 
     ctx.fillStyle = C.navy;
     var TMAX = 430;
@@ -1942,7 +1892,7 @@
     ctx.fillRect(0, h - PIE, w, PIE);
 
     ctx.fillStyle = C.bandaTinta || '#fff';
-    var fr = lema(data).toUpperCase();
+    var fr = fraseImpresa(data).toUpperCase();
     var zf = fitText(ctx, fr, w - 150, 800, 22, 12);
     ctx.font = 'italic ' + font(800, zf);
     var af = ctx.measureText(fr).width;
@@ -2009,7 +1959,7 @@
 
     ctx.font = font(700, 18);
     ctx.globalAlpha = 0.85;
-    tracked(ctx, 'CERTIFICADO · ' + (data.siglas || ''), 62, 260, 4);
+    tracked(ctx, certDe(data) + ' · ' + (data.siglas || ''), 62, 260, 4);
     ctx.fillText(data.emisor || '', 62, 292);
     ctx.globalAlpha = 1;
 
@@ -2079,9 +2029,9 @@
     // Frase y avisos al pie, dentro de su franja y sin pisar el QR.
     var libre = qx - 84;
     ctx.fillStyle = tinta;
-    var zf = fitText(ctx, lema(data), libre, 700, 24, 14);
+    var zf = fitText(ctx, fraseImpresa(data), libre, 700, 24, 14);
     ctx.font = 'italic ' + font(700, zf);
-    ctx.fillText(lema(data), 60, h - 118);
+    ctx.fillText(fraseImpresa(data), 60, h - 118);
 
     ctx.font = font(800, 22);
     ctx.globalAlpha = 0.95;
@@ -2113,6 +2063,9 @@
     },
     catalogo: catalogo,
     datosMuestra: datosMuestra,
+    carnets: registro,
+    tipos: tiposDisponibles,
+    texto: gx,
     drawEmblema: drawEmblema,
     W: W,
     H: H

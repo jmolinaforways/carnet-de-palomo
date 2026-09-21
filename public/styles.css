@@ -555,12 +555,13 @@ img, canvas, video, svg{max-width:100%}
 /* Sin raton bajan a flanquear el nombre del diseno: encima del carnet
    taparian justo la foto y el QR, que es lo que se esta mirando. */
 @media (hover:none){
-  .flecha{
-    width:36px;height:36px;font-size:23px;
-    top:auto;bottom:-44px;transform:none;
-  }
-  .flecha.izq{left:26px}
-  .flecha.der{right:26px}
+  .flecha{width:36px;height:36px;font-size:23px}
+
+  /* Solo en el carrusel de disenos bajan a flanquear el nombre. En el
+     de la portada, debajo estan los puntos y se pisarian. */
+  .pista-selector .flecha{top:auto;bottom:-44px;transform:none}
+  .pista-selector .flecha.izq{left:26px}
+  .pista-selector .flecha.der{right:26px}
   .carrusel-pie{min-height:36px;line-height:36px;font-size:15px}
 }
 .lamina{
@@ -738,4 +739,69 @@ img, canvas, video, svg{max-width:100%}
 @media (max-width:359px){
   .sigueme-btn{padding:8px 11px;font-size:12px}
   .sigueme{gap:9px}
+}
+
+/* ---------- elegir el carnet, lo primero de la portada ---------- */
+
+.elige{margin:26px 0 4px}
+.elige-tit{
+  margin:0 0 12px;
+  font:800 19px/1.2 'Archivo',system-ui,sans-serif;color:#eaf0fb;
+  text-align:center;
+}
+.busca{
+  display:flex;align-items:center;gap:9px;
+  margin:0 0 12px;padding:0 13px;
+  border:1px solid var(--line);border-radius:12px;
+  background:rgba(255,255,255,.06);
+}
+.busca-lupa{font-size:14px;opacity:.6;line-height:1}
+.busca input{
+  flex:1;min-width:0;
+  padding:12px 0;border:0;background:none;color:#eaf0fb;
+  font:600 15px/1 'Archivo',system-ui,sans-serif;
+}
+.busca input:focus{outline:none}
+.busca input::placeholder{color:#7d8ea8;font-weight:500}
+.busca input::-webkit-search-cancel-button{filter:invert(.6)}
+
+.carnets{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
+.carnet-op{
+  padding:11px 16px;
+  border:1px solid var(--line);border-radius:12px;
+  background:rgba(255,255,255,.05);color:#c3d2ec;cursor:pointer;
+  font:700 15px/1 'Archivo',system-ui,sans-serif;
+  transition:background .16s,border-color .16s,color .16s;
+}
+.carnet-op:hover{background:rgba(255,255,255,.1)}
+.carnet-op.elegido{
+  background:linear-gradient(180deg,var(--red),#a80e1f);
+  border-color:transparent;color:#fff;
+}
+.sin-resultados{
+  margin:10px 0 0;text-align:center;
+  font-size:13.5px;color:var(--muted);
+}
+
+/* ---------- el género ---------- */
+
+.genero{
+  margin:18px 0 0;padding:0;border:0;
+}
+.genero legend{
+  padding:0;margin:0 0 9px;
+  font:700 12px/1 'Archivo',system-ui,sans-serif;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.genero-ops{display:flex;gap:8px;flex-wrap:wrap}
+.gen{
+  flex:1;min-width:84px;min-height:46px;padding:0 12px;
+  border:1px solid var(--line);border-radius:11px;cursor:pointer;
+  background:rgba(255,255,255,.06);color:#c3d2ec;
+  font:700 14px/1.2 'Archivo',system-ui,sans-serif;
+  transition:background .16s,border-color .16s,color .16s;
+}
+.gen.activo{
+  background:linear-gradient(180deg,#1d56b0,#0b3070);
+  border-color:transparent;color:#fff;
 }
