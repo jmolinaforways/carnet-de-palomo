@@ -71,9 +71,8 @@
       <h1>Carnet de Palomo</h1>
       <p class="sub">Tranquilo en su casa, todo fr&iacute;o. No tamo en l&iacute;os.</p>
 
-      <div class="demo" aria-label="Ejemplo de Carnet de Palomo">
-        <canvas id="demoCanvas"></canvas>
-      </div>
+      <div class="slider" id="slider" aria-label="Diseños disponibles"></div>
+      <p class="slider-pista">Desliza para ver los diseños &rarr;</p>
 
       <button class="btn btn-primary btn-xl" id="btnStart">Genera el tuyo</button>
       <p class="claim">Gratis, r&aacute;pido y sin dar datos personales.</p>
@@ -117,10 +116,32 @@
     </section>
   </section>
 
-  <!-- ================= PASO 1: DATOS ================= -->
+  <!-- ================= PASO 1: ELIGE ================= -->
+  <section class="step" id="step-estilo">
+    <div class="card-ui">
+      <p class="step-label">Paso 1 de 3</p>
+      <h2>Elige tus batallas</h2>
+      <p class="hint">&iquest;Eres de los que se queda tranquilo en su casa, o de los que va
+      a la fiesta y no baila? Elige y luego el dise&ntilde;o.</p>
+
+      <div class="tipos" role="tablist">
+        <button class="tipo activo" id="tipoPalomo" type="button" role="tab">Palomo</button>
+        <button class="tipo" id="tipoPariguayo" type="button" role="tab">Pariguayo</button>
+      </div>
+
+      <div class="disenos" id="disenos"></div>
+
+      <div class="row-actions">
+        <button class="btn btn-quiet" data-back>Atr&aacute;s</button>
+        <button class="btn btn-primary" id="btnSeguir" disabled>Continuar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PASO 2: DATOS ================= -->
   <section class="step" id="step-form">
     <div class="card-ui">
-      <p class="step-label">Paso 1 de 2</p>
+      <p class="step-label">Paso 2 de 3</p>
       <h2>&iquest;C&oacute;mo te llamas?</h2>
 
       <label class="field">

@@ -17,7 +17,9 @@
     stream: null,
     carnet: null,     // datos emitidos por el servidor
     blob: null,       // PNG listo para descargar/compartir
-    prevStep: 'step-form'
+    prevStep: 'step-form',
+    tipo: 'palomo',
+    estilo: 'oficial'
   };
 
   /* ---------------- navegación ---------------- */
@@ -56,26 +58,53 @@
     return cv;
   }
 
-  function paintDemo() {
-    var cv = $('demoCanvas');
-    if (!cv || !window.Carnet) { return; }
+  // Los diseños se dibujan aquí, con datos de muestra: la portada no le
+  // pide ni un carnet al servidor, que gastaría números del contador.
+  function miniatura(tipo, estilo, ancho) {
+    var cv = document.createElement('canvas');
+    window.Carnet.render(cv, window.Carnet.datosMuestra(tipo, estilo, fotoDemo()), 1, estilo);
+    var url = cv.toDataURL('image/jpeg', 0.82);
+    cv.width = cv.height = 0;   // el lienzo ya no hace falta
+    return url;
+  }
 
-    var hoy = new Date();
-    var dd = String(hoy.getDate()).padStart(2, '0');
-    var mm = String(hoy.getMonth() + 1).padStart(2, '0');
+  function pintarSlider() {
+    var cont = $('slider');
+    if (!cont || !window.Carnet) { return; }
+    cont.innerHTML = '';
+    window.Carnet.catalogo().forEach(function (c) {
+      var img = new Image();
+      img.src = miniatura(c.tipo, c.estilo);
+      img.alt = 'Carnet de ' + c.tipo + ', diseño ' + c.nombre;
+      img.loading = 'lazy';
+      cont.appendChild(img);
+    });
+  }
 
-    window.Carnet.render(cv, {
-      nombre: 'JUAN PALOMO',
-      serial: 'PAL-000001-7',
-      nivel: 97,
-      categoria: 'PALOMO CERTIFICADO',
-      lugar: 'SANTO DOMINGO',
-      oficio: 'TRANQUILO DE SU CASA',
-      emitido: dd + '/' + mm + '/' + hoy.getFullYear(),
-      vence: 'UN PALOMO NUNCA MUERE',
-      qrUrl: window.location.origin,
-      photo: fotoDemo()
-    }, 2);
+  function pintarSelector() {
+    var cont = $('disenos');
+    if (!cont || !window.Carnet) { return; }
+    cont.innerHTML = '';
+    window.Carnet.estilos().forEach(function (e) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'diseno' + (e.id === state.estilo ? ' elegido' : '');
+      b.innerHTML = '<img src="' + miniatura(state.tipo, e.id) + '" alt="">' +
+                    '<span>' + e.nombre + '</span>';
+      b.addEventListener('click', function () {
+        state.estilo = e.id;
+        pintarSelector();
+        $('btnSeguir').disabled = false;
+      });
+      cont.appendChild(b);
+    });
+  }
+
+  function elegirTipo(t) {
+    state.tipo = t;
+    $('tipoPalomo').classList.toggle('activo', t === 'palomo');
+    $('tipoPariguayo').classList.toggle('activo', t === 'pariguayo');
+    pintarSelector();
   }
 
   /* ---------------- foto ---------------- */
@@ -231,7 +260,9 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nombre: cleanName($('inNombre').value),
-        lugar: cleanName($('inLugar').value)
+        lugar: cleanName($('inLugar').value),
+        tipo: state.tipo,
+        estilo: state.estilo
       })
     }).then(function (r) {
       return r.json().then(function (j) {
@@ -265,22 +296,14 @@
 
   function drawResult(j) {
     return Promise.all([loadFonts(), window.Carnet.loadAssets()]).then(function () {
-      var data = {
-        nombre: j.nombre,
-        serial: j.serial,
-        emitido: j.emitido,
-        vence: j.vence,
-        nivel: j.nivel,
-        categoria: j.categoria,
-        lugar: j.lugar,
-        oficio: j.oficio,
+      var data = Object.assign({}, j, {
         qrUrl: j.verifyUrl,
         photo: state.photo
-      };
+      });
 
-      window.Carnet.render($('carnetCanvas'), data, EXPORT_SCALE);
+      window.Carnet.render($('carnetCanvas'), data, EXPORT_SCALE, j.estilo || state.estilo);
 
-      $('secuencial').textContent = 'Eres el palomo número ' +
+      $('secuencial').textContent = 'Eres el ' + (j.tipo || 'palomo') + ' número ' +
         Number(j.secuencial).toLocaleString('es-DO');
 
       $('verifyLink').href = j.verifyUrl;
@@ -408,16 +431,21 @@
     $('inLugar').value = '';
     $('inAcepto').checked = false;
     $('photoPreview').classList.remove('has-photo');
+    go('step-estilo');
     $('fileInput').value = '';
     validate();
-    go('step-form');
   }
 
   function init() {
-    paintDemo();
-    loadFonts().then(paintDemo);   // se repinta cuando llega la tipografía
+    loadFonts().then(function () {
+      pintarSlider();
+      pintarSelector();
+    });
 
-    $('btnStart').addEventListener('click', function () { go('step-form'); });
+    $('btnStart').addEventListener('click', function () { go('step-estilo'); });
+    $('tipoPalomo').addEventListener('click', function () { elegirTipo('palomo'); });
+    $('tipoPariguayo').addEventListener('click', function () { elegirTipo('pariguayo'); });
+    $('btnSeguir').addEventListener('click', function () { go('step-form'); });
 
     document.querySelectorAll('[data-back]').forEach(function (b) {
       b.addEventListener('click', function () { go('step-intro'); });

@@ -13,29 +13,137 @@
    verificar no requiere consultar nada.
    ========================================================================= */
 
-const CATEGORIAS = [
-  'PALOMO CERTIFICADO',
-  'PALOMO DE PRIMERA',
-  'PALOMO VITALICIO',
-  'TRANQUILO DE SU CASA',
-  'PALOMO SIN UNA MAÑA',
-  'PALOMO DE CONFIANZA',
-  'PALOMO HOMOLOGADO'
-];
+/* ---------------- las dos categorías ----------------
+
+   Palomo: el tranquilo de su casa, sin una maña.
+   Pariguayo: el que va a la fiesta y se queda mirando.
+
+   Cada una cambia quién emite el carnet y qué dice; el dibujo es el mismo.
+   En el token viaja solo la inicial, para que el QR no crezca.
+   ---------------------------------------------------------------- */
+
+const TIPOS = {
+  palomo: {
+    id: 'palomo',
+    inicial: 'p',
+    nombre: 'Palomo',
+    titulo: 'CARNET DE PALOMO',
+    nivelEtiqueta: 'Nivel de tigueraje',
+    hashtag: 'palomos',
+    vence: 'DE POR VIDA',
+    invitacion: 'Invita a tus panas palomos al club.',
+
+    // Una institución por estilo, para que cada diseño tenga su voz.
+    emisores: {
+      oficial:  { nombre: 'Ministerio de Palomos', siglas: 'MINPAL' },
+      titular:  { nombre: 'Dirección General del Palomaje', siglas: 'DGP' },
+      asodopa:  { nombre: 'Asociación Dominicana de Palomos', siglas: 'ASODOPA' },
+      nocturno: { nombre: 'Federación Dominicana de Palomos', siglas: 'FEDOPAL' },
+      tricolor: { nombre: 'Asociación Nacional de Palomos', siglas: 'ANPC' }
+    },
+
+    frases: {
+      oficial:  'La paz también es una forma de éxito.',
+      titular:  'El que se queda en su casa, siempre gana.',
+      asodopa:  'Mejor tranquilo en mi casa que en líos en la calle.',
+      nocturno: 'No es un sueño, es un palomo certificado.',
+      tricolor: "Pa' los palomos de verdad."
+    },
+
+    condiciones: [
+      'PALOMO CERTIFICADO',
+      'OFICIALMENTE PALOMO',
+      'PALOMO VERIFICADO',
+      'PALOMO DE PRIMERA',
+      'PALOMO VITALICIO',
+      'TRANQUILO DE SU CASA',
+      'PALOMO SIN UNA MAÑA'
+    ],
+    oficios: [
+      'TRABAJAR Y EVITAR PROBLEMAS',
+      'DE LA CASA AL TRABAJO',
+      'CASA, COLMADO Y CASA',
+      'DISFRUTAR MI FAMILIA',
+      'SERENO DE SU CASA',
+      'NI FU NI FA',
+      'EN SU CASA TEMPRANO'
+    ],
+    antecedentes: [
+      'NINGUNO, GRACIAS A DIOS',
+      'NINGUNO',
+      'LIMPIO COMO EL AGUA',
+      'NI UNA MULTA',
+      'NINGUNO, PREGUNTE'
+    ]
+  },
+
+  pariguayo: {
+    id: 'pariguayo',
+    inicial: 'g',
+    nombre: 'Pariguayo',
+    titulo: 'CARNET DE PARIGUAYO',
+    nivelEtiqueta: 'Nivel de flow',
+    hashtag: 'pariguayos',
+    vence: 'DE POR VIDA',
+    invitacion: 'Invita a tus panas pariguayos al club.',
+
+    emisores: {
+      oficial:  { nombre: 'Ministerio de Pariguayos', siglas: 'MINPAR' },
+      titular:  { nombre: 'Dirección General del Pariguayaje', siglas: 'DGPAR' },
+      asodopa:  { nombre: 'Asociación Dominicana de Pariguayos', siglas: 'ASODOPARI' },
+      nocturno: { nombre: 'Federación Dominicana de Pariguayos', siglas: 'FEDOPARI' },
+      tricolor: { nombre: 'Asociación Nacional de Pariguayos', siglas: 'ANPAR' }
+    },
+
+    frases: {
+      oficial:  'El que no baila, observa.',
+      titular:  'Yo no bailo, yo cuido los bultos.',
+      asodopa:  'Llegué temprano y me quedé en la esquina.',
+      nocturno: 'No es un sueño, es un pariguayo certificado.',
+      tricolor: "Pa' los pariguayos de verdad."
+    },
+
+    condiciones: [
+      'PARIGUAYO CERTIFICADO',
+      'OFICIALMENTE PARIGUAYO',
+      'PARIGUAYO VERIFICADO',
+      'MIRÓN OFICIAL',
+      'PARIGUAYO VITALICIO',
+      'EL QUE NO BAILA',
+      'PARIGUAYO DE PRIMERA'
+    ],
+    oficios: [
+      'SOSTENIENDO LA PARED',
+      'CUIDANDO LOS BULTOS',
+      'MIRANDO LA FIESTA',
+      'PARADO EN LA ESQUINA',
+      'BUSCANDO EL HIELO',
+      'GUARDANDO EL PUESTO',
+      'GRABANDO A LOS DEMÁS'
+    ],
+    antecedentes: [
+      'NINGUNO, NI BAILANDO',
+      'NINGUNO, GRACIAS A DIOS',
+      'NUNCA ME HE TIRADO',
+      'CERO PASOS DADOS',
+      'NINGUNO, PREGUNTE'
+    ]
+  }
+};
+
+function tipoDe(v) {
+  if (v === 'pariguayo' || v === 'g') return TIPOS.pariguayo;
+  return TIPOS.palomo;
+}
+
+// Los cinco estilos. El servidor solo necesita saber cuáles existen para
+// entregar el emisor y la frase que le tocan a cada uno.
+const ESTILOS = ['oficial', 'titular', 'asodopa', 'nocturno', 'tricolor'];
+const estiloDe = (v) => (ESTILOS.includes(v) ? v : 'oficial');
 
 // Lo que sale en el carnet cuando no escriben de dónde son. El lugar viaja
 // dentro del token firmado, así que verificarlo no consulta nada.
 const SIN_LUGAR = 'NO DECLARADO';
-
-const OFICIOS = [
-  'TRANQUILO DE SU CASA',
-  'DE LA CASA AL TRABAJO',
-  'CASA, COLMADO Y CASA',
-  'SIN MAÑA ALGUNA',
-  'SERENO DE SU CASA',
-  'NI FU NI FA',
-  'EN SU CASA TEMPRANO'
-];
 
 /* ---------------- Durable Object: el contador ---------------- */
 
@@ -47,20 +155,33 @@ export class Secuencia {
   // Cada Durable Object atiende una petición a la vez, así que el
   // incremento es atómico sin necesidad de bloqueos.
   async fetch(request) {
+    const url = new URL(request.url);
     const actual = (await this.state.storage.get('n')) || 0;
+    const cab = { 'Content-Type': 'application/json' };
 
     // /peek solo mira el contador; sirve para verificar sin emitir.
-    if (new URL(request.url).pathname === '/peek') {
-      return new Response(JSON.stringify({ n: actual }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
+    if (url.pathname === '/peek') {
+      return new Response(JSON.stringify({ n: actual }), { headers: cab });
+    }
+
+    // /stats devuelve además qué diseños se eligen más. Es un recuento
+    // por diseño, no por persona: no sabe quién eligió qué.
+    if (url.pathname === '/stats') {
+      const disenos = (await this.state.storage.get('disenos')) || {};
+      return new Response(JSON.stringify({ n: actual, disenos }), { headers: cab });
     }
 
     const siguiente = actual + 1;
     await this.state.storage.put('n', siguiente);
-    return new Response(JSON.stringify({ n: siguiente }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    const clave = url.searchParams.get('d');
+    if (clave) {
+      const disenos = (await this.state.storage.get('disenos')) || {};
+      disenos[clave] = (disenos[clave] || 0) + 1;
+      await this.state.storage.put('disenos', disenos);
+    }
+
+    return new Response(JSON.stringify({ n: siguiente }), { headers: cab });
   }
 }
 
@@ -142,15 +263,33 @@ async function readToken(secret, token) {
 // sale del nombre, así que es estable: el mismo nombre siempre tiene la
 // misma condición y el mismo nivel de palomería, aunque saque el carnet
 // diez veces.
-async function derive(secret, nombre, seq) {
+async function derive(secret, nombre, seq, tipo, estilo) {
   const mac = await sign(secret, 'palomo:v2:' + nombre.toLocaleLowerCase('es'));
   const chk = await sign(secret, 'palomo:chk:' + seq);
+  const prefijo = tipo.id === 'pariguayo' ? 'PAR' : 'PAL';
+  const emisor = tipo.emisores[estilo] || tipo.emisores.oficial;
 
   return {
-    serial: `PAL-${String(seq).padStart(6, '0')}-${chk[0] % 10}`,
-    nivel: 82 + (mac[5] % 19),
-    categoria: CATEGORIAS[mac[6] % CATEGORIAS.length],
-    oficio: OFICIOS[mac[8] % OFICIOS.length]
+    tipo: tipo.id,
+    estilo,
+    serial: `${prefijo}-${String(seq).padStart(6, '0')}-${chk[0] % 10}`,
+
+    // El chiste está invertido: un palomo tiene CERO tigueraje. Una barra
+    // casi vacía dice más que un 97 por ciento.
+    nivel: (mac[5] % 30) / 10,
+    nivelEtiqueta: tipo.nivelEtiqueta,
+
+    categoria: tipo.condiciones[mac[6] % tipo.condiciones.length],
+    oficio: tipo.oficios[mac[8] % tipo.oficios.length],
+    antecedentes: tipo.antecedentes[mac[9] % tipo.antecedentes.length],
+    vence: tipo.vence,
+
+    emisor: emisor.nombre,
+    siglas: emisor.siglas,
+    titulo: tipo.titulo,
+    frase: tipo.frases[estilo] || tipo.frases.oficial,
+    hashtag: tipo.hashtag,
+    invitacion: tipo.invitacion
   };
 }
 
@@ -180,11 +319,12 @@ function contador(env) {
   return env.SECUENCIA.get(env.SECUENCIA.idFromName(CONTADOR));
 }
 
-async function siguienteSecuencial(env) {
+async function siguienteSecuencial(env, diseno) {
   // Si el contador falla, el sitio no se cae: damos un número basado en
   // el reloj. No es correlativo, pero sigue siendo único.
   try {
-    const res = await contador(env).fetch('https://secuencia/next');
+    const q = diseno ? '?d=' + encodeURIComponent(diseno) : '';
+    const res = await contador(env).fetch('https://secuencia/next' + q);
     const { n } = await res.json();
     if (Number.isInteger(n) && n > 0) return n;
   } catch {
@@ -341,11 +481,13 @@ async function emitir(request, env) {
   const secret = secretoDe(env, new URL(request.url));
   if (!secret) return json({ ok: false, error: SIN_LLAVE }, 503);
 
+  const tipo = tipoDe(body && body.tipo);
+  const estilo = estiloDe(body && body.estilo);
   const emitido = hoyRD();
-  const seq = await siguienteSecuencial(env);
-  const datos = await derive(secret, nombre, seq);
+  const seq = await siguienteSecuencial(env, tipo.id + ':' + estilo);
+  const datos = await derive(secret, nombre, seq, tipo, estilo);
   const token = await makeToken(secret, {
-    n: nombre, e: emitido, q: seq, l: lugar
+    n: nombre, e: emitido, q: seq, l: lugar, t: tipo.inicial
   });
 
   return json({
@@ -355,7 +497,6 @@ async function emitir(request, env) {
     ...datos,
     lugar,
     emitido,
-    vence: 'UN PALOMO NUNCA MUERE',
     token,
     verifyUrl: `${new URL(request.url).origin}/v/${token}`
   });
@@ -377,7 +518,8 @@ async function verificar(request, env, token) {
   }
 
   const nombre = limpiarNombre(payload.n);
-  const datos = await derive(secret, nombre, payload.q);
+  const tipo = tipoDe(payload.t);
+  const datos = await derive(secret, nombre, payload.q, tipo, 'oficial');
   const lugar = limpiarLugar(payload.l) || SIN_LUGAR;
 
   return new Response(
@@ -481,19 +623,20 @@ function paginaVerificado(d) {
     `
 <div class="stamp" style="color:#5fd39a">✓</div>
 <h1>Carnet auténtico</h1>
-<p class="lead">El Ministerio de Palomos confirma que este carnet fue emitido por nosotros
+<p class="lead">El ${esc(d.emisor)} confirma que este carnet fue emitido por nosotros
 y que sus datos no han sido alterados.</p>
 
 <div class="panel">
   <div class="row"><span class="k">Nombre</span><span class="v">${esc(d.nombre)}</span></div>
-  <div class="row"><span class="k">No. de palomo</span><span class="v mono">${esc(d.serial)}</span></div>
-  <div class="row"><span class="k">Palomo número</span><span class="v mono">${d.secuencial}</span></div>
+  <div class="row"><span class="k">No. de ${esc(d.tipo)}</span><span class="v mono">${esc(d.serial)}</span></div>
+  <div class="row"><span class="k">${esc(d.tipo)} número</span><span class="v mono">${d.secuencial}</span></div>
   <div class="row"><span class="k">Condición</span><span class="v">${esc(d.categoria)}</span></div>
-  <div class="row"><span class="k">Nivel de palomería</span><span class="v mono">${d.nivel}%</span></div>
+  <div class="row"><span class="k">${esc(d.nivelEtiqueta)}</span><span class="v mono">${d.nivel.toFixed(1)}%</span></div>
+  <div class="row"><span class="k">Antecedentes</span><span class="v">${esc(d.antecedentes)}</span></div>
   <div class="row"><span class="k">Lugar de tranquilidad</span><span class="v">${esc(d.lugar)}</span></div>
   <div class="row"><span class="k">Ocupación u oficio</span><span class="v">${esc(d.oficio)}</span></div>
   <div class="row"><span class="k">Emitido</span><span class="v mono">${esc(d.emitido)}</span></div>
-  <div class="row"><span class="k">Vence</span><span class="v">UN PALOMO NUNCA MUERE</span></div>
+  <div class="row"><span class="k">Vence</span><span class="v">${esc(d.vence)}</span></div>
 </div>
 
 <a class="cta" href="/">Sacar mi propio carnet</a>`
@@ -743,6 +886,16 @@ export default {
 
     if (path.startsWith('/v/')) {
       return verificar(request, env, decodeURIComponent(path.slice(3)));
+    }
+
+    if (path === '/api/populares') {
+      try {
+        const res = await contador(env).fetch('https://secuencia/stats');
+        const { n, disenos } = await res.json();
+        return json({ ok: true, total: n, disenos: disenos || {} });
+      } catch {
+        return json({ ok: false, error: 'El registro no responde.' }, 503);
+      }
     }
 
     if (path === '/verificar') return rutaVerificar(request, env);

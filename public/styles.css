@@ -507,3 +507,60 @@ img, canvas, video, svg{max-width:100%}
   margin:12px 0 0;
   font-size:12.5px;line-height:1.55;color:var(--muted);
 }
+
+/* ---------- carrusel de la portada ---------- */
+.slider{
+  display:flex;gap:12px;
+  margin:24px -18px 8px;
+  padding:4px 18px 10px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.slider::-webkit-scrollbar{display:none}
+.slider img{
+  flex:0 0 auto;
+  width:min(300px,78vw);
+  height:auto;
+  scroll-snap-align:center;
+  border-radius:11px;
+  box-shadow:0 16px 36px -14px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.1);
+}
+.slider-pista{
+  margin:0 0 4px;
+  font-size:12.5px;color:var(--muted);
+}
+
+/* ---------- elegir categoría ---------- */
+.tipos{display:flex;gap:9px;margin:18px 0 16px}
+.tipo{
+  flex:1;min-height:50px;
+  border:1px solid var(--line);border-radius:12px;cursor:pointer;
+  background:rgba(255,255,255,.06);color:#c3d2ec;
+  font:700 16px/1 'Archivo',system-ui,sans-serif;
+  transition:background .16s,border-color .16s,color .16s;
+}
+.tipo.activo{
+  background:linear-gradient(180deg,var(--red),#a80e1f);
+  border-color:transparent;color:#fff;
+}
+
+/* ---------- rejilla de diseños ---------- */
+.disenos{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-bottom:6px;
+}
+.diseno{
+  padding:0;border:2px solid transparent;border-radius:12px;
+  background:rgba(255,255,255,.05);cursor:pointer;overflow:hidden;
+  transition:border-color .16s,transform .12s;
+}
+.diseno:active{transform:scale(.98)}
+.diseno img{width:100%;height:auto;display:block}
+.diseno span{
+  display:block;padding:7px 4px;
+  font:700 12px/1 'Archivo',system-ui,sans-serif;color:#a9bcd8;
+}
+.diseno.elegido{border-color:var(--rojo)}
+.diseno.elegido span{color:#fff}

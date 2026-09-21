@@ -14,16 +14,114 @@
 
   var SITIO = 'palomos.com.do';
 
-  var C = {
-    bg1:   '#fbfdff',
-    bg2:   '#e6eef7',
-    navy:  '#13294b',
-    navy2: '#31507f',
-    label: '#6b7c93',
-    red:   '#c8102e',
-    line:  'rgba(19,41,75,.16)',
-    ghost: '#9fb6d0'
+  /* ---------- los estilos entre los que se elige ----------
+
+     Cada uno es una paleta más un puñado de decisiones: si la cabecera es
+     una línea fina o una banda con el título en grande, y qué institución
+     lo emite. El dibujo es el mismo para todos.
+     ------------------------------------------------------------------- */
+
+  var ESTILOS = {
+    oficial: {
+      nombre: 'Oficial',
+      marca: 'PALOMOS', marcaFin: 'RD',
+      emisor: 'Ministerio de Palomos',
+      titulo: 'CARNET DE PALOMO',
+      cabecera: 'linea',
+      bg1: '#fbfdff', bg2: '#e6eef7',
+      navy: '#13294b', navy2: '#31507f',
+      label: '#6b7c93', red: '#c8102e',
+      line: 'rgba(19,41,75,.16)',
+      guilloche: '#b9cde2', guillocheAlfa: 0.45,
+      marcaAgua: 0.045,
+      formato: 'credencial',
+      pie: 'rgba(255,255,255,.82)', pieTinta: 'rgba(19,41,75,.82)',
+      suave: 'rgba(19,41,75,.25)', tenue: 'rgba(19,41,75,.12)'
+    },
+
+    asodopa: {
+      nombre: 'ASODOPA',
+      marca: 'ASODOPA', marcaFin: '',
+      emisor: 'Asociación Dominicana de Palomos',
+      titulo: 'CARNET DE MIEMBRO',
+      cabecera: 'banda',
+      banda: '#a4122a', bandaTinta: '#fff6ec',
+      bg1: '#fdfaf2', bg2: '#f0e6d2',
+      navy: '#3a2416', navy2: '#7a4a2c',
+      label: '#8a7157', red: '#a4122a',
+      line: 'rgba(58,36,22,.18)',
+      guilloche: '#d9c7a5', guillocheAlfa: 0.55,
+      marcaAgua: 0.05,
+      formato: 'solapin',
+      grad: ['#c8102e', '#7d0b1e'],
+      pie: 'rgba(255,252,244,.9)', pieTinta: 'rgba(58,36,22,.85)',
+      suave: 'rgba(58,36,22,.28)', tenue: 'rgba(58,36,22,.14)'
+    },
+
+    titular: {
+      nombre: 'Titular',
+      marca: 'PALOMOS', marcaFin: 'RD',
+      emisor: 'Ministerio de Palomos',
+      titulo: 'CARNET DE PALOMO',
+      cabecera: 'banda',
+      banda: '#13294b', bandaTinta: '#ffffff',
+      bg1: '#ffffff', bg2: '#e9eef5',
+      navy: '#13294b', navy2: '#31507f',
+      label: '#6b7c93', red: '#c8102e',
+      line: 'rgba(19,41,75,.16)',
+      guilloche: '#c3d2e2', guillocheAlfa: 0.4,
+      marcaAgua: 0.05,
+      formato: 'credencial',
+      pie: 'rgba(255,255,255,.88)', pieTinta: 'rgba(19,41,75,.85)',
+      suave: 'rgba(19,41,75,.25)', tenue: 'rgba(19,41,75,.12)'
+    },
+
+    nocturno: {
+      nombre: 'Nocturno',
+      marca: 'PALOMOS', marcaFin: 'RD',
+      emisor: 'Ministerio de Palomos',
+      titulo: 'CARNET DE PALOMO',
+      cabecera: 'banda',
+      banda: '#c8102e', bandaTinta: '#ffffff',
+      bg1: '#16294d', bg2: '#0a1730',
+      navy: '#eef3fb', navy2: '#7fb2ff',
+      label: '#8ea2c4', red: '#ff5f74',
+      line: 'rgba(255,255,255,.16)',
+      guilloche: '#2f4c80', guillocheAlfa: 0.55,
+      marcaAgua: 0.07,
+      formato: 'cuadrado',
+      grad: ['#1b3a72', '#07132b'],
+      pie: 'rgba(4,12,28,.55)', pieTinta: 'rgba(238,243,251,.88)',
+      suave: 'rgba(255,255,255,.28)', tenue: 'rgba(255,255,255,.14)'
+    },
+
+    tricolor: {
+      nombre: 'Tricolor',
+      cabecera: 'banda',
+      banda: '#002d62', bandaTinta: '#ffffff',
+      bg1: '#ffffff', bg2: '#f2f5f9',
+      navy: '#002d62', navy2: '#3a68a8',
+      label: '#6f7f96', red: '#ce1126',
+      line: 'rgba(0,45,98,.18)',
+      guilloche: '#cfdcea', guillocheAlfa: 0.5,
+      marcaAgua: 0.05,
+      formato: 'cuadrado',
+      grad: ['#002d62', '#ce1126'],
+      bandaGrad: ['#002d62', '#ce1126'],
+      pie: 'rgba(255,255,255,.88)', pieTinta: 'rgba(0,45,98,.85)',
+      suave: 'rgba(0,45,98,.25)', tenue: 'rgba(0,45,98,.12)'
+    }
   };
+
+  // Cinco estilos por dos categorías: diez carnets distintos.
+  var ORDEN = ['oficial', 'titular', 'asodopa', 'nocturno', 'tricolor'];
+
+  function estiloDe(id) {
+    return ESTILOS[id] || ESTILOS.oficial;
+  }
+
+  // Paleta activa. renderCarnet la cambia antes de dibujar.
+  var C = ESTILOS.oficial;
 
   var F = {
     sans: "'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
@@ -231,8 +329,8 @@
     ctx.rect(x, y, w, h);
     ctx.clip();
 
-    ctx.globalAlpha = 0.45;
-    ctx.strokeStyle = '#b9cde2';
+    ctx.globalAlpha = C.guillocheAlfa;
+    ctx.strokeStyle = C.guilloche;
     ctx.lineWidth = 0.8;
 
     for (var k = 0; k < 30; k++) {
@@ -325,7 +423,7 @@
     ctx.save();
     ctx.fillStyle = '#fff';
     ctx.fillRect(x, y, size, size);
-    ctx.fillStyle = C.navy;
+    ctx.fillStyle = '#101820';
     for (var r = 0; r < n; r++) {
       for (var c = 0; c < n; c++) {
         if (qr.isDark(r, c)) {
@@ -363,12 +461,103 @@
     ];
   }
 
+
+  /* ---------- datos de muestra, solo para la portada ---------- */
+
+  var MUESTRA = {
+    palomo: {
+      titulo: 'CARNET DE PALOMO', hashtag: 'palomos',
+      nivelEtiqueta: 'Nivel de tigueraje', vence: 'DE POR VIDA',
+      categoria: 'PALOMO CERTIFICADO', oficio: 'TRABAJAR Y EVITAR PROBLEMAS',
+      antecedentes: 'NINGUNO, GRACIAS A DIOS',
+      emisores: {
+        oficial:  ['Ministerio de Palomos', 'MINPAL'],
+        titular:  ['Dirección General del Palomaje', 'DGP'],
+        asodopa:  ['Asociación Dominicana de Palomos', 'ASODOPA'],
+        nocturno: ['Federación Dominicana de Palomos', 'FEDOPAL'],
+        tricolor: ['Asociación Nacional de Palomos', 'ANPC']
+      },
+      frases: {
+        oficial:  'La paz también es una forma de éxito.',
+        titular:  'El que se queda en su casa, siempre gana.',
+        asodopa:  'Mejor tranquilo en mi casa que en líos en la calle.',
+        nocturno: 'No es un sueño, es un palomo certificado.',
+        tricolor: "Pa' los palomos de verdad."
+      }
+    },
+    pariguayo: {
+      titulo: 'CARNET DE PARIGUAYO', hashtag: 'pariguayos',
+      nivelEtiqueta: 'Nivel de flow', vence: 'DE POR VIDA',
+      categoria: 'PARIGUAYO CERTIFICADO', oficio: 'CUIDANDO LOS BULTOS',
+      antecedentes: 'NINGUNO, NI BAILANDO',
+      emisores: {
+        oficial:  ['Ministerio de Pariguayos', 'MINPAR'],
+        titular:  ['Dirección General del Pariguayaje', 'DGPAR'],
+        asodopa:  ['Asociación Dominicana de Pariguayos', 'ASODOPARI'],
+        nocturno: ['Federación Dominicana de Pariguayos', 'FEDOPARI'],
+        tricolor: ['Asociación Nacional de Pariguayos', 'ANPAR']
+      },
+      frases: {
+        oficial:  'El que no baila, observa.',
+        titular:  'Yo no bailo, yo cuido los bultos.',
+        asodopa:  'Llegué temprano y me quedé en la esquina.',
+        nocturno: 'No es un sueño, es un pariguayo certificado.',
+        tricolor: "Pa' los pariguayos de verdad."
+      }
+    }
+  };
+
+  function datosMuestra(tipo, estilo, foto) {
+    var m = MUESTRA[tipo] || MUESTRA.palomo;
+    var em = m.emisores[estilo] || m.emisores.oficial;
+    var hoy = new Date();
+    var dd = String(hoy.getDate()).padStart(2, '0');
+    var mm = String(hoy.getMonth() + 1).padStart(2, '0');
+
+    return {
+      nombre: tipo === 'pariguayo' ? 'JUAN PARIGUAYO' : 'JUAN PALOMO',
+      serial: (tipo === 'pariguayo' ? 'PAR' : 'PAL') + '-000001-7',
+      nivel: 0,
+      nivelEtiqueta: m.nivelEtiqueta,
+      categoria: m.categoria,
+      oficio: m.oficio,
+      antecedentes: m.antecedentes,
+      lugar: 'SANTO DOMINGO',
+      emitido: dd + '/' + mm + '/' + hoy.getFullYear(),
+      vence: m.vence,
+      emisor: em[0], siglas: em[1],
+      titulo: m.titulo,
+      frase: m.frases[estilo] || m.frases.oficial,
+      hashtag: m.hashtag,
+      qrUrl: 'https://palomos.com.do',
+      photo: foto
+    };
+  }
+
+  // Las diez combinaciones, en el orden en que se enseñan.
+  function catalogo() {
+    var lista = [];
+    ['palomo', 'pariguayo'].forEach(function (t) {
+      ORDEN.forEach(function (e) {
+        lista.push({ tipo: t, estilo: e, nombre: ESTILOS[e].nombre });
+      });
+    });
+    return lista;
+  }
+
   /* =======================================================================
      Render
      ======================================================================= */
 
-  function renderCarnet(canvas, data, scale) {
+  function renderCarnet(canvas, data, scale, estiloId) {
+    C = estiloDe(estiloId || data.estilo);
     scale = scale || 1;
+    if (C.formato === 'solapin')  { return renderSolapin(canvas, data, scale); }
+    if (C.formato === 'cuadrado') { return renderCuadrado(canvas, data, scale); }
+    return renderCredencial(canvas, data, scale);
+  }
+
+  function renderCredencial(canvas, data, scale) {
     canvas.width = W * scale;
     canvas.height = H * scale;
 
@@ -391,51 +580,92 @@
     // Marca de agua. Muy tenue a propósito: si se nota, compite con los
     // datos y parece una mancha.
     ctx.save();
-    ctx.globalAlpha = 0.045;
-    drawPalomo(ctx, 655, 290, 330, C.navy);
+    ctx.globalAlpha = C.marcaAgua;
+    drawPalomo(ctx, 700, 300, 460, C.navy);
     ctx.restore();
 
     /* --- cabecera --- */
-    drawEmblema(ctx, 58, 46, 62, C.navy);
+    // Dos tratamientos: una línea fina y sobria, o una banda de color con
+    // el título en grande, que es lo que más se comparte.
+    var emisor = data.emisor || 'Ministerio de Palomos';
+    var titulo = data.titulo || 'CARNET DE PALOMO';
+    var siglas = data.siglas || 'MINPAL';
+    var marca  = titulo.replace('CARNET DE ', '') + 'S';
 
-    // «PALOMOS» en azul y «RD» en rojo: los dos colores del país, sin
-    // reproducir la bandera.
-    ctx.font = font(800, 30);
-    ctx.fillStyle = C.navy;
-    ctx.fillText('PALOMOS ', 100, 57);
-    var anchoPalomos = ctx.measureText('PALOMOS ').width;
-    ctx.fillStyle = C.red;
-    ctx.fillText('RD', 100 + anchoPalomos, 57);
-    var anchoMarca = anchoPalomos + ctx.measureText('RD').width;
+    if (C.cabecera === 'banda') {
+      if (C.bandaGrad) {
+        var gb = ctx.createLinearGradient(0, 0, W, 0);
+        gb.addColorStop(0, C.bandaGrad[0]);
+        gb.addColorStop(1, C.bandaGrad[1]);
+        ctx.fillStyle = gb;
+      } else {
+        ctx.fillStyle = C.banda;
+      }
+      ctx.fillRect(0, 0, W, 96);
 
-    var divisor = 100 + anchoMarca + 26;
-    ctx.strokeStyle = C.line;
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.moveTo(divisor, 18);
-    ctx.lineTo(divisor, 74);
-    ctx.stroke();
+      drawEmblema(ctx, 58, 48, 60, C.bandaTinta);
 
-    ctx.fillStyle = C.red;
-    ctx.font = font(700, 21);
-    ctx.fillText('Ministerio de Palomos', divisor + 20, 53);
+      ctx.fillStyle = C.bandaTinta;
+      var tam = fitText(ctx, titulo, 520, 800, 40, 22);
+      ctx.font = font(800, tam);
+      ctx.fillText(titulo, 100, 46);
 
-    ctx.fillStyle = C.navy;
-    ctx.font = font(700, 17);
-    (function () {
-      var t = 'CARNET DE PALOMO';
-      var tw = trackedWidth(ctx, t, 1.6);
-      tracked(ctx, t, W - 32 - tw, 53, 1.6);
-    })();
+      ctx.font = font(600, 15);
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(emisor, 100, 72);
+      ctx.globalAlpha = 1;
 
-    // Regla bajo la cabecera, partida en azul y rojo con el papel de por medio.
-    (function () {
-      var y = 89, x0 = 32, w = W - 64, h = 3;
+      // Las siglas a la derecha, como el sello de la institución.
+      ctx.font = font(800, 26);
+      var sig = siglas;
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(sig, W - 32 - ctx.measureText(sig).width, 58);
+      ctx.globalAlpha = 1;
+
+    } else {
+      drawEmblema(ctx, 58, 46, 62, C.navy);
+
+      ctx.font = font(800, 30);
       ctx.fillStyle = C.navy;
-      ctx.fillRect(x0, y, w * 0.46, h);
+      ctx.fillText(marca + ' ', 100, 57);
+      var anchoMarca = ctx.measureText(marca + ' ').width;
       ctx.fillStyle = C.red;
-      ctx.fillRect(x0 + w * 0.54, y, w * 0.46, h);
-    })();
+      ctx.fillText('RD', 100 + anchoMarca, 57);
+      anchoMarca += ctx.measureText('RD').width;
+
+      var divisor = 100 + anchoMarca + 26;
+      ctx.strokeStyle = C.line;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(divisor, 18);
+      ctx.lineTo(divisor, 74);
+      ctx.stroke();
+
+      ctx.fillStyle = C.red;
+      ctx.font = font(700, 21);
+      ctx.fillText(emisor, divisor + 20, 53);
+
+      ctx.fillStyle = C.navy;
+      ctx.font = font(700, 17);
+      (function () {
+        ctx.font = font(700, 17);
+        var tw = trackedWidth(ctx, titulo, 1.6);
+        tracked(ctx, titulo, W - 32 - tw, 46, 1.6);
+        ctx.fillStyle = C.red;
+        ctx.font = font(700, 11);
+        var t2 = 'CERTIFICADO';
+        var tw2 = trackedWidth(ctx, t2, 2.6);
+        tracked(ctx, t2, W - 32 - tw2, 66, 2.6);
+      })();
+
+      (function () {
+        var y = 89, x0 = 32, w = W - 64, h = 3;
+        ctx.fillStyle = C.navy;
+        ctx.fillRect(x0, y, w * 0.46, h);
+        ctx.fillStyle = C.red;
+        ctx.fillRect(x0 + w * 0.54, y, w * 0.46, h);
+      })();
+    }
 
     /* --- helpers de campo --- */
     function label(text, x, y) {
@@ -463,7 +693,7 @@
       ctx.fillRect(PX, PY, PW, PH);
     }
     ctx.restore();
-    ctx.strokeStyle = 'rgba(19,41,75,.25)';
+    ctx.strokeStyle = C.suave;
     ctx.lineWidth = 1;
     roundRect(ctx, PX, PY, PW, PH, 5);
     ctx.stroke();
@@ -481,23 +711,26 @@
     /* --- columna de datos --- */
     var BX = 306, FIELD_W = 344;
 
-    label('Número de palomo', BX, 122);
-    value(data.serial, BX, 156, 30, FIELD_W, F.mono, 700);
+    label('Número de carnet', BX, 120);
+    value(data.serial, BX, 152, 29, FIELD_W, F.mono, 700);
 
-    label('Nombre', BX, 194);
-    value(nom.nombres, BX, 218, 23, FIELD_W);
+    label('Nombre', BX, 190);
+    value(nom.nombres, BX, 214, 22, FIELD_W);
 
-    label('Apellido', BX, 248);
-    value(nom.apellidos, BX, 272, 23, FIELD_W);
+    label('Apellido', BX, 238);
+    value(nom.apellidos, BX, 262, 22, FIELD_W);
 
-    label('Condición', BX, 302);
-    value(data.categoria, BX, 326, 21, FIELD_W);
+    label('Estatus', BX, 286);
+    value(data.categoria, BX, 310, 20, FIELD_W);
 
-    label('Lugar de tranquilidad', BX, 356);
-    value(data.lugar, BX, 380, 21, FIELD_W);
+    label('Lugar de tranquilidad', BX, 334);
+    value(data.lugar, BX, 358, 20, FIELD_W);
 
-    label('Ocupación u oficio', BX, 410);
-    value(data.oficio, BX, 434, 21, FIELD_W);
+    label('Especialidad', BX, 382);
+    value(data.oficio, BX, 406, 20, FIELD_W);
+
+    label('Antecedentes', BX, 430);
+    value(data.antecedentes || 'NINGUNO', BX, 454, 20, FIELD_W);
 
     /* --- columna derecha: el QR, en grande --- */
     var RX = 690;
@@ -506,7 +739,7 @@
     ctx.fillStyle = '#fff';
     roundRect(ctx, QX - 7, QY - 7, QS + 14, QS + 14, 7);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(19,41,75,.18)';
+    ctx.strokeStyle = C.suave;
     ctx.lineWidth = 1;
     roundRect(ctx, QX - 7, QY - 7, QS + 14, QS + 14, 7);
     ctx.stroke();
@@ -526,10 +759,10 @@
     })();
 
     // nivel de palomería
-    label('Nivel de palomería', RX, 378);
+    label(data.nivelEtiqueta || 'Nivel de tigueraje', RX, 378);
     (function () {
       var bx = RX, by = 390, bw = 186, bh = 13;
-      ctx.fillStyle = 'rgba(19,41,75,.12)';
+      ctx.fillStyle = C.tenue;
       roundRect(ctx, bx, by, bw, bh, 6.5);
       ctx.fill();
 
@@ -543,7 +776,7 @@
 
       ctx.fillStyle = C.navy;
       ctx.font = font(700, 17, F.mono);
-      ctx.fillText(data.nivel + '%', bx + bw + 12, by + bh);
+      ctx.fillText(Number(data.nivel).toFixed(1) + '%', bx + bw + 12, by + bh);
     })();
 
     label('Vigencia hasta', RX, 428);
@@ -553,14 +786,14 @@
     ctx.save();
     ctx.translate(W - 13, 478);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillStyle = 'rgba(19,41,75,.42)';
+    ctx.fillStyle = C.label;
     ctx.font = font(600, 14, F.mono);
     ctx.fillText(deaccent(data.serial).replace(/-/g, ' '), 0, 0);
     ctx.restore();
 
     /* --- pie: MRZ + invitación + avisos --- */
     var MY = 496;
-    ctx.fillStyle = 'rgba(255,255,255,.82)';
+    ctx.fillStyle = C.pie;
     ctx.fillRect(0, MY, W, H - MY);
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1;
@@ -570,18 +803,23 @@
     ctx.stroke();
 
     var lines = mrzLines(data);
-    ctx.fillStyle = 'rgba(19,41,75,.82)';
+    ctx.fillStyle = C.pieTinta;
     ctx.font = font(400, 25, F.mono);
     ctx.fillText(lines[0], 32, MY + 40);
     ctx.fillText(lines[1], 32, MY + 70);
 
-    // invitación al club
-    ctx.fillStyle = C.navy;
-    ctx.font = font(700, 13);
-    ctx.fillText(
-      'Invita a tus panas palomos al club. Verifica este carnet con su número en ' + SITIO,
-      32, MY + 102
-    );
+    // La frase, que es lo que la gente cita cuando lo comparte.
+    (function () {
+      ctx.fillStyle = C.navy;
+      ctx.font = 'italic ' + font(700, 17);
+      var f = data.frase || '';
+      ctx.fillText(f, 32, MY + 104);
+
+      ctx.fillStyle = C.label;
+      ctx.font = font(600, 11);
+      var v = 'Verifica este carnet en ' + SITIO;
+      ctx.fillText(v, W - 32 - ctx.measureText(v).width, MY + 104);
+    })();
 
     ctx.fillStyle = C.label;
     ctx.font = font(600, 10.5);
@@ -601,7 +839,7 @@
       ctx.fillStyle = C.navy;
       ctx.fillText('#team', hx, hy);
       ctx.fillStyle = C.red;
-      ctx.fillText('palomos', hx + ctx.measureText('#team').width, hy);
+      ctx.fillText(data.hashtag || 'palomos', hx + ctx.measureText('#team').width, hy);
     })();
 
     // El cuño del Ministerio, estampado encima del pie y girado, como si
@@ -641,10 +879,308 @@
     return canvas;
   }
 
+
+  /* =======================================================================
+     Solapín vertical — el de colgar del cuello, con su ranura arriba.
+     ======================================================================= */
+
+  function renderSolapin(canvas, data, scale) {
+    var w = 760, h = 1060;
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.textBaseline = 'alphabetic';
+
+    var seed = hash32(data.nombre + '|' + data.serial);
+    var nom = partirNombre(data.nombre);
+
+    // Fondo y cabecera en degradado.
+    ctx.fillStyle = C.bg1;
+    ctx.fillRect(0, 0, w, h);
+    drawGuilloche(ctx, 0, 0, w, h, seed);
+
+    var g = ctx.createLinearGradient(0, 0, w, 300);
+    g.addColorStop(0, C.grad[0]);
+    g.addColorStop(1, C.grad[1]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, 300);
+
+    // La ranura del cordón.
+    ctx.fillStyle = C.bg1;
+    roundRect(ctx, w / 2 - 62, 26, 124, 26, 13);
+    ctx.fill();
+
+    // Título apilado, que es lo que manda en este formato.
+    var partes = (data.titulo || 'CARNET DE PALOMO').split(' ');
+    var ultima = partes.pop();
+    var primera = partes.join(' ');
+
+    ctx.fillStyle = C.bandaTinta || '#fff';
+    ctx.font = font(800, 38);
+    ctx.fillText(primera, 44, 150);
+    var tam = fitText(ctx, ultima, 420, 800, 74, 40);
+    ctx.font = font(800, tam);
+    ctx.fillText(ultima, 44, 216);
+
+    ctx.font = font(700, 20);
+    ctx.globalAlpha = 0.9;
+    tracked(ctx, 'CERTIFICADO', 46, 250, 5);
+    ctx.globalAlpha = 1;
+
+    // Sello del emisor arriba a la derecha.
+    ctx.globalAlpha = 0.95;
+    drawEmblema(ctx, w - 108, 150, 132, C.bandaTinta || '#fff');
+    ctx.globalAlpha = 1;
+
+    ctx.font = font(600, 15);
+    ctx.globalAlpha = 0.9;
+    ctx.fillText(data.emisor || '', 44, 284);
+    ctx.globalAlpha = 1;
+
+    // Marca de agua.
+    ctx.save();
+    ctx.globalAlpha = C.marcaAgua;
+    drawPalomo(ctx, w * 0.62, 640, 520, C.navy);
+    ctx.restore();
+
+    function label(t, x, y) { ctx.fillStyle = C.label; ctx.font = font(600, 12); ctx.fillText(t, x, y); }
+    function value(t, x, y, size, maxW) {
+      ctx.fillStyle = C.navy;
+      var z = fitText(ctx, t, maxW, 700, size, 12);
+      ctx.font = font(700, z);
+      ctx.fillText(t, x, y);
+    }
+
+    // Foto grande, centrada bajo la cabecera.
+    var pw = 250, ph = 312, px = 44, py = 336;
+    ctx.save();
+    roundRect(ctx, px, py, pw, ph, 6);
+    ctx.clip();
+    if (data.photo) { ctx.drawImage(data.photo, px, py, pw, ph); }
+    else { ctx.fillStyle = '#c3d2e2'; ctx.fillRect(px, py, pw, ph); }
+    ctx.restore();
+    ctx.strokeStyle = C.suave; ctx.lineWidth = 1.4;
+    roundRect(ctx, px, py, pw, ph, 6); ctx.stroke();
+
+    // Datos a la derecha de la foto.
+    var bx = 322, bw = w - bx - 44;
+    label('Número de carnet', bx, 356);
+    ctx.fillStyle = C.navy; ctx.font = font(700, 26, F.mono);
+    ctx.fillText(data.serial, bx, 386);
+
+    label('Nombre', bx, 424);   value(nom.nombres, bx, 448, 21, bw);
+    label('Apellido', bx, 486); value(nom.apellidos, bx, 510, 21, bw);
+    label('Estatus', bx, 548);  value(data.categoria, bx, 572, 18, bw);
+    label('Antecedentes', bx, 610); value(data.antecedentes || 'NINGUNO', bx, 634, 17, bw);
+
+    // Fila de datos bajo la foto.
+    label('Lugar de tranquilidad', 44, 700); value(data.lugar, 44, 724, 19, 300);
+    label('Especialidad', 396, 700);         value(data.oficio, 396, 724, 17, 320);
+    label(data.nivelEtiqueta || 'Nivel de tigueraje', 44, 772);
+    (function () {
+      var bx2 = 44, by = 784, bw2 = 220, bh = 13;
+      ctx.fillStyle = C.tenue; roundRect(ctx, bx2, by, bw2, bh, 6.5); ctx.fill();
+      var pct = Math.max(0, Math.min(100, data.nivel)) / 100;
+      ctx.fillStyle = C.red;
+      roundRect(ctx, bx2, by, Math.max(bh, bw2 * pct), bh, 6.5); ctx.fill();
+      ctx.fillStyle = C.navy; ctx.font = font(700, 18, F.mono);
+      ctx.fillText(Number(data.nivel).toFixed(1) + '%', bx2 + bw2 + 12, by + bh);
+    })();
+    label('Vigencia', 396, 772); value(data.vence, 396, 796, 19, 320);
+
+    // QR grande abajo a la izquierda, firma al lado.
+    var qs = 186, qx = 44, qy = 826;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, qx - 8, qy - 8, qs + 16, qs + 16, 8); ctx.fill();
+    ctx.strokeStyle = C.suave; ctx.lineWidth = 1;
+    roundRect(ctx, qx - 8, qy - 8, qs + 16, qs + 16, 8); ctx.stroke();
+    drawQR(ctx, data.qrUrl, qx, qy, qs);
+
+    ctx.fillStyle = C.red; ctx.font = font(700, 13);
+    ctx.fillText(SITIO, qx, qy + qs + 26);
+
+    drawSignature(ctx, 300, 852, 200, 58, seed);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(296, 918); ctx.lineTo(516, 918); ctx.stroke();
+    label('Firma del titular', 296, 938);
+
+    // Cuño.
+    (function () {
+      ctx.save(); ctx.translate(w - 122, 890); ctx.rotate(-0.16);
+      ctx.globalAlpha = 0.5; ctx.strokeStyle = C.red;
+      ctx.lineWidth = 2.8; ctx.beginPath(); ctx.arc(0, 0, 58, 0, Math.PI * 2); ctx.stroke();
+      ctx.lineWidth = 1.1; ctx.beginPath(); ctx.arc(0, 0, 50, 0, Math.PI * 2); ctx.stroke();
+      drawPalomo(ctx, 0, -10, 70, C.red);
+      ctx.fillStyle = C.red; ctx.font = font(700, 9);
+      var t = (data.siglas || '') + ' · CERTIFICADO';
+      tracked(ctx, t, -trackedWidth(ctx, t, 0.7) / 2, 34, 0.7);
+      ctx.restore();
+    })();
+
+    // Cinta del pie con la frase.
+    var g2 = ctx.createLinearGradient(0, 0, w, 0);
+    g2.addColorStop(0, C.grad[0]); g2.addColorStop(1, C.grad[1]);
+    ctx.fillStyle = g2;
+    ctx.fillRect(0, h - 88, w, 88);
+
+    ctx.fillStyle = C.bandaTinta || '#fff';
+    ctx.font = 'italic ' + font(700, 19);
+    var fr = data.frase || '';
+    ctx.fillText(fr, w / 2 - ctx.measureText(fr).width / 2, h - 50);
+
+    ctx.font = font(600, 11);
+    ctx.globalAlpha = 0.85;
+    var av = 'DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · #team' + (data.hashtag || 'palomos');
+    ctx.fillText(av, w / 2 - ctx.measureText(av).width / 2, h - 24);
+    ctx.globalAlpha = 1;
+
+    return canvas;
+  }
+
+  /* =======================================================================
+     Cuadrado — pensado para Instagram, donde 1:1 ocupa toda la pantalla.
+     ======================================================================= */
+
+  function renderCuadrado(canvas, data, scale) {
+    var w = 1000, h = 1000;
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.textBaseline = 'alphabetic';
+
+    var seed = hash32(data.nombre + '|' + data.serial);
+    var nom = partirNombre(data.nombre);
+
+    // Todo el fondo en degradado.
+    var g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, C.grad[0]);
+    g.addColorStop(1, C.grad[1]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    drawGuilloche(ctx, 0, 0, w, h, seed);
+
+    var tinta = C.bandaTinta || '#fff';
+
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    drawPalomo(ctx, w * 0.72, h * 0.54, 720, tinta);
+    ctx.restore();
+
+    // Título arriba, en grande y apilado.
+    var partes = (data.titulo || 'CARNET DE PALOMO').split(' ');
+    var ultima = partes.pop();
+    var primera = partes.join(' ');
+
+    ctx.fillStyle = tinta;
+    ctx.font = font(800, 44);
+    ctx.fillText(primera, 60, 120);
+    var tam = fitText(ctx, ultima, 640, 800, 96, 50);
+    ctx.font = font(800, tam);
+    ctx.fillText(ultima, 60, 206);
+
+    ctx.font = font(700, 18);
+    ctx.globalAlpha = 0.85;
+    tracked(ctx, 'CERTIFICADO · ' + (data.siglas || ''), 62, 242, 4);
+    ctx.fillText(data.emisor || '', 62, 274);
+    ctx.globalAlpha = 1;
+
+    drawEmblema(ctx, w - 110, 130, 128, tinta);
+
+    function label(t, x, y) {
+      ctx.globalAlpha = 0.72; ctx.fillStyle = tinta;
+      ctx.font = font(600, 13); ctx.fillText(t, x, y); ctx.globalAlpha = 1;
+    }
+    function value(t, x, y, size, maxW) {
+      ctx.fillStyle = tinta;
+      var z = fitText(ctx, t, maxW, 700, size, 13);
+      ctx.font = font(700, z);
+      ctx.fillText(t, x, y);
+    }
+
+    // Foto a la izquierda.
+    var pw = 300, ph = 375, px = 60, py = 320;
+    ctx.save();
+    roundRect(ctx, px, py, pw, ph, 8);
+    ctx.clip();
+    if (data.photo) { ctx.drawImage(data.photo, px, py, pw, ph); }
+    else { ctx.fillStyle = '#c3d2e2'; ctx.fillRect(px, py, pw, ph); }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 2;
+    roundRect(ctx, px, py, pw, ph, 8); ctx.stroke();
+
+    drawSignature(ctx, px + 10, py + ph + 14, 220, 56, seed);
+    ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, py + ph + 76); ctx.lineTo(px + pw, py + ph + 76); ctx.stroke();
+    label('Firma del titular', px, py + ph + 96);
+
+    // Datos a la derecha.
+    var bx = 404, bw = 420;
+    label('Número de carnet', bx, 340);
+    ctx.fillStyle = tinta; ctx.font = font(700, 32, F.mono);
+    ctx.fillText(data.serial, bx, 378);
+
+    label('Nombre', bx, 418);   value(nom.nombres + ' ' + nom.apellidos, bx, 446, 26, bw);
+    label('Estatus', bx, 488);  value(data.categoria, bx, 514, 22, bw);
+    label('Lugar de tranquilidad', bx, 556); value(data.lugar, bx, 582, 22, bw);
+    label('Especialidad', bx, 624); value(data.oficio, bx, 650, 20, bw);
+    label('Antecedentes', bx, 692); value(data.antecedentes || 'NINGUNO', bx, 718, 20, bw);
+
+    label(data.nivelEtiqueta || 'Nivel de tigueraje', bx, 760);
+    (function () {
+      var bx2 = bx, by = 772, bw2 = 250, bh = 14;
+      ctx.fillStyle = 'rgba(255,255,255,.22)';
+      roundRect(ctx, bx2, by, bw2, bh, 7); ctx.fill();
+      var pct = Math.max(0, Math.min(100, data.nivel)) / 100;
+      ctx.fillStyle = tinta;
+      roundRect(ctx, bx2, by, Math.max(bh, bw2 * pct), bh, 7); ctx.fill();
+      ctx.font = font(700, 20, F.mono); ctx.fillStyle = tinta;
+      ctx.fillText(Number(data.nivel).toFixed(1) + '%', bx2 + bw2 + 14, by + bh);
+    })();
+    label('Vigencia', bx, 828); value(data.vence, bx, 854, 22, bw);
+
+    // QR abajo a la derecha, sobre blanco para que siempre escanee.
+    var qs = 172, qx = w - 60 - qs, qy = h - 232;
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, qx - 10, qy - 10, qs + 20, qs + 20, 10); ctx.fill();
+    drawQR(ctx, data.qrUrl, qx, qy, qs);
+    ctx.fillStyle = tinta; ctx.font = font(700, 14);
+    ctx.fillText(SITIO, qx + qs / 2 - ctx.measureText(SITIO).width / 2, qy + qs + 30);
+
+    // Frase y avisos al pie.
+    ctx.fillStyle = tinta;
+    ctx.font = 'italic ' + font(700, 24);
+    ctx.fillText(data.frase || '', 60, h - 118);
+
+    ctx.font = font(800, 22);
+    ctx.globalAlpha = 0.95;
+    ctx.fillText('#team' + (data.hashtag || 'palomos'), 60, h - 72);
+    ctx.globalAlpha = 1;
+
+    ctx.font = font(600, 12);
+    ctx.globalAlpha = 0.7;
+    ctx.fillText('DOCUMENTO DE PARODIA · SIN VALIDEZ LEGAL · MEME DE @javimolinax', 60, h - 40);
+    ctx.globalAlpha = 1;
+
+    return canvas;
+  }
+
   global.Carnet = {
     render: renderCarnet,
     loadAssets: loadAssets,
     drawPalomo: drawPalomo,
+    medidas: function (id) {
+      var e = estiloDe(id);
+      if (e.formato === 'solapin')  { return { w: 760, h: 1060 }; }
+      if (e.formato === 'cuadrado') { return { w: 1000, h: 1000 }; }
+      return { w: W, h: H };
+    },
+    estilos: function () { return ORDEN.map(function (id) { return { id: id, nombre: ESTILOS[id].nombre }; }); },
+    catalogo: catalogo,
+    datosMuestra: datosMuestra,
     drawEmblema: drawEmblema,
     W: W,
     H: H
