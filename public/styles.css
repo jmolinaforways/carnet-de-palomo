@@ -518,7 +518,7 @@ img, canvas, video, svg{max-width:100%}
 /* ---------- carrusel de la portada ---------- */
 .slider{
   display:flex;
-  margin:22px -18px 10px;
+  margin:0 -18px;
   padding:0;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
@@ -526,6 +526,33 @@ img, canvas, video, svg{max-width:100%}
   scrollbar-width:none;
 }
 .slider::-webkit-scrollbar{display:none}
+
+/* ---------- flechas del carrusel ---------- */
+
+/* En el móvil se desliza con el dedo y las flechas estorban; en el
+   escritorio no hay dedo, así que sin ellas el carrusel no se ve. */
+.pista{position:relative}
+#slider{margin-top:22px;margin-bottom:10px}
+#disenos{margin-top:16px;margin-bottom:6px}
+.flecha{
+  position:absolute;top:50%;transform:translateY(-50%);
+  z-index:3;
+  width:42px;height:42px;padding:0 0 4px;
+  display:none;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.22);border-radius:50%;
+  background:rgba(9,19,38,.9);color:#e4ecfa;
+  font:400 27px/1 system-ui,sans-serif;cursor:pointer;
+  box-shadow:0 6px 18px -6px rgba(0,0,0,.8);
+  transition:background .16s,border-color .16s,opacity .16s;
+}
+.flecha:hover{background:var(--red);border-color:var(--red);color:#fff}
+.flecha:disabled{opacity:.25;cursor:default}
+.flecha:disabled:hover{background:rgba(9,19,38,.9);border-color:rgba(255,255,255,.22);color:#e4ecfa}
+.flecha.izq{left:-4px}
+.flecha.der{right:-4px}
+@media (hover:hover) and (pointer:fine){
+  .flecha{display:flex}
+}
 .lamina{
   flex:0 0 100%;
   box-sizing:border-box;
@@ -580,7 +607,7 @@ img, canvas, video, svg{max-width:100%}
 /* ---------- rejilla de diseños ---------- */
 .carrusel{
   display:flex;gap:12px;
-  margin:16px -18px 6px;
+  margin:0 -18px;
   padding:6px 18px 10px;
   overflow-x:auto;
   scroll-snap-type:x mandatory;

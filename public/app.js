@@ -115,6 +115,24 @@
       }
     }
 
+    // Las flechas del escritorio avanzan una lámina entera.
+    (function () {
+      var atras = $('sliderAtras'), alante = $('sliderAlante');
+      if (!atras || !alante) { return; }
+
+      function estado() {
+        atras.disabled = cont.scrollLeft < 8;
+        alante.disabled = cont.scrollLeft > cont.scrollWidth - cont.clientWidth - 8;
+      }
+      function mover(d) {
+        cont.scrollBy({ left: cont.clientWidth * d, behavior: 'smooth' });
+      }
+      atras.onclick = function () { mover(-1); };
+      alante.onclick = function () { mover(1); };
+      cont.addEventListener('scroll', estado, { passive: true });
+      estado();
+    })();
+
     if (puntos) {
       cont.addEventListener('scroll', function () {
         var n = Math.round(cont.scrollLeft / Math.max(1, cont.clientWidth));
@@ -187,6 +205,7 @@
       b.addEventListener('click', function () {
         state.estilo = e.id;
         marcarElegido();
+        flechasSelector();
         b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       });
       cont.appendChild(b);
@@ -194,6 +213,36 @@
 
     marcarElegido();
     if (centrar !== false) { cont.scrollLeft = 0; }
+    flechasSelector();
+  }
+
+  // Aquí la flecha no solo desplaza: cambia el diseño elegido, que es
+  // lo que se espera de un selector.
+  function moverSeleccion(paso) {
+    var lista = deLaFamilia();
+    var i = 0;
+    lista.forEach(function (e, n) { if (e.id === state.estilo) { i = n; } });
+    var j = Math.max(0, Math.min(lista.length - 1, i + paso));
+    if (j === i) { return; }
+
+    state.estilo = lista[j].id;
+    marcarElegido();
+    flechasSelector();
+
+    var cont = $('disenos');
+    if (cont && cont.children[j]) {
+      cont.children[j].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
+
+  function flechasSelector() {
+    var atras = $('disenoAtras'), alante = $('disenoAlante');
+    if (!atras || !alante) { return; }
+    var lista = deLaFamilia();
+    var i = 0;
+    lista.forEach(function (e, n) { if (e.id === state.estilo) { i = n; } });
+    atras.disabled = i <= 0;
+    alante.disabled = i >= lista.length - 1;
   }
 
   function elegirFamilia(f) {
@@ -555,6 +604,8 @@
     $('tipoPariguayo').addEventListener('click', function () { elegirTipo('pariguayo'); });
     $('famCarnet').addEventListener('click', function () { elegirFamilia('carnet'); });
     $('famCredencial').addEventListener('click', function () { elegirFamilia('credencial'); });
+    $('disenoAtras').addEventListener('click', function () { moverSeleccion(-1); });
+    $('disenoAlante').addEventListener('click', function () { moverSeleccion(1); });
     $('btnSeguir').addEventListener('click', emitir);
 
     document.querySelectorAll('[data-back]').forEach(function (b) {

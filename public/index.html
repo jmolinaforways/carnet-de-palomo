@@ -71,9 +71,13 @@
       <h1>Carnet de Palomo</h1>
       <p class="sub">Tranquilo en su casa, todo fr&iacute;o. No tamo en l&iacute;os.</p>
 
-      <div class="slider" id="slider" aria-label="Diseños disponibles"></div>
+      <div class="pista">
+        <button class="flecha izq" id="sliderAtras" type="button" aria-label="Dise&ntilde;os anteriores">&lsaquo;</button>
+        <div class="slider" id="slider" aria-label="Dise&ntilde;os disponibles"></div>
+        <button class="flecha der" id="sliderAlante" type="button" aria-label="Dise&ntilde;os siguientes">&rsaquo;</button>
+      </div>
       <div class="puntos" id="puntos" aria-hidden="true"></div>
-      <p class="slider-pista">20 dise&ntilde;os. Desliza para verlos &rarr;</p>
+      <p class="slider-pista">20 dise&ntilde;os entre carnets y credenciales.</p>
 
       <button class="btn btn-primary btn-xl" id="btnStart">Genera el tuyo</button>
       <p class="claim">Gratis, r&aacute;pido y sin dar datos personales.</p>
@@ -134,7 +138,11 @@
         <button class="tipo" id="famCredencial" type="button" role="tab">Credencial</button>
       </div>
 
-      <div class="carrusel" id="disenos" aria-label="Dise&ntilde;os"></div>
+      <div class="pista">
+        <button class="flecha izq" id="disenoAtras" type="button" aria-label="Dise&ntilde;o anterior">&lsaquo;</button>
+        <div class="carrusel" id="disenos" aria-label="Dise&ntilde;os"></div>
+        <button class="flecha der" id="disenoAlante" type="button" aria-label="Dise&ntilde;o siguiente">&rsaquo;</button>
+      </div>
       <p class="carrusel-pie"><span id="disenoNombre">&nbsp;</span></p>
 
       <p class="error" id="estiloError" hidden></p>
