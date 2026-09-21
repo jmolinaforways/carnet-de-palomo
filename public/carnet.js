@@ -514,65 +514,6 @@
 
   /* ---------- piezas de las réplicas ---------- */
 
-  // Cabeza de palomo de perfil, con corona y lentes: el motivo que se
-  // repite en los carnets que circulan. El palomo no sale humilde.
-  //
-  // Todo cuelga del circulo del craneo. Dos cosas la hacen legible y
-  // las dos se me fueron al primer intento: que la boveda asome POR
-  // ENCIMA de los lentes, y que el cuello sea corto y con pecho. Sin
-  // eso sale una bota con corona.
-  function drawCabezaPalomo(ctx, cx, cy, size, color) {
-    var r = size * 0.30;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.fillStyle = color;
-
-    // cuello corto, con el pecho saliendo hacia la izquierda
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.72, r * 0.62);
-    ctx.bezierCurveTo(-r * 1.18, r * 1.15, -r * 1.08, r * 1.66, -r * 0.74, r * 1.76);
-    ctx.lineTo(r * 0.36, r * 1.76);
-    ctx.bezierCurveTo(r * 0.78, r * 1.28, r * 0.88, r * 0.98, r * 0.82, r * 0.54);
-    ctx.closePath();
-    ctx.fill();
-
-    // craneo
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fill();
-
-    // pico, justo debajo de los lentes
-    ctx.beginPath();
-    ctx.moveTo(r * 0.78, r * 0.06);
-    ctx.lineTo(r * 2.00, r * 0.34);
-    ctx.lineTo(r * 0.78, r * 0.62);
-    ctx.closePath();
-    ctx.fill();
-
-    // lentes a la altura del ojo, dejando ver la boveda por arriba
-    ctx.save();
-    ctx.rotate(-0.09);
-    roundRect(ctx, -r * 1.00, -r * 0.26, r * 1.86, r * 0.52, r * 0.14);
-    ctx.fill();
-    ctx.fillRect(-r * 1.20, -r * 0.16, r * 0.26, r * 0.15);
-
-    ctx.globalCompositeOperation = 'destination-out';
-    [-r * 0.70, r * 0.12].forEach(function (x) {
-      ctx.beginPath();
-      ctx.moveTo(x + r * 0.34, -r * 0.19);
-      ctx.lineTo(x + r * 0.56, -r * 0.19);
-      ctx.lineTo(x + r * 0.26, r * 0.18);
-      ctx.lineTo(x + r * 0.04, r * 0.18);
-      ctx.closePath();
-      ctx.fill();
-    });
-    ctx.restore();
-    ctx.restore();
-
-    drawCorona(ctx, cx - r * 0.06, cy - r * 1.28, r * 1.05, color);
-  }
-
-
   // Huella dactilar de adorno: arcos concéntricos partidos, que es lo
   // que se lee como huella a este tamaño.
   function drawHuella(ctx, cx, cy, size, color) {
@@ -1748,7 +1689,7 @@
     ctx.lineTo(tx + 34 + trackedWidth(ctx, cert, 5.5), 211);
     ctx.stroke();
 
-    drawCabezaPalomo(ctx, 682, 170, 150, C.navy);
+    drawEmblema(ctx, 706, 156, 128, C.navy);
 
     /* sello de parodia */
     ctx.save();
