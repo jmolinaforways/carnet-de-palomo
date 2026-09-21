@@ -118,7 +118,7 @@ export const CARNETS = {
       asodopa: { m: 'Mejor tranquilo en mi casa que en líos en la calle.', f: 'Mejor tranquila en mi casa que en líos en la calle.' },
       nocturno: 'Sin líos, sin cuentos, sin maña.',
       tricolor: { m: "Pa' los palomos de verdad.", f: "Pa' las palomas de verdad." },
-      esmeralda: 'Tranquilo en su casa, todo frío.'
+      esmeralda: { m: 'Tranquilo en su casa, todo frío.', f: 'Tranquila en su casa, todo frío.' }
     },
 
     condiciones: [
@@ -227,23 +227,23 @@ export const CARNETS = {
       asodopa: 'Llegué temprano y me quedé en la esquina.',
       nocturno: 'Buscando el hielo toda la noche.',
       tricolor: { m: "Pa' los pariguayos de verdad.", f: "Pa' las pariguayas de verdad." },
-      esmeralda: 'Parado ahí, como siempre.'
+      esmeralda: { m: 'Parado ahí, como siempre.', f: 'Parada ahí, como siempre.' }
     },
 
     condiciones: [
       { m: 'PARIGUAYO CERTIFICADO', f: 'PARIGUAYA CERTIFICADA' },
       { m: 'OFICIALMENTE PARIGUAYO', f: 'OFICIALMENTE PARIGUAYA' },
       { m: 'PARIGUAYO VERIFICADO', f: 'PARIGUAYA VERIFICADA' },
-      'MIRÓN OFICIAL',
+      { m: 'MIRÓN OFICIAL', f: 'MIRONA OFICIAL' },
       { m: 'PARIGUAYO VITALICIO', f: 'PARIGUAYA VITALICIA' },
-      'EL QUE NO BAILA',
+      { m: 'EL QUE NO BAILA', f: 'LA QUE NO BAILA' },
       { m: 'PARIGUAYO DE PRIMERA', f: 'PARIGUAYA DE PRIMERA' }
     ],
     oficios: [
       'SOSTENIENDO LA PARED',
       'CUIDANDO LOS BULTOS',
       'MIRANDO LA FIESTA',
-      'PARADO EN LA ESQUINA',
+      { m: 'PARADO EN LA ESQUINA', f: 'PARADA EN LA ESQUINA' },
       'BUSCANDO EL HIELO',
       'GUARDANDO EL PUESTO',
       'GRABANDO A LOS DEMÁS'
