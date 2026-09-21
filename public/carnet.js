@@ -869,6 +869,132 @@
     ctx.restore();
   }
 
+  // La Estatua de la Libertad. A este tamaño lo que la hace reconocible
+  // son dos cosas y nada mas: la corona de picos y el brazo en alto con
+  // la antorcha. El resto es un cuerpo que se ensancha hacia abajo.
+  function drawLibertad(ctx, cx, cy, s, fill) {
+    var k = s / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = fill;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // pedestal
+    ctx.fillRect(-30, 40, 60, 10);
+    ctx.fillRect(-22, 30, 44, 12);
+
+    // el manto, ensanchando hacia abajo
+    ctx.beginPath();
+    ctx.moveTo(-7, -14);
+    ctx.lineTo(9, -14);
+    ctx.lineTo(20, 32);
+    ctx.lineTo(-20, 32);
+    ctx.closePath();
+    ctx.fill();
+
+    // la tabla, en el brazo de abajo
+    ctx.save();
+    ctx.rotate(0.22);
+    ctx.fillRect(-27, -8, 15, 21);
+    ctx.restore();
+
+    // el brazo en alto
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(6, -12);
+    ctx.lineTo(19, -44);
+    ctx.stroke();
+
+    // la antorcha
+    ctx.fillRect(12, -54, 15, 7);
+    ctx.beginPath();
+    ctx.moveTo(19, -56);
+    ctx.quadraticCurveTo(13, -66, 19, -76);
+    ctx.quadraticCurveTo(25, -66, 19, -56);
+    ctx.closePath();
+    ctx.fill();
+
+    // la cabeza
+    ctx.beginPath();
+    ctx.arc(0, -22, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // la corona de picos
+    ctx.lineWidth = 4;
+    for (var i = 0; i < 7; i++) {
+      var a = -Math.PI + (Math.PI / 6) * i;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * 8, -22 + Math.sin(a) * 8);
+      ctx.lineTo(Math.cos(a) * 19, -22 + Math.sin(a) * 19);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  /* ---------- la isla, como marca de pais ---------- */
+
+  // La Espanola. Va chiquita y tenue, de marca de agua: no es un simbolo
+  // patrio -la ley cubre la bandera, el escudo y el himno- pero tampoco
+  // hace falta que grite.
+  //
+  // La silueta se reconoce por el oeste, que se abre en dos penínsulas
+  // con el golfo en medio, y por como se afila hacia el este.
+  function drawIsla(ctx, cx, cy, ancho, fill, alfa) {
+    var k = ancho / 100;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(k, k);
+    if (alfa !== undefined) { ctx.globalAlpha = alfa; }
+    ctx.fillStyle = fill;
+
+    // La costa NO esta dibujada a ojo. Son veintiseis puntos reales
+    // -Punta Cana, Samana, Monte Cristi, el Mole, Puerto Principe,
+    // Tiburon, Cabo Beata, Santo Domingo- proyectados a una caja de
+    // cien de ancho, recorridos en el sentido de las agujas.
+    //
+    // Dos intentos a ojo salieron peces. Con la costa de verdad sale
+    // la isla.
+    //
+    // Se unen con rectas, no con curvas. Suavizarlas redondeaba las dos
+    // peninsulas del oeste, que son justo lo que hace reconocible a la
+    // isla: sin ellas parece una mancha.
+    ctx.beginPath();
+    ctx.moveTo(49.5, 3.2);
+    ctx.lineTo(50.0, 2.5);
+    ctx.lineTo(38.1, -3.3);
+    ctx.lineTo(32.8, -4.6);
+    ctx.lineTo(33.6, -6.9);
+    ctx.lineTo(36.4, -8.8);
+    ctx.lineTo(24.4, -14.2);
+    ctx.lineTo(11.4, -16.6);
+    ctx.lineTo(-4.1, -17.8);
+    ctx.lineTo(-13.0, -16.0);
+    ctx.lineTo(-23.2, -19.1);
+    ctx.lineTo(-32.1, -16.6);
+    ctx.lineTo(-20.8, -11.0);
+    ctx.lineTo(-21.1, -5.6);
+    ctx.lineTo(-15.3, 3.3);
+    ctx.lineTo(-27.4, 5.3);
+    ctx.lineTo(-44.2, 2.0);
+    ctx.lineTo(-50.0, 6.9);
+    ctx.lineTo(-38.1, 9.5);
+    ctx.lineTo(-18.3, 8.8);
+    ctx.lineTo(-5.7, 11.9);
+    ctx.lineTo(-0.3, 15.5);
+    ctx.lineTo(4.9, 9.2);
+    ctx.lineTo(13.8, 7.7);
+    ctx.lineTo(24.4, 5.3);
+    ctx.lineTo(39.4, 5.8);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   // Cuál se dibuja. Vive aquí, como la paleta, y lo fija renderCarnet.
   var EMBLEMA = 'palomo';
 
@@ -878,6 +1004,7 @@
     if (EMBLEMA === 'castillo') { return drawCastillo(ctx, cx, cy, s, fill); }
     if (EMBLEMA === 'moto')     { return drawMoto(ctx, cx, cy, s, fill); }
     if (EMBLEMA === 'reloj')    { return drawReloj(ctx, cx, cy, s, fill); }
+    if (EMBLEMA === 'libertad') { return drawLibertad(ctx, cx, cy, s, fill); }
     return drawPalomo(ctx, cx, cy, s, fill);
   }
 
@@ -1214,7 +1341,11 @@
     } else {
       drawEmblema(ctx, 58, 46, 62, C.navy);
 
-      ctx.font = font(800, 30);
+      // La marca se encoge si el nombre es largo. Con «DOMINICAN YORKS»
+      // a cuerpo fijo, el divisor se iba tan a la derecha que el emisor
+      // acababa encima del titulo.
+      var zm = fitText(ctx, marca + ' RD', 300, 800, 30, 17);
+      ctx.font = font(800, zm);
       ctx.fillStyle = C.navy;
       ctx.fillText(marca + ' ', 100, 57);
       var anchoMarca = ctx.measureText(marca + ' ').width;
@@ -1222,7 +1353,10 @@
       ctx.fillText('RD', 100 + anchoMarca, 57);
       anchoMarca += ctx.measureText('RD').width;
 
-      var divisor = 100 + anchoMarca + 26;
+      // La isla, DESPUES de medir el RD: antes se le montaba encima.
+      drawIsla(ctx, 100 + anchoMarca + 26, 52, 40, C.navy2, 0.7);
+
+      var divisor = 100 + anchoMarca + 52;
       ctx.strokeStyle = C.line;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
@@ -1230,12 +1364,19 @@
       ctx.lineTo(divisor, 74);
       ctx.stroke();
 
+      // El titulo se mide primero: el emisor tiene que caber en lo que
+      // sobre. Con los dos largos -«Ministerio de Dominican Yorks» y
+      // «CARNET DE DOMINICAN YORK»- se encontraban en el medio.
+      ctx.font = font(700, 17);
+      var anchoTitulo = trackedWidth(ctx, titulo, 1.6);
+      var huecoEmisor = (W - 32 - anchoTitulo) - (divisor + 20) - 18;
+
       ctx.fillStyle = C.red;
-      ctx.font = font(700, 21);
+      var ze = fitText(ctx, emisor, huecoEmisor, 700, 21, 12);
+      ctx.font = font(700, ze);
       ctx.fillText(emisor, divisor + 20, 53);
 
       ctx.fillStyle = C.navy;
-      ctx.font = font(700, 17);
       (function () {
         ctx.font = font(700, 17);
         var tw = trackedWidth(ctx, titulo, 1.6);
@@ -1771,6 +1912,8 @@
     })();
 
     /* pie */
+    drawIsla(ctx, 690, 540, 84, C.navy, 0.30);
+
     drawBarras(ctx, 46, 520, 216, 42, seed, C.navy);
     ctx.fillStyle = C.navy; ctx.font = font(700, 15, F.mono);
     ctx.fillText(data.serial, 46, 582);
@@ -1914,6 +2057,8 @@
     })();
 
     /* pie */
+    drawIsla(ctx, 676, 512, 80, C.navy, 0.30);
+
     drawBarras(ctx, 44, 402, 212, 42, seed, C.navy);
     ctx.fillStyle = C.navy; ctx.font = font(700, 15, F.mono);
     ctx.fillText(data.serial, 44, 464);
@@ -2019,6 +2164,8 @@
     ctx.strokeStyle = C.line; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(bx + 72, 470); ctx.lineTo(bx + 280, 470); ctx.stroke();
 
+    drawIsla(ctx, 904, 372, 78, C.navy, 0.30);
+
     var qs = 118, qx = 856, qy = 200;
     ctx.fillStyle = '#fff';
     roundRect(ctx, qx - 7, qy - 7, qs + 14, qs + 14, 6); ctx.fill();
@@ -2112,6 +2259,7 @@
     ctx.fillText('(' + (data.siglas || '') + ')', tx, fy + 40);
     ctx.fillStyle = C.red;
     ctx.fillText('RD', tx, fy + 64);
+    drawIsla(ctx, tx + 46, fy + 59, 44, C.navy2, 0.75);
 
     function label(t, x, y) {
       ctx.fillStyle = C.navy2;
@@ -2356,6 +2504,7 @@
     tipos: tiposDisponibles,
     texto: gx,
     drawEmblema: drawEmblema,
+    isla: drawIsla,
     W: W,
     H: H
   };

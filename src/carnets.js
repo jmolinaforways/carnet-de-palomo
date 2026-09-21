@@ -758,7 +758,124 @@ export const CARNETS = {
       'NINGUNO, PAPI LO RESOLVIÓ'
     ]
   }
+,
 
+  dominicanyork: {
+    id: 'dominicanyork',
+
+    codigo: 'y',
+    prefijo: 'DNY',
+
+    slug: 'carnet-de-dominican-york',
+    orden: 7,
+    buscar: [
+      'dominican york', 'dominicanyork', 'nueva york', 'new york', 'ny',
+      'bronx', 'diáspora', 'de allá', 'barriles', 'diciembre'
+    ],
+
+    nombre: 'Dominican York',
+    sujeto: 'DOMINICAN YORK',
+    plural: 'DOMINICAN YORKS',
+    hashtag: 'dominicanyorks',
+    emblema: 'libertad',
+    nivelEtiqueta: 'Nivel de acento',
+    vence: 'HASTA DICIEMBRE',
+    invitacion: 'Invita a tus panas de allá al club.',
+    titulo: 'CARNET DE DOMINICAN YORK',
+
+    lema: 'EL BRONX · EL ALTO · LA ISLA',
+    cintilla: { m: 'Un Dominican York Certificado', f: 'Una Dominican York Certificada' },
+    citas: [
+      'Allá es otra cosa, pero la isla no se olvida.',
+      'Yo bajo en diciembre, sin falta.'
+    ],
+    sello: [
+      'BAJA EN DICIEMBRE',
+      'MANDA LOS BARRILES',
+      'ACENTO MIXTO',
+      'NUNCA OLVIDA'
+    ],
+
+    seo: {
+      titulo: 'Emite tu Carnet de Dominican York | Gratis y en 10 segundos',
+      descripcion: 'De aquí y de allá, bajando en diciembre sin falta. Emite tu Carnet de Dominican York con tu foto, gratis y sin dar datos personales. #teamdominicanyorks',
+      og: '/og.jpg'
+    },
+
+    portada: {
+      kicker: 'Ministerio de Dominican Yorks · RD',
+      h1: 'Carnet de Dominican York',
+      sub: 'De aquí y de allá. Bajando en diciembre, sin falta.'
+    },
+
+    titulos: {
+      oficial: 'CARNET DE DOMINICAN YORK',
+      institucional: 'CARNET DE DOMINICAN YORK',
+      crema: 'CERTIFICADO DE DOMINICAN YORK',
+      hielo: 'CARNET DE DOMINICAN YORK',
+      carbon: 'CARNET DE DOMINICAN YORK',
+      candela: 'CREDENCIAL DE DOMINICAN YORK',
+      solapin: 'CARNET DE DOMINICAN YORK',
+      asodopa: 'CERTIFICADO DE DOMINICAN YORK',
+      nocturno: 'CARNET DE DOMINICAN YORK',
+      tricolor: 'CERTIFICADO DE DOMINICAN YORK',
+      esmeralda: 'CREDENCIAL DE DOMINICAN YORK'
+    },
+
+    emisores: {
+      oficial: { nombre: 'Ministerio de Dominican Yorks', siglas: 'MINDY' },
+      institucional: { nombre: 'Dirección Nacional del Exterior', siglas: 'DNEX' },
+      crema: { nombre: 'Instituto Nacional de la Diáspora', siglas: 'INADIA' },
+      hielo: { nombre: 'Comisión Nacional de Dominican Yorks', siglas: 'CONADY' },
+      carbon: { nombre: 'Consejo Superior del Exterior', siglas: 'CONSUEX' },
+      candela: { nombre: 'Registro Nacional de Dominican Yorks', siglas: 'RENADY' },
+      solapin: { nombre: 'Federación Dominicana en el Exterior', siglas: 'FEDOEX' },
+      asodopa: { nombre: 'Asociación Dominicana en Nueva York', siglas: 'ASODONY' },
+      nocturno: { nombre: 'Cámara Dominicana del Exterior', siglas: 'CADOEX' },
+      tricolor: { nombre: 'Asociación Nacional de Dominican Yorks', siglas: 'ANDY' },
+      esmeralda: { nombre: 'Junta Central del Exterior', siglas: 'JCEX' }
+    },
+
+    frases: {
+      oficial: 'Se puede vivir allá sin dejar de ser de aquí.',
+      institucional: 'Yo bajo en diciembre, sin falta.',
+      crema: 'Allá es otra cosa, pero la isla no se olvida.',
+      hielo: 'Dos inviernos y un solo corazón.',
+      carbon: 'Trabajo allá, pero sueño aquí.',
+      candela: 'Mi gente, mi isla, mi diciembre.',
+      solapin: { m: 'No es un sueño, es un dominican york certificado.', f: 'No es un sueño, es una dominican york certificada.' },
+      asodopa: { m: 'El que se va también carga la isla.', f: 'La que se va también carga la isla.' },
+      nocturno: 'Frío afuera, merengue adentro.',
+      tricolor: "Pa' los dominicanyork de verdad.",
+      esmeralda: { m: 'Tranquilo allá, pensando en la isla.', f: 'Tranquila allá, pensando en la isla.' }
+    },
+
+    condiciones: [
+      { m: 'DOMINICAN YORK CERTIFICADO', f: 'DOMINICAN YORK CERTIFICADA' },
+      'OFICIALMENTE DOMINICAN YORK',
+      { m: 'DOMINICAN YORK VERIFICADO', f: 'DOMINICAN YORK VERIFICADA' },
+      'DE AQUÍ Y DE ALLÁ',
+      { m: 'DOMINICAN YORK VITALICIO', f: 'DOMINICAN YORK VITALICIA' },
+      'BAJA TODOS LOS DICIEMBRES',
+      'DOS PAÍSES, UNA ISLA'
+    ],
+    oficios: [
+      'MANDAR LOS BARRILES',
+      'TRABAJAR DOBLE TURNO',
+      'LLAMAR TODOS LOS DOMINGOS',
+      'TRAER LOS TENIS NUEVOS',
+      'BUSCAR DÓNDE VENDEN YUCA',
+      'EXPLICAR QUE ALLÁ ES DIFERENTE',
+      "AHORRAR PA' DICIEMBRE"
+    ],
+    antecedentes: [
+      'NINGUNO, NI AQUÍ NI ALLÁ',
+      'CERO, TODO EN ORDEN',
+      'NINGUNO, PURO TRABAJO',
+      { m: 'LIMPIO EN LOS DOS PAÍSES', f: 'LIMPIA EN LOS DOS PAÍSES' },
+      'NINGUNO, PREGUNTE ALLÁ'
+    ]
+  }
 };
 
 // En el orden en que se enseñan.
