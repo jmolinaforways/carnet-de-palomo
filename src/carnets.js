@@ -39,6 +39,8 @@ export function g(valor, genero) {
 
 // «Certificado» describe a la persona, no al documento, asi que
 // concuerda. Es igual para todos los carnets: vive aqui una sola vez.
+// El plural va escrito, no derivado: «BEBEDOR» + «S» da «BEBEDORS».
+// En espanol las palabras acabadas en consonante llevan -es.
 export const CERTIFICADO = { m: 'CERTIFICADO', f: 'CERTIFICADA' };
 
 export const CARNETS = {
@@ -57,6 +59,7 @@ export const CARNETS = {
 
     nombre: { m: 'Palomo', f: 'Paloma' },
     sujeto: { m: 'PALOMO', f: 'PALOMA' },
+    plural: { m: 'PALOMOS', f: 'PALOMAS' },
     hashtag: 'palomos',
     nivelEtiqueta: 'Nivel de tigueraje',
     vence: 'DE POR VIDA',
@@ -175,6 +178,7 @@ export const CARNETS = {
 
     nombre: { m: 'Pariguayo', f: 'Pariguaya' },
     sujeto: { m: 'PARIGUAYO', f: 'PARIGUAYA' },
+    plural: { m: 'PARIGUAYOS', f: 'PARIGUAYAS' },
     hashtag: 'pariguayos',
     nivelEtiqueta: 'Nivel de flow',
     vence: 'DE POR VIDA',
@@ -277,8 +281,125 @@ export const CARNETS = {
       'CERO PASOS DADOS',
       'NINGUNO, PREGUNTE'
     ]
-  }
-};
+  },
+
+  bebedor: {
+    id: 'bebedor',
+
+    codigo: 'b',
+    prefijo: 'BEB',
+
+    slug: 'carnet-de-bebedor',
+    orden: 3,
+    buscar: [
+      'bebedor', 'bebedora', 'beber', 'tomar', 'trago', 'tragos',
+      'ron', 'cerveza', 'fria', 'jumo', 'botella', 'hielo', 'bebida'
+    ],
+
+    nombre: { m: 'Bebedor', f: 'Bebedora' },
+    sujeto: { m: 'BEBEDOR', f: 'BEBEDORA' },
+    plural: { m: 'BEBEDORES', f: 'BEBEDORAS' },
+    hashtag: 'bebedores',
+    nivelEtiqueta: 'Nivel de resistencia',
+    vence: 'DE VIERNES A DOMINGO',
+    invitacion: 'Invita a tus panas bebedores al club.',
+    titulo: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+
+    lema: 'BEBER · COMPARTIR · NO PELEAR',
+    cintilla: { m: 'Un Bebedor Certificado', f: 'Una Bebedora Certificada' },
+    citas: [
+      'El que bebe tranquilo, llega a su casa.',
+      'Una fría con los míos y de vuelta pa\' casa.'
+    ],
+    sello: [
+      'SIN PELEAR',
+      'PAGA LO SUYO',
+      'CON SU GRUPO',
+      'LLEGA A CASA'
+    ],
+
+    seo: {
+      titulo: 'Emite tu Carnet de Bebedor RD | Gratis y en 10 segundos',
+      descripcion: 'Bebo con los míos, no peleo y llego a mi casa. Emite tu Carnet de Bebedor con tu foto, gratis y sin dar datos personales. #teambebedores',
+      og: '/og.jpg'
+    },
+
+    portada: {
+      kicker: 'Ministerio de Bebedores · RD',
+      h1: 'Carnet de Bebedor',
+      sub: 'Una fría con los míos, sin líos y de vuelta a casa.'
+    },
+
+    titulos: {
+      oficial: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+      institucional: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+      crema: { m: 'CERTIFICADO DE BEBEDOR', f: 'CERTIFICADO DE BEBEDORA' },
+      hielo: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+      carbon: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+      candela: { m: 'CREDENCIAL DE BEBEDOR', f: 'CREDENCIAL DE BEBEDORA' },
+      solapin: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+      asodopa: { m: 'CERTIFICADO DE BEBEDOR', f: 'CERTIFICADO DE BEBEDORA' },
+      nocturno: { m: 'CARNET DE BEBEDOR', f: 'CARNET DE BEBEDORA' },
+      tricolor: { m: 'CERTIFICADO DE BEBEDOR', f: 'CERTIFICADO DE BEBEDORA' },
+      esmeralda: { m: 'CREDENCIAL DE BEBEDOR', f: 'CREDENCIAL DE BEBEDORA' }
+    },
+
+    // Una institución por estilo. No cambian con el género: son el
+    // nombre del organismo.
+    emisores: {
+      oficial: { nombre: 'Ministerio de Bebedores', siglas: 'MINBE' },
+      institucional: { nombre: 'Dirección General del Bebedaje', siglas: 'DGB' },
+      crema: { nombre: 'Instituto Nacional de la Fría', siglas: 'INAFRIA' },
+      hielo: { nombre: 'Comisión Nacional de Bebedores', siglas: 'CONABE' },
+      carbon: { nombre: 'Consejo Superior de Bebedores', siglas: 'CONSUBE' },
+      candela: { nombre: 'Registro Nacional de Bebedores', siglas: 'RENABE' },
+      solapin: { nombre: 'Federación Dominicana de Bebedores', siglas: 'FEDOBE' },
+      asodopa: { nombre: 'Asociación Dominicana de Bebedores', siglas: 'ASODOBE' },
+      nocturno: { nombre: 'Cámara Dominicana de Bebedores', siglas: 'CADOBE' },
+      tricolor: { nombre: 'Asociación Nacional de Bebedores', siglas: 'ANBE' },
+      esmeralda: { nombre: 'Junta Central de Bebedores', siglas: 'JCB' }
+    },
+
+    frases: {
+      oficial: 'Beber sin pelear también es un arte.',
+      institucional: { m: 'El que bebe tranquilo, llega a su casa.', f: 'La que bebe tranquila, llega a su casa.' },
+      crema: 'Aquí se bebe, no se pelea.',
+      hielo: 'Fría, buena compañía y punto.',
+      carbon: 'Bebo lo mío y pago lo mío.',
+      candela: 'Mi grupo, mi hielo, mi música.',
+      solapin: { m: 'No es un sueño, es un bebedor certificado.', f: 'No es un sueño, es una bebedora certificada.' },
+      asodopa: 'Mejor una fría con los míos que un lío en la calle.',
+      nocturno: 'Sin peleas, sin escándalo, sin llorar.',
+      tricolor: { m: "Pa' los bebedores de verdad.", f: "Pa' las bebedoras de verdad." },
+      esmeralda: { m: 'Tranquilo con mi fría, todo frío.', f: 'Tranquila con mi fría, todo frío.' }
+    },
+
+    condiciones: [
+      { m: 'BEBEDOR CERTIFICADO', f: 'BEBEDORA CERTIFICADA' },
+      { m: 'OFICIALMENTE BEBEDOR', f: 'OFICIALMENTE BEBEDORA' },
+      { m: 'BEBEDOR VERIFICADO', f: 'BEBEDORA VERIFICADA' },
+      { m: 'BEBEDOR DE PRIMERA', f: 'BEBEDORA DE PRIMERA' },
+      { m: 'BEBEDOR VITALICIO', f: 'BEBEDORA VITALICIA' },
+      { m: 'SOCIAL, NO PROBLEMÁTICO', f: 'SOCIAL, NO PROBLEMÁTICA' },
+      'AGUANTA LA NOCHE'
+    ],
+    oficios: [
+      'MANTENER LA FRÍA FRÍA',
+      'PONER LA MÚSICA',
+      'CUIDAR AL GRUPO',
+      'PAGAR LA PRIMERA RONDA',
+      'BUSCAR EL HIELO',
+      'LLEVAR A TODOS A SU CASA',
+      'CONTAR EL MISMO CUENTO'
+    ],
+    antecedentes: [
+      'NINGUNO, NI UNA PELEA',
+      { m: 'NUNCA HE MANEJADO BEBIDO', f: 'NUNCA HE MANEJADO BEBIDA' },
+      'CERO ESCÁNDALOS',
+      'SIEMPRE LLEGO A MI CASA',
+      'NINGUNO, PREGUNTE'
+    ]
+  }};
 
 // En el orden en que se enseñan.
 export const ORDEN_CARNETS = Object.values(CARNETS)

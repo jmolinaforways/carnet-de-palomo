@@ -513,6 +513,11 @@
   function sujeto(d)  { return d.sujeto || 'PALOMO'; }
   function selloDe(d) { return (d.sello && d.sello.length) ? d.sello : []; }
 
+  // Viene escrito en el registro. Antes se le sumaba una S al sujeto y
+  // salia «BEBEDORS RD»: en espanol las palabras acabadas en
+  // consonante hacen el plural en -es.
+  function pluralDe(d) { return d.plural || (sujeto(d) + 'S'); }
+
   // Concuerda con la persona. Cableado en ocho sitios, decia siempre
   // CERTIFICADO aunque el carnet fuera de una mujer.
   function certDe(d) { return d.certificado || 'CERTIFICADO'; }
@@ -819,6 +824,7 @@
       frase: t(c.frases[estilo] || c.frases.oficial),
       hashtag: c.hashtag,
       sujeto: t(c.sujeto),
+      plural: t(c.plural),
       certificado: gen === 'f' ? 'CERTIFICADA' : 'CERTIFICADO',
       lema: t(c.lema),
       cintilla: t(c.cintilla),
@@ -831,9 +837,12 @@
   }
 
   // Las diez combinaciones, en el orden en que se enseñan.
-  function catalogo() {
+  // Con un tipo, solo los de ese carnet. Sin el, todos: la portada
+  // ensena los del carnet elegido, que es lo que se esta mirando.
+  function catalogo(tipo) {
     var lista = [];
-    tiposDisponibles().forEach(function (t) {
+    var tipos = tipo ? [tipo] : tiposDisponibles();
+    tipos.forEach(function (t) {
       ORDEN.forEach(function (e) {
         lista.push({ tipo: t, estilo: e, nombre: ESTILOS[e].nombre, familia: ESTILOS[e].familia });
       });
@@ -890,7 +899,7 @@
     var emisor = data.emisor || 'Ministerio de Palomos';
     var titulo = data.titulo || 'CARNET DE PALOMO';
     var siglas = data.siglas || 'MINPAL';
-    var marca  = titulo.replace('CARNET DE ', '') + 'S';
+    var marca  = pluralDe(data);
 
     if (C.cabecera === 'banda') {
       if (C.bandaGrad) {
@@ -1401,7 +1410,7 @@
     /* corona y lema de arriba */
     drawCorona(ctx, 68, 62, 38, C.navy);
     ctx.fillStyle = C.navy2; ctx.font = font(700, 12);
-    tracked(ctx, "«PA' LOS " + sujeto(data) + 'S', 96, 56, 1.4);
+    tracked(ctx, "«PA' LOS " + pluralDe(data), 96, 56, 1.4);
     tracked(ctx, 'DE VERDAD»', 96, 74, 1.4);
 
     /* foto con cintilla */
@@ -1537,7 +1546,7 @@
 
     drawCorona(ctx, 62, 58, 34, C.navy);
     ctx.fillStyle = C.navy2; ctx.font = font(700, 12);
-    tracked(ctx, '«PA\' LOS ' + suj + 'S', 88, 52, 1.4);
+    tracked(ctx, '«PA\' LOS ' + pluralDe(data), 88, 52, 1.4);
     tracked(ctx, 'DE VERDAD»', 88, 70, 1.4);
 
     /* foto y cintilla con el nombre de pila */

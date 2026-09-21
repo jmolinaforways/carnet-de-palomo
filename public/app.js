@@ -88,7 +88,7 @@
     cont.innerHTML = '';
     if (puntos) { puntos.innerHTML = ''; }
 
-    var todos = window.Carnet.catalogo();
+    var todos = window.Carnet.catalogo(state.tipo);
     var laminas = Math.ceil(todos.length / POR_LAMINA);
 
     for (var i = 0; i < laminas; i++) {
@@ -387,19 +387,27 @@
 
     cont.innerHTML = '';
     lista.forEach(function (c) {
+      var nombre = window.Carnet.texto(c.nombre, 'm');
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'carnet-op' + (c.id === state.tipo ? ' elegido' : '');
-      b.textContent = window.Carnet.texto(c.nombre, 'm');
       b.setAttribute('aria-pressed', c.id === state.tipo ? 'true' : 'false');
+      b.setAttribute('aria-label', 'Carnet de ' + nombre);
+
+      // Cada uno se ve, no solo se lee. El estilo que sale de muestra es
+      // el primero, que es el que la gente reconoce.
+      b.innerHTML =
+        '<span class="carnet-mini"><img alt="" src="' + miniatura(c.id, 'oficial', 0.3) + '"></span>' +
+        '<span class="carnet-nom">' + nombre + '</span>';
+
       b.addEventListener('click', function () { elegirCarnet(c.id); });
       cont.appendChild(b);
     });
 
     if ($('sinCarnets')) { $('sinCarnets').hidden = lista.length > 0; }
 
-    // La caja de busqueda solo estorba mientras haya pocos.
-    if ($('buscaCaja')) { $('buscaCaja').hidden = carnetsDisponibles().length < 7; }
+    // Siempre visible: con tres carnets sobra, pero la lista va a
+    // crecer y aprender donde esta el buscador tiene que costar una vez.
   }
 
   function elegirCarnet(id) {
@@ -816,9 +824,13 @@
       if (pista) { pista.textContent = 'Este es el tuyo, ya con tu cara y tu nombre.'; }
     }
 
+    // Una primera pasada para que la lista este desde el principio, y
+    // otra cuando lleguen las fuentes: las miniaturas se dibujan con
+    // ellas, y la primera vez todavia no estan.
     pintarCarnets();
 
     loadFonts().then(function () {
+      pintarCarnets();
       pintarSlider();
       // elegirFamilia y no pintarSelector: el diseno de salida es
       // aleatorio y su pestana de formato tiene que venir marcada.
