@@ -739,58 +739,79 @@
     ctx.restore();
   }
 
-  // Un motor calibrando: la rueda de delante levantada. Es la estampa
-  // del wawawa y de lejos se reconoce por la inclinacion.
+  // Un motor calibrando.
   //
-  // Va gorda y compacta a proposito. Al primer intento los trazos eran
-  // finos y se perdian a treinta y siete pixeles, y el manubrio subia
-  // tanto que la corona de la marca le caia encima.
+  // Se dibuja de perfil, derecha, y luego se GIRA entera apoyada en la
+  // rueda de atras. Inclinar cada pieza por separado -que fue el primer
+  // intento- da un monton de palitos sueltos que no parecen una moto.
+  //
+  // Y va maciza, no de trazos: a treinta y siete pixeles una silueta
+  // llena se reconoce y unas lineas finas no.
   function drawMoto(ctx, cx, cy, s, fill) {
     var k = s / 100;
     ctx.save();
     ctx.translate(cx, cy);
     ctx.scale(k, k);
-    ctx.strokeStyle = fill;
+
+    // Mas grande y algo mas abajo: en el aro quedaba chica y el
+    // manubrio se metia debajo de la corona de la marca.
+    ctx.translate(0, 8);
+    ctx.scale(1.18, 1.18);
+
+    // el caballito: girar sobre el punto donde la rueda trasera toca
+    ctx.translate(-28, 40);
+    ctx.rotate(-0.42);
+    ctx.translate(28, -40);
+
     ctx.fillStyle = fill;
+    ctx.strokeStyle = fill;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // rueda de atras, apoyada
-    ctx.lineWidth = 14;
+    // cuerpo: motor, tanque y asiento de una pieza
     ctx.beginPath();
-    ctx.arc(-30, 22, 22, 0, Math.PI * 2);
+    ctx.moveTo(-50, 2);
+    ctx.lineTo(-10, -4);
+    ctx.quadraticCurveTo(4, -18, 20, -15);
+    ctx.lineTo(30, 2);
+    ctx.lineTo(20, 20);
+    ctx.lineTo(-18, 20);
+    ctx.closePath();
+    ctx.fill();
+
+    // la horquilla hasta la rueda de delante
+    ctx.lineWidth = 9;
+    ctx.beginPath();
+    ctx.moveTo(24, -12);
+    ctx.lineTo(36, 18);
     ctx.stroke();
 
-    // rueda de delante, en el aire
+    // el manubrio, corto: es lo que subia hasta la corona
+    ctx.lineWidth = 8;
     ctx.beginPath();
-    ctx.arc(30, -10, 20, 0, Math.PI * 2);
+    ctx.moveTo(22, -14);
+    ctx.lineTo(27, -28);
+    ctx.stroke();
+    ctx.lineWidth = 9;
+    ctx.beginPath();
+    ctx.moveTo(16, -31);
+    ctx.lineTo(38, -25);
     ctx.stroke();
 
-    // el cuerpo, subiendo de atras adelante
-    ctx.lineWidth = 15;
-    ctx.beginPath();
-    ctx.moveTo(-30, 22);
-    ctx.lineTo(-2, 4);
-    ctx.lineTo(22, -8);
-    ctx.stroke();
-
-    // el asiento
-    ctx.lineWidth = 17;
-    ctx.beginPath();
-    ctx.moveTo(-38, 2);
-    ctx.lineTo(-10, -7);
-    ctx.stroke();
-
-    // el manubrio, corto para dejarle sitio a la corona
-    ctx.lineWidth = 11;
-    ctx.beginPath();
-    ctx.moveTo(15, -11);
-    ctx.lineTo(21, -27);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(11, -30);
-    ctx.lineTo(32, -25);
-    ctx.stroke();
+    // las ruedas, macizas con el centro en hueco
+    function rueda(x, y, fuera, dentro) {
+      ctx.beginPath();
+      ctx.arc(x, y, fuera, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, dentro, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    rueda(-30, 18, 24, 11);
+    rueda(36, 18, 21, 9);
 
     ctx.restore();
   }
